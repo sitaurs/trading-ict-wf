@@ -7,8 +7,15 @@ const log = getLogger('PromptBuilders');
 
 async function getPrompt(filename) {
     const promptPath = path.join(__dirname, '..', '..', 'prompts', filename);
-    const content = await fs.readFile(promptPath, 'utf8');
-    return content;
+    
+    try {
+        log.info(`Loading prompt: ${filename}`);
+        const content = await fs.readFile(promptPath, 'utf8');
+        return content;
+    } catch (error) {
+        log.error(`Failed to load prompt ${filename}:`, error);
+        throw new Error(`Prompt loading failed: ${error.message}`);
+    }
 }
 
 async function prepareStage1Prompt(pair, ohlcvData) {
@@ -56,68 +63,94 @@ async function prepareHoldClosePrompt(pair, ohlcvData, tradeDetails = null, curr
 
 // Helper functions untuk data pasar
 async function getChartImages(pair, timeframes = ['H4', 'H1', 'M15']) {
-    const images = [];
-    const apiKeys = [
-        process.env.CHART_IMG_KEY_1,
-        process.env.CHART_IMG_KEY_2,
-        process.env.CHART_IMG_KEY_3
-    ].filter(key => key);
-
-    let keyIndex = 0;
-
-    for (const tf of timeframes) {
-        try {
-            const apiKey = apiKeys[keyIndex % apiKeys.length];
-            const url = `https://api.chart-img.com/v2/tradingview/advanced-chart`;
-            
-            const response = await axios.get(url, {
-                params: {
-                    symbol: `FX:${pair}`,
-                    interval: tf,
-                    studies: 'ATR@tv-basicstudies',
-                    format: 'webp',
-                    width: 1280,
-                    height: 720,
-                    key: apiKey
-                },
-                responseType: 'arraybuffer',
-                timeout: 30000
-            });
-
-            const base64 = Buffer.from(response.data).toString('base64');
-            images.push(base64);
-            keyIndex++;
-            
-            log.debug(`Chart image acquired for ${pair} ${tf}`);
-            
-        } catch (error) {
-            log.error(`Failed to get chart image for ${pair} ${tf}:`, error.message);
+    try {
+        // Use the helper function from helpers.js which has proven working implementation
+        const { getChartImages: helpersGetChartImages } = require('./helpers');
+        const chartData = await helpersGetChartImages(pair);
+        
+        if (chartData && chartData.images && chartData.images.length > 0) {
+            // Convert buffer images to base64
+            const base64Images = chartData.images.map(buffer => buffer.toString('base64'));
+            log.debug(`Successfully got ${base64Images.length} chart images for ${pair}`);
+            return base64Images;
+        } else {
+            log.warn(`No chart images received for ${pair}, continuing without images`);
+            return [];
         }
+    } catch (error) {
+        log.error(`Failed to get chart images for ${pair}:`, error.message);
+        // Continue without images rather than failing completely
+        return [];
     }
-
-    return images;
 }
 
 async function fetchOhlcv(pair) {
-    // Placeholder implementation - ganti dengan API data yang sesuai
     try {
-        // Simulasi data OHLCV
-        const mockData = {
-            pair,
-            timeframe: 'M15',
-            data: [
-                { time: '2024-01-24T10:00:00Z', open: 1.2345, high: 1.2367, low: 1.2340, close: 1.2355, volume: 1000 },
-                { time: '2024-01-24T10:15:00Z', open: 1.2355, high: 1.2370, low: 1.2348, close: 1.2365, volume: 1200 }
-            ]
-        };
+        // Use the MT5 API from helpers.js
+        const { fetchOhlcv: helpersFetchOhlcv } = require('./helpers');
         
-        log.debug(`OHLCV data fetched for ${pair}`);
-        return mockData;
+        // Fetch real OHLCV data using MT5 API
+        const ohlcvData = await helpersFetchOhlcv(pair, 'm15', 50);
+        
+        if (ohlcvData && ohlcvData.length > 0) {
+            log.debug(`Real OHLCV data fetched for ${pair}: ${ohlcvData.length} candles`);
+            return {
+                pair,
+                timeframe: 'M15',
+                data: ohlcvData,
+                count: ohlcvData.length,
+                source: 'MT5_API'
+            };
+        } else {
+            // Fallback to mock data if API fails
+            log.warn(`No OHLCV data received for ${pair}, using mock data`);
+            return getMockOhlcvData(pair);
+        }
         
     } catch (error) {
-        log.error(`Failed to fetch OHLCV for ${pair}:`, error.message);
-        return { pair, timeframe: 'M15', data: [] };
+        log.error(`Failed to fetch OHLCV for ${pair}:`, {
+            error: error.message,
+            statusCode: error.response?.status,
+            responseData: error.response?.data,
+            stack: error.stack
+        });
+        
+        // Always fallback to mock data to prevent complete failure
+        log.info(`Using mock data for ${pair} due to API failure`);
+        return getMockOhlcvData(pair);
     }
+}
+
+function getMockOhlcvData(pair) {
+    // Generate more realistic mock data with proper price ranges
+    const basePrice = pair.includes('JPY') ? 150.00 : 1.0800;
+    const data = [];
+    
+    for (let i = 0; i < 50; i++) {
+        const variance = (Math.random() - 0.5) * 0.01;
+        const open = basePrice + variance;
+        const close = open + (Math.random() - 0.5) * 0.005;
+        const high = Math.max(open, close) + Math.random() * 0.002;
+        const low = Math.min(open, close) - Math.random() * 0.002;
+        
+        data.push({
+            time: new Date(Date.now() - (50 - i) * 15 * 60 * 1000).toISOString(),
+            open: parseFloat(open.toFixed(5)),
+            high: parseFloat(high.toFixed(5)),
+            low: parseFloat(low.toFixed(5)),
+            close: parseFloat(close.toFixed(5)),
+            volume: Math.floor(Math.random() * 2000) + 500
+        });
+    }
+    
+    return {
+        pair,
+        timeframe: 'M15',
+        data,
+        count: data.length,
+        source: 'MOCK_DATA',
+        isMockData: true
+    };
 }
 
 module.exports = { 

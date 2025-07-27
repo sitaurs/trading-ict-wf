@@ -23,11 +23,20 @@ if (!fs.existsSync(SESSION_DIR)) {
  * @returns {Promise<object>} Instance socket Baileys yang aktif.
  */
 async function startWhatsAppClient(onSocketUpdate) {
+    log.info('🚀 Memulai WhatsApp client', { 
+        sessionDir: SESSION_DIR,
+        timestamp: new Date().toISOString()
+    });
+    
     // Menggunakan MultiFileAuthState untuk menyimpan kredensial login
     const { state, saveCreds } = await useMultiFileAuthState(SESSION_DIR);
     const { version, isLatest } = await fetchLatestBaileysVersion();
     
-    log.info(`Menggunakan Baileys v${version.join('.')}, Versi Terbaru: ${isLatest}`);
+    log.info(`📱 Menggunakan Baileys v${version.join('.')}, Versi Terbaru: ${isLatest}`, { 
+        version: version.join('.'), 
+        isLatest,
+        timestamp: new Date().toISOString()
+    });
 
     const sock = makeWASocket({
         version,
@@ -36,22 +45,44 @@ async function startWhatsAppClient(onSocketUpdate) {
         browser: ['Trading', 'Chrome', '1.0.0'], // Nama yang akan muncul di "Perangkat Tertaut"
     });
 
+    log.debug('🔌 Socket WhatsApp dibuat', { 
+        socketId: sock.user?.id,
+        browser: ['Trading', 'Chrome', '1.0.0'],
+        timestamp: new Date().toISOString()
+    });
+
     // Informasikan socket baru ke pemanggil
     if (typeof onSocketUpdate === 'function') {
+        log.debug('📢 Menginformasikan socket update ke callback', { 
+            hasCallback: true,
+            timestamp: new Date().toISOString()
+        });
         onSocketUpdate(sock);
+    } else {
+        log.warn('⚠️ Tidak ada callback untuk socket update', { 
+            onSocketUpdate: typeof onSocketUpdate
+        });
     }
 
     // Listener untuk menangani update koneksi (QR code, terhubung, terputus, dll.)
     sock.ev.on('connection.update', (update) => {
         const { connection, lastDisconnect, qr } = update;
 
+        log.debug('🔄 Connection update received', { 
+            connection, 
+            hasQr: !!qr, 
+            hasDisconnect: !!lastDisconnect,
+            timestamp: new Date().toISOString()
+        });
+
         if (connection === 'close') {
             const error = new Boom(lastDisconnect?.error)?.output?.statusCode;
 
-            log.error('Koneksi terputus karena:', { 
+            log.error('❌ Koneksi terputus', { 
                 error: lastDisconnect?.error?.message || lastDisconnect?.error, 
                 statusCode: error,
                 stack: lastDisconnect?.error?.stack,
+                disconnectReason: lastDisconnect?.error?.output?.payload?.error,
                 timestamp: new Date().toISOString()
             });
 

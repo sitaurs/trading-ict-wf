@@ -1,0 +1,311 @@
+﻿Strategi PO3 (Power of Three) dalam Trading Forex
+Power of Three (PO3) adalah sebuah konsep strategi trading yang dipopulerkan oleh Michael J. Huddleston
+(Inner Circle Trader/ICT). Strategi ini membagi pergerakan harga menjadi tiga fase utama –  Accumulation
+(Akumulasi),  Manipulation  (Manipulasi),  dan  Distribution  (Distribusi) –  sering  disingkat  sebagai  AMD 1 .
+Tujuan  dari  PO3  adalah  mengikuti  jejak  “smart  money” (institusi  besar)  dan  memanfaatkan  pola
+pergerakan harga yang mereka ciptakan,  sambil  menghindarkan trader  dari  jebakan pergerakan palsu
+yang sering membuat rugi trader ritel 2 .  Dengan memahami tiga fase tersebut, trader bisa mengatur
+timing entri dan exit yang lebih tepat, selaras dengan arah pergerakan pasar sebenarnya.
+
+Pengertian dan Tujuan Strategi PO3
+PO3 merupakan model trading yang berusaha mengungkap “trik” pergerakan pasar yang biasa dilakukan
+oleh pelaku institusi besar. Intinya, strategi ini membantu trader mengidentifikasi fase-fase pergerakan
+harga yang didorong oleh aksi  institusi,  sehingga trader ritel  dapat  mengambil  posisi  searah dengan
+institusi  tersebut  daripada  terjebak  oleh  pergerakan semu 2 .  Dalam praktiknya,  strategi  PO3 dipakai
+untuk membaca kapan smart money sedang mengakumulasi posisi, kapan mereka memanipulasi harga
+(misalnya  dengan  stop  hunt atau  false  breakout),  dan  kapan  mereka  mendistribusikan atau  melepas
+posisinya sehingga terjadi pergerakan trend sesungguhnya. Dengan kata lain, fungsi utama PO3 adalah
+mengikuti jejak smart money untuk menangkap pergerakan besar  sekaligus menghindari entry di area
+yang rawan jebakan false breakout.
+
+Strategi PO3 tidak bergantung pada indikator teknikal khusus, melainkan pada pemahaman struktur pasar
+dan price action. Meski begitu, konsep ini  universal dan dapat diterapkan di berbagai instrumen (forex,
+saham, kripto, dll) serta  berlaku di semua timeframe 3 .  Selanjutnya akan dijelaskan komponen fase-
+fasenya dan cara menerapkannya langkah demi langkah.
+
+Fase-Fase Utama PO3
+PO3  terdiri  dari  tiga  fase  berurutan  yang  selalu  terjadi  secara  bergantian  dalam  sebuah  skenario
+Accumulation → Manipulation → Distribution. Berikut penjelasan tiap fase:
+
+1. Fase Akumulasi (Accumulation Phase)
+
+Contoh fase  Akumulasi: Harga bergerak dalam rentang sempit (konsolidasi) sebelum terjadi pergerakan besar
+berikutnya. 4
+
+Fase akumulasi ditandai dengan konsolidasi harga dalam kisaran sempit. Ini merupakan periode di mana
+smart money mulai membangun posisi besarnya secara bertahap tanpa memicu pergerakan harga besar
+
+5 . Pada fase ini, volatilitas rendah dan candle cenderung kecil; harga “terkunci” dalam range terbatas.
+Efek dari konsolidasi ini adalah terbentuknya banyak pesanan stop-loss di kedua sisi range tersebut: trader
+yang  mengantisipasi  bullish menaruh  stop-loss  di  bawah  support  range,  sedangkan  yang  bearish
+
+1
+
+
+
+menaruh stop-loss di atas resistance range 6 . Area konsolidasi inilah yang kelak menyediakan likuiditas
+bagi pergerakan berikutnya. Bagi trader, tanda fase akumulasi adalah ketika price action tampak datar dan
+range-bound (harga bolak-balik di area sempit tanpa arah jelas).
+
+2. Fase Manipulasi (Manipulation Phase)
+
+Contoh fase  Manipulasi: Terjadi  false breakout (jebolan palsu) di atas/bawah area konsolidasi untuk menyapu
+likuiditas sebelum berbalik arah. 7
+
+Fase manipulasi adalah gerakan harga palsu yang sengaja melampaui batas atas atau bawah dari range
+akumulasi.  Pergerakan  ini  biasanya  cepat  dan  berlawanan dengan  arah  pergerakan  utama  yang
+diharapkan. Tujuannya adalah  menjebak trader ritel dan menciptakan likuiditas bagi pelaku besar 8 .
+Contohnya,  jika sebelumnya pasar dalam akumulasi  dan banyak trader memasang posisi  buy di  dalam
+range,  maka institusi  akan mendorong harga  turun menembus support range tersebut  (breakout  ke
+bawah) untuk menghantam stop-loss para buyer, sekaligus memancing trader breakout sell masuk posisi.
+Sebaliknya, jika banyak yang sell di dalam range, harga akan didorong naik sedikit melampaui resistance
+untuk mengambil stop-loss penjual dan mengundang breakout buyer masuk 7 . Inilah yang disebut juga
+stop hunting. Fase manipulasi sering kali terjadi berbarengan dengan news penting atau pembukaan sesi
+pasar besar (misal  awal sesi  London/New York),  sehingga pergerakannya tiba-tiba dan penuh  spike 9 .
+Bagi trader yang tidak waspada, pergerakan ini tampak seperti breakout nyata, padahal hanya sementara
+sebelum harga berbalik arah. 
+
+Ciri-ciri  Manipulasi: biasanya berlangsung singkat,  ditandai  wick candle yang panjang keluar dari  area
+konsolidasi lalu kembali lagi, dan sering terjadi peningkatan volume sesaat. Intinya, fase ini menciptakan
+jebakan dan mengumpulkan order para trader ritel yang salah sisi, yang nantinya akan dimanfaatkan oleh
+smart money pada fase selanjutnya.
+
+3. Fase Distribusi (Distribution Phase)
+
+Contoh fase  Distribusi:  Setelah menyapu likuiditas lewat manipulasi,  harga bergerak kuat ke arah sebaliknya
+ketika smart money mendorong harga ke targetnya. 10
+
+Fase  distribusi  adalah  fase  pergerakan  sesungguhnya dari  strategi  PO3  –  di  sinilah  smart  money
+menjalankan niat  aslinya setelah mengumpulkan cukup posisi  pada dua fase sebelumnya.  Setelah fase
+manipulasi selesai dan likuiditas terkumpul, institusi mulai  mendorong harga berlawanan arah dengan
+gerakan manipulasi  tadi,  sesuai dengan posisi  yang telah mereka akumulasi 11 .  Hasilnya, terjadi trend
+atau  impulsive move yang kuat. Pada fase distribusi bullish, misalnya, harga akan melonjak naik dengan
+cepat; pada distribusi bearish, harga akan turun tajam. Biasanya fase ini ditandai candle besar searah trend,
+volume  tinggi,  dan  breakout  sebenarnya menembus  level-level  kunci  (melampaui  high/low  dari  fase
+akumulasi/manipulasi) 12 13 .  Fase  distribusi  juga  disebut  sebagai  fase  “markup” atau  “expansion”
+(ekspansi)  karena  pasar  bergerak  memperluas  range  menuju  level  target  baru.  Trader  ritel  yang
+sebelumnya terjebak sering kali panik dan berusaha mengejar ketinggalan dengan ikut masuk searah trend
+pada fase ini, yang ironisnya berarti mereka membeli dari smart money yang justru mulai merealisasikan
+profitnya. 
+
+Pada  intinya,  fase  distribusi  adalah  momen  terbaik  untuk  meraih  profit sesuai  arah  smart  money.
+Strategi  PO3 mengajarkan kita  agar  masuk setelah manipulasi dan  ikut  dalam gerakan distribusi  ini
+
+2
+
+
+
+daripada terjebak sebelum waktunya. Fase distribusi biasanya berlanjut hingga momentum mulai habis
+dan kembali muncul konsolidasi baru, menandai siklus PO3 berikutnya.
+
+Langkah-Langkah Trading dengan Strategi PO3
+Bagaimana  menerapkan  strategi  PO3  dalam  praktik  trading?  Berikut  panduan  step-by-step yang  bisa
+diikuti, termasuk penerapan multi-timeframe, entri, dan exit:
+
+1. Tentukan Bias Arah (Market Bias) – Sebelum mencari setup PO3, tentukan terlebih dahulu  bias
+arah pasar secara  higher timeframe.  Analisis kerangka waktu tinggi (misal: daily atau H4) untuk
+melihat tren utama atau kecenderungan candle selanjutnya 14 . Dengan mengetahui apakah bias
+harian cenderung  bullish atau  bearish, Anda punya landasan untuk mengantisipasi arah distribusi
+nantinya.  Sebagai  contoh,  jika  tren jangka tinggi  bullish,  Anda akan fokus mencari  peluang  buy
+(distribusi  naik)  sehingga  fase  manipulasi  yang  diwaspadai  adalah  penurunan  sementara.
+Menentukan bias ini penting, namun tetap fleksibel jika ada perubahan struktur pasar.
+
+2. Identifikasi  Fase  Akumulasi  (Range  Konsolidasi) –  Beralih  ke  timeframe  lebih  rendah  (misal:
+intraday  1  jam,  15  menit,  atau  sesuai  gaya  trading  Anda)  untuk  menemukan  area  konsolidasi
+sebagai calon fase akumulasi. Cari segmen grafik di mana harga bergerak sideways dalam range
+sempit  dengan  level  high dan  low yang  jelas.  Pada  forex  intraday,  sering  kali  range  sesi  Asia
+berfungsi sebagai fase akumulasi, terutama untuk pair mayor non-JPY/AUD, karena volume sesi Asia
+relatif  rendah sehingga harga cenderung mendatar 15 .  Tandai  batas atas  (resistance)  dan batas
+bawah (support) dari range ini – di sinilah banyak likuiditas (stop-loss) menumpuk di kedua sisinya.
+Pastikan range cukup jelas dan telah berlangsung cukup lama untuk dianggap akumulasi  (misal
+beberapa jam untuk intraday, atau beberapa hari untuk setup harian/mingguan).
+
+3. Pantau Terjadinya Fase Manipulasi – Bersabarlah menunggu harga menembus keluar dari range
+akumulasi tadi. Inilah fase manipulasi, di mana harga akan melakukan false breakout ke salah satu
+sisi  range. Perhatikan arah breakout ini relatif  terhadap bias yang telah Anda tetapkan. Jika bias
+Anda  bullish,  seringkali  manipulasi  akan  muncul  sebagai  breakout  turun (harga  menjebol
+sementara  support  range  akumulasi)  untuk  mengambil  stop-loss  para  buyer  sebelum  nantinya
+berbalik naik. Sebaliknya, jika bias bearish, manipulasi kemungkinan berupa breakout naik sedikit
+di  atas  resistance  range  lalu  berbalik  turun.  Catat  bahwa  saat  fase  manipulasi  terjadi,  jangan
+langsung melawan;  biarkan harga menyelesaikan aksinya menyapu likuiditas.  Tanda manipulasi
+berakhir biasanya ketika pergerakan palsu itu gagal lanjut (misal: candle berikutnya kembali masuk
+ke dalam range atau terjadi  rejection kuat).  Pada tahap ini,  perhatian utama adalah mengamati
+reaksi harga setelah false breakout: apakah harga langsung balik arah masuk range lagi? Apakah
+muncul pola pembalikan (seperti pin bar, engulfing) di sekitar level ekstrim tadi? Ini pertanda awal
+bahwa fase manipulasi usai dan fase distribusi siap dimulai.
+
+4. Konfirmasi Pembalikan & Lakukan Entri Posisi – Setelah melihat tanda bahwa manipulasi selesai,
+siapkan strategi masuk posisi untuk menunggangi fase distribusi.  Entri dilakukan setelah harga
+menunjukkan konfirmasi berbalik arah dari gerakan manipulasi. Cara umumnya: tunggu harga
+kembali masuk ke dalam range akumulasi atau menembus sisi range yang berlawanan dengan
+arah manipulasi tadi 16 . Misal, pada skenario bullish – harga awalnya jatuh (manipulasi) menembus
+support range, lalu berbalik naik lagi.  Entry  buy dapat dilakukan ketika candle  menutup di atas
+level  low  range (masuk  kembali  ke  atas  support  konsolidasi) 17 .  Ini  mengonfirmasi  bahwa
+
+3
+
+
+
+breakout turun tadi memang palsu dan sekarang harga siap distribusi naik. Sebaliknya untuk setup
+bearish, entry sell dilakukan setelah harga berbalik turun dan menutup di bawah level high range
+konsolidasi 18 .  Beberapa  trader  agresif  bisa  masuk  tepat  saat  harga  kembali  ke  dalam  range,
+namun yang lebih konservatif menunggu break of structure kecil atau candle konfirmasi pembalikan
+di  timeframe  entry  (contoh:  ada  change  of  character  (ChoCH) di  M5/M15  menandai  reversal
+struktur 19 ). Intinya, pastikan Anda tidak entry selama fase manipulasi berlangsung, melainkan
+setelah pergerakan berbalik arah menunjukkan distribusi dimulai. 
+
+5. Atur  Stop Loss dan  Target  Profit –  Segera setelah entri,  tentukan level  pengaman dan target.
+Strategi PO3 menganjurkan menempatkan Stop Loss (SL) tepat di luar level ekstrem yang terbentuk
+pada fase manipulasi. Artinya, untuk posisi buy/bullish, pasang SL di low terendah saat manipulasi
+(di  bawah  wick  terendah  false  break);  untuk  posisi  sell/bearish,  pasang  SL  di  high  tertinggi
+manipulasi 20 . Level ini logis karena jika harga kembali menembus titik tersebut, berarti skenario
+PO3  gagal.  Selanjutnya  tetapkan  Target  Profit  (TP).  Sebagai  panduan  konservatif,  target  bisa
+dipatok pada rasio minimal 1:2 dari risk:reward 20  – misalnya jika SL 20 pip, TP sekitar 40 pip. TP
+idealnya disesuaikan dengan struktur market: bisa pada level likuiditas signifikan berikutnya di arah
+distribusi  (contoh:  di  dekat  high/low penting terdekat,  area  supply/demand,  atau FVG terdekat).
+Anda juga dapat menggunakan  trailing stop atau mengambil partial profit jika pergerakan sangat
+kuat,  namun  pastikan  mengamankan  profit saat  fase  distribusi  menunjukkan  tanda-tanda
+melemah. 
+
+6. Monitoring Fase Distribusi – Setelah masuk, biarkan perdagangan berjalan sesuai rencana. Amati
+perkembangan fase distribusi: pada umumnya pergerakan trend akan berlanjut hingga mendekati
+sesi pasar berikutnya atau muncul zona konsolidasi baru. Jika Anda melewatkan entri tepat setelah
+manipulasi,  masih ada peluang masuk saat  pullback kecil  di  tengah fase distribusi  (misal  harga
+retrace ke level tertentu lalu melanjutkan trend) 21 ,  namun biasanya dengan potensi  risk/reward
+lebih  kecil.  Hindari  masuk  terlambat  di  akhir  distribusi  karena  risikonya  harga  berbalik  arah.
+Disiplinlah dengan SL dan TP yang sudah ditetapkan di langkah 5 – jangan tergoda menggeser SL ke
+arah yang lebih lebar (memperbesar risiko). Strategi PO3 bekerja baik jika dijalankan secara disiplin
+sesuai rule fase-fasenya.
+
+Dengan  langkah-langkah  di  atas,  Anda  telah  menerapkan  PO3:  mengenali  konsolidasi  (akumulasi),
+bersabar  menunggu  stop-hunt  (manipulasi),  lalu  masuk  mengikuti  arus  smart  money pada  distribusi
+dengan manajemen risiko yang jelas. Berikut ini contoh ilustrasi nyata pola PO3 pada kondisi bullish dan
+bearish untuk memperjelas penerapannya.
+
+Contoh Ilustrasi Strategi PO3
+Untuk membantu pemahaman, perhatikan dua contoh skenario PO3 berikut – satu bullish setup dan satu
+bearish setup. Masing-masing contoh menunjukkan bagaimana fase Akumulasi, Manipulasi, dan Distribusi
+teridentifikasi pada grafik, serta di mana titik entry, stop loss, dan target diambil.
+
+Contoh Setup Bullish (PO3 Bullish)
+
+Contoh PO3 Bullish: Terlihat area Akumulasi (kuning) di mana harga berkonsolidasi. Lalu terjadi Manipulasi
+(merah)  ketika  harga  false  break menembus  low konsolidasi  (stop-hunt  ke  bawah).  Setelah  itu,  harga
+berbalik naik memasuki fase Distribusi (hijau) sesuai arah bullish yang diinginkan smart money. Entri buy
+
+4
+
+
+
+dikonfirmasi saat candle menutup di atas batas bawah range akumulasi (setelah kembali ke dalam range)
+17 . Stop-loss ditempatkan sedikit di bawah low manipulasi (ujung wick merah), dan target profit diatur
+
+sekitar dua kali  jarak SL (rasio 1:2) 17 .  Hasilnya, harga bergerak impulsif  ke atas sesuai fase distribusi,
+memungkinkan trader meraih profit maksimal dengan risiko minimal yang telah terkontrol.
+
+Contoh Setup Bearish (PO3 Bearish)
+
+Contoh  PO3  Bearish:  Area  konsolidasi  Akumulasi ditandai  warna  kuning  (harga  sideways).  Kemudian
+Manipulasi (merah) terjadi sebagai lonjakan  false breakout ke atas melewati  high range, menyapu stop
+trader  yang sell  di  atas  resistance.  Segera  setelah  itu,  harga  berbalik  turun memasuki  fase  Distribusi
+bearish (zona hijau bawah).  Entri  sell dilakukan ketika harga  kembali  turun menembus batas bawah
+range akumulasi (candle close di bawah support konsolidasi) 18 , mengonfirmasi pergerakan turun yang
+sesungguhnya.  Stop-loss diletakkan tepat  di  atas  puncak manipulasi (high tertinggi  pada false  break
+merah), sementara target profit dipasang sekitar dua kali jarak SL atau pada level low signifikan berikutnya
+
+18 . Benar saja, harga meluncur turun kencang dalam fase distribusi, sehingga posisi sell tersebut berhasil
+mencapai target dengan rasio profit/risk yang optimal.
+
+(Pada kedua ilustrasi di atas, fase akumulasi diberi highlight kuning, fase manipulasi merah, dan fase distribusi
+hijau. Strategi PO3 menyarankan trader masuk setelah manipulasi dan keluar sebelum distribusi selesai, sesuai
+contoh.)
+
+Tips Penerapan pada Berbagai Kondisi Pasar dan Timeframe
+Strategi Power of Three dapat diaplikasikan di berbagai kondisi market, mulai dari intraday hingga skala
+mingguan. Berikut beberapa tips implementasinya di beragam situasi:
+
+• Multi-Timeframe  Analysis: Seperti  disinggung  pada  langkah  1,  PO3  sangat  efektif  bila
+dikombinasikan  dengan  analisis  multi-timeframe.  Timeframe  tinggi  (daily/4H)  digunakan  untuk
+menentukan  bias  dan  konteks  (apakah  market  cenderung  trending  atau  reversal),  sedangkan
+timeframe rendah (H1 ke bawah) untuk mengeksekusi entri PO3. Misalnya, jika daily bias bullish,
+carilah  pola  PO3  bullish  di  intraday  (akumulasi  +  manipulasi  turun  kecil  lalu  distribusi  naik).
+Sebaliknya jika bias high timeframe bearish, prioritaskan mencari setup PO3 bearish di timeframe
+rendah. Pendekatan ini selaras dengan saran ICT bahwa trader memulai dengan bias harian, lalu
+menandai harga pembukaan hari sebagai referensi untuk mendeteksi manipulasi (harga biasanya
+akan bergerak di bawah pembukaan harian untuk bias bullish, atau di atas pembukaan harian untuk
+bias bearish sebelum berbalik) 22 23 . Dengan multi-timeframe, sinyal PO3 Anda akan lebih terfilter
+dan searah tren yang lebih besar.
+
+• Sesi Pasar dan Waktu Rilis Berita: Kondisi market berbeda di setiap sesi trading, dan hal ini dapat
+dimanfaatkan  dalam  PO3.  Seperti  disebutkan  sebelumnya,  sesi  Asia kerap  merupakan  waktu
+akumulasi (pergerakan lambat, range sempit) untuk banyak pasangan mata uang 15 .  Kemudian,
+menjelang atau saat pembukaan sesi London, sering muncul fase manipulasi (karena volume tiba-
+tiba melonjak, likuiditas Asia diambil). Fase distribusi biasanya berlangsung sepanjang sesi London
+hingga awal sesi  New York,  ketika tren utama hari itu berjalan. Selain itu,  pengumuman berita
+penting (misal suku bunga, NFP) sering bertindak sebagai trigger manipulasi – harga bisa spike ke
+satu arah saat  berita  rilis  (stop hunt),  lalu  berbalik  melanjutkan trend semula.  Trader  sebaiknya
+
+5
+
+
+
+menghindari entry sebelum event berita besar dan menunggu reaksi pasca berita untuk melihat
+apakah skenario PO3 terbentuk.
+
+• Kondisi  Trending  vs  Ranging: PO3  paling  bermanfaat  pada  hari  atau  pekan  di  mana  terjadi
+pergerakan trending yang jelas (karena itu berarti ada intent distribusi dari smart money). Dalam
+market  yang  ranging besar  (sideways  berkepanjangan  tanpa  trend),  pola  PO3  mungkin  kurang
+menonjol atau distribusinya tidak jauh bergerak. Oleh sebab itu, mengenali konteks trend makro
+penting – misal dalam mingguan (weekly), seringkali awal pekan cenderung lambat, lalu di tengah
+pekan terjadi pergerakan besar terarah (distribusi) setelah high/low awal pekan terbentuk. Jika pasar
+global sedang sepi katalis, trader perlu lebih selektif karena manipulasi bisa gagal menghasilkan
+distribusi yang signifikan. 
+
+• Latihan Identifikasi Pola: Setiap trader sebaiknya melatih mata untuk mengenali pola akumulasi-
+manipulasi-distribusi di histori chart. Pola ini dapat muncul di timeframe apapun 3 , jadi cobalah
+amati chart 5M, 15M, H1, Daily, bahkan Weekly untuk melihat bagaimana PO3 berulang. Dengan
+latihan, Anda akan mulai melihat signature PO3: misalnya, candle harian bullish yang khas biasanya
+memiliki  ekor bawah (tanda manipulasi turun) dan badan hijau panjang di atas (tanda distribusi
+naik) 24  –  ini  pertanda bahwa hari  itu smart money mendorong harga naik setelah menjemput
+likuiditas  di  bawah.  Pola  serupa  terlihat  pada  minggu  bullish  (awal  minggu  turun  dulu  ambil
+likuiditas, lalu pertengahan minggu rally). Semakin Anda paham polanya, semakin percaya diri pula
+menerapkannya real-time.
+
+• Manajemen Risiko Tetap Utama: Meskipun PO3 memberikan kerangka jelas,  tidak ada strategi
+yang 100% akurat. Selalu gunakan  stop loss dan jangan over-leverage. Jika ternyata setelah entry
+harga  berbalik mengenai SL (artinya manipulasi ternyata berlanjut atau skenario gagal),  terimalah
+kekalahan kecil dan evaluasi. Terkadang fase akumulasi yang Anda identifikasi bisa tembus berulang
+kali (false break berganda) sebelum akhirnya distribusi jalan, sehingga kesabaran dan disiplin sangat
+diuji.  Namun,  dengan manajemen risiko ketat,  satu kali  profit  distribusi  biasanya bisa menutupi
+beberapa kali loss kecil akibat tersentuh di fase manipulasi.
+
+Sebagai  kesimpulan,  Power  of  Three (PO3) adalah  strategi  yang  lengkap untuk  memahami  dinamika
+pergerakan  harga  oleh  smart  money.  Dengan  mengenali  fase  Akumulasi,  Manipulasi,  dan  Distribusi,
+seorang trader dapat mengembangkan sistem trading otomatis (AI trading) yang memproses data multi-
+timeframe  untuk  mendeteksi  pola  ini  dan  mengeksekusi  entri/exit  sesuai  aturan.  Langkah-langkahnya
+mencakup identifikasi konsolidasi,  konfirmasi false breakout, hingga manajemen posisi selama trending
+move,  yang  semuanya  telah  diuraikan  di  atas.  Jika  diterapkan  dengan  disiplin,  PO3  bisa  menjadi  alat
+ampuh untuk meningkatkan win rate dan  risk-reward trading Anda, karena pada dasarnya Anda belajar
+“trading bersama institusi, bukan melawannya.” Selamat menerapkan strategi PO3, semoga sukses! 
+
+Sumber: Strategi PO3 ICT oleh InnerCircleTrader 25 2 ; Penjelasan fase-fase AMD 6 26 11 ; Panduan
+trading PO3 (FluxCharts, FXOpen) 16 20 17 ; Tips implementasi PO3 (HowToTrade) 15 , dsb. 
+
+1 3 4 6 7 10 11 16 17 18 20 25 26 ICT Power of Three Strategy Explained: How to Identify and
+Trade It
+https://www.fluxcharts.com/articles/trading-strategies/ict-strategies/ict-power-of-three
+
+6
+
+
+
+2 15 24 ICT Power of 3 (PO3): What Is It and How to Use it?
+https://howtotrade.com/blog/power-of-3-ict/
+
+5 9 22 23 Power of 3 | PDF | Market Trend | Day Trading
+https://www.scribd.com/document/791979191/Power-Of-3
+
+8 12 13 14 19 21 What Is ICT PO3, and How Do Traders Use It? | Market Pulse
+https://fxopen.com/blog/en/what-is-ict-po3-and-how-do-traders-use-it/
+
+7

@@ -8,14 +8,19 @@ const CONTEXT_DIR = path.join(__dirname, '..', 'daily_context');
 async function ensureDir() {
     try {
         await fs.access(CONTEXT_DIR);
+        log.debug('📁 Direktori daily_context ditemukan', { path: CONTEXT_DIR });
     } catch {
         await fs.mkdir(CONTEXT_DIR, { recursive: true });
-        log.info('Direktori daily_context telah dibuat.');
+        log.info('📁 Direktori daily_context berhasil dibuat', { 
+            path: CONTEXT_DIR,
+            action: 'CREATE_DIRECTORY',
+            timestamp: new Date().toISOString()
+        });
     }
 }
 
 function getNewContext(pair) {
-    return {
+    const newContext = {
         date: new Date().toISOString().split('T')[0],
         pair,
         status: 'PENDING_BIAS', // PENDING_BIAS -> PENDING_MANIPULATION -> PENDING_ENTRY -> COMPLETE_*
@@ -34,6 +39,14 @@ function getNewContext(pair) {
         result: null,
         error_log: null
     };
+    
+    log.debug('🆕 Created new context', { 
+        pair, 
+        context: newContext,
+        timestamp: new Date().toISOString()
+    });
+    
+    return newContext;
 }
 
 async function getContext(pair) {
@@ -41,23 +54,63 @@ async function getContext(pair) {
     const contextPath = path.join(CONTEXT_DIR, `${pair}.json`);
     const today = new Date().toISOString().split('T')[0];
 
+    log.debug('📖 Getting context for pair', { 
+        pair, 
+        contextPath, 
+        today,
+        timestamp: new Date().toISOString()
+    });
+
     try {
         const data = await fs.readFile(contextPath, 'utf8');
         const context = JSON.parse(data);
+        
+        log.debug('📄 Context file loaded', { 
+            pair, 
+            contextDate: context.date, 
+            today, 
+            status: context.status,
+            fileSize: data.length
+        });
+        
         if (context.date !== today) {
-            log.info(`Konteks untuk ${pair} sudah usang. Membuat konteks baru untuk hari ini.`);
+            log.info(`🔄 Konteks untuk ${pair} sudah usang (${context.date} != ${today}). Membuat konteks baru`, { 
+                pair, 
+                oldDate: context.date, 
+                newDate: today,
+                oldStatus: context.status
+            });
             const newCtx = getNewContext(pair);
             await fs.writeFile(contextPath, JSON.stringify(newCtx, null, 2), 'utf8');
             return newCtx;
         }
+        
+        log.debug('✅ Context loaded successfully', { 
+            pair, 
+            status: context.status, 
+            lock: context.lock,
+            tradeStatus: context.trade_status
+        });
+        
         return context;
     } catch (error) {
         if (error.code === 'ENOENT') {
-            log.info(`File konteks untuk ${pair} tidak ditemukan. Membuat baru.`);
+            log.info(`📝 File konteks untuk ${pair} tidak ditemukan. Membuat baru`, { 
+                pair, 
+                contextPath,
+                timestamp: new Date().toISOString()
+            });
             const newCtx = getNewContext(pair);
             await fs.writeFile(contextPath, JSON.stringify(newCtx, null, 2), 'utf8');
             return newCtx;
         }
+        
+        log.error('❌ Error loading context', { 
+            pair, 
+            error: error.message, 
+            contextPath,
+            stack: error.stack
+        });
         throw error;
     }
 }
@@ -65,8 +118,36 @@ async function getContext(pair) {
 async function saveContext(context) {
     await ensureDir();
     const contextPath = path.join(CONTEXT_DIR, `${context.pair}.json`);
-    await fs.writeFile(contextPath, JSON.stringify(context, null, 2), 'utf8');
-    log.info(`Konteks untuk ${context.pair} berhasil disimpan. Status: ${context.status}`);
+    
+    log.debug('💾 Saving context', { 
+        pair: context.pair, 
+        status: context.status, 
+        lock: context.lock,
+        contextPath,
+        timestamp: new Date().toISOString()
+    });
+    
+    try {
+        await fs.writeFile(contextPath, JSON.stringify(context, null, 2), 'utf8');
+        
+        log.info(`✅ Konteks untuk ${context.pair} berhasil disimpan`, { 
+            pair: context.pair, 
+            status: context.status,
+            lock: context.lock,
+            fileSize: JSON.stringify(context, null, 2).length,
+            contextPath,
+            timestamp: new Date().toISOString()
+        });
+    } catch (error) {
+        log.error('❌ Error saving context', { 
+            pair: context.pair, 
+            error: error.message, 
+            contextPath,
+            context,
+            stack: error.stack
+        });
+        throw error;
+    }
 }
 
 module.exports = { getContext, saveContext };

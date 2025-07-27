@@ -1,0 +1,1127 @@
+﻿Analisis Kuantitatif dan Kerangka Implementasi Algoritmik 
+untuk Strategi Forex "Power of Three" (ICT) 
+Bagian 1: Dekonstruksi Konseptual Power of Three (PO3) 
+1.1. Pengantar Model PO3: Membaca Niat Institusional 
+Strategi Power of Three (PO3), yang juga dikenal sebagai siklus Accumulation, 
+Manipulation, Distribution (AMD), adalah sebuah model konseptual yang dirancang 
+untuk menguraikan pergerakan harga harian di pasar keuangan, khususnya forex. 
+Model ini dikembangkan oleh Michael J. Huddleston, yang dikenal sebagai The Inner 
+Circle Trader (ICT).1 Daripada memperlakukan pergerakan harga sebagai kebisingan 
+acak, PO3 menawarkan sebuah lensa untuk melihat pasar melalui perspektif likuiditas 
+dan alur pesanan institusional.1 Pendekatan ini berakar pada premis bahwa pelaku 
+pasar besar, atau "Smart Money" (misalnya, bank, dana lindung nilai, dan institusi 
+keuangan lainnya), secara aktif merekayasa kondisi pasar untuk memfasilitasi eksekusi 
+posisi besar mereka.2 
+
+Definisi Inti: PO3 bukanlah sekadar pola grafik, melainkan sebuah model alur 
+pesanan institusional. Kerangka kerja ini memetakan setiap hari perdagangan ke 
+dalam tiga fase yang disengaja dan berulang: Akumulasi, Manipulasi, dan Distribusi.1 
+Tujuan utamanya adalah untuk memungkinkan para trader menyelaraskan posisi 
+mereka dengan pergerakan institusional yang sebenarnya, dan menghindari jebakan 
+yang sengaja dibuat untuk trader ritel, seperti sinyal breakout palsu.4 Dengan 
+memahami siklus ini, seorang trader dapat mengantisipasi di mana uang institusional 
+membangun posisi, di mana mereka menjebak partisipan lain, dan di mana pergerakan 
+harga yang sesungguhnya akan dimulai.1 
+
+Logika Fundamental AMD (Accumulation, Manipulation, Distribution): Logika 
+yang mendasari siklus AMD adalah cerminan dari proses tiga langkah yang sistematis 
+yang digunakan oleh Smart Money. 
+1.​ Akumulasi: Institusi secara diam-diam dan bertahap membangun posisi besar 
+
+mereka (baik beli maupun jual) saat pasar tampak tenang dan tidak memiliki arah 
+yang jelas.3 Fase ini memangsa ketidaksabaran trader ritel.2 
+
+2.​ Manipulasi: Setelah posisi awal dibangun, institusi dengan sengaja mendorong 
+harga ke arah yang berlawanan dengan niat mereka yang sebenarnya. Tindakan 
+ini dirancang untuk memicu stop-loss dari trader yang sudah berada di pasar dan 
+untuk mendorong trader breakout masuk ke arah yang salah, sehingga 
+
+
+
+menciptakan likuiditas yang besar.1 Fase ini mengeksploitasi emosi trader, seperti 
+rasa takut ketinggalan (FOMO) atau panik.2 
+
+3.​ Distribusi: Dengan likuiditas yang cukup telah direkayasa, institusi sekarang 
+dapat dengan mudah menyelesaikan sisa posisi mereka dan membiarkan harga 
+bergerak ke arah yang mereka inginkan sejak awal. Ini adalah fase tren yang 
+sebenarnya, di mana institusi merealisasikan keuntungan mereka.1 Fase ini 
+memberikan imbalan kepada trader yang memahami permainan ini.2 
+
+Fraktalitas Konsep: Salah satu aspek paling kuat dari model AMD/PO3 adalah 
+sifatnya yang fraktal. Ini berarti pola tiga fase yang sama—Akumulasi, Manipulasi, 
+Distribusi—tidak hanya terjadi pada siklus harian tetapi juga dapat diamati di semua 
+kerangka waktu, mulai dari grafik bulanan hingga grafik 15-menit atau bahkan lebih 
+rendah.5 Sebuah konsolidasi besar pada grafik bulanan dapat diikuti oleh manipulasi 
+di atas atau di bawah rentang tersebut, yang kemudian mengarah pada pergerakan 
+distribusi selama berbulan-bulan.8 Demikian pula, rentang Sesi Asia pada grafik 
+15-menit dapat dilihat sebagai akumulasi intraday, yang dimanipulasi selama Sesi 
+London, dan didistribusikan selama Sesi New York. Universalitas ini menunjukkan 
+bahwa logika di balik rekayasa likuiditas adalah prinsip dasar dari pergerakan pasar, 
+terlepas dari skala waktunya. 
+
+ 
+
+1.2. Anatomi Rinci Setiap Fase Siklus Harga Harian 
+ 
+
+Setiap fase dalam siklus PO3 memiliki karakteristik yang berbeda dalam hal aksi harga, 
+volatilitas, volume, dan waktu kejadian. Memahami anatomi setiap fase adalah kunci 
+untuk implementasi algoritmik yang sukses. 
+
+ 
+
+Fase 1: Akumulasi (Consolidation & Position Building) 
+ 
+
+Fase Akumulasi adalah tahap awal di mana panggung untuk pergerakan hari itu 
+disiapkan. 
+●​ Aksi Harga: Fase ini ditandai oleh pergerakan harga yang cenderung 
+
+menyamping (sideways) dalam sebuah rentang konsolidasi yang jelas.3 Harga 
+berfluktuasi antara level support dan resistance yang terdefinisi dengan baik, 
+seringkali dengan sedikit atau tanpa arah tren yang jelas.2 
+
+
+
+●​ Volatilitas & Volume: Volatilitas selama fase ini biasanya rendah hingga sangat 
+rendah.2 Volume perdagangan juga cenderung menurun seiring berjalannya waktu 
+dalam rentang tersebut, yang mencerminkan berkurangnya partisipasi dari trader 
+ritel dan sifat tersembunyi dari aktivitas institusional.3 
+
+●​ Waktu & Lokasi: Dalam konteks intraday, fase Akumulasi paling sering terjadi 
+selama Sesi Perdagangan Asia (Tokyo).1 Sesi ini secara historis dikenal memiliki 
+likuiditas dan volatilitas yang lebih rendah dibandingkan dengan Sesi London atau 
+New York, menjadikannya waktu yang ideal bagi institusi untuk membangun posisi 
+tanpa menarik banyak perhatian.9 Konsolidasi ini sering kali terbentuk di sekitar 
+atau di dekat harga pembukaan harian (​
+daily open).1 
+
+●​ Tujuan Institusional: Tujuan utama Smart Money selama fase ini adalah untuk 
+membangun posisi (baik beli atau jual) dalam jumlah besar secara bertahap.1 
+Mereka menggunakan​
+limit order dan memecah pesanan besar mereka menjadi bagian-bagian yang 
+lebih kecil untuk menghindari pergerakan harga yang signifikan yang dapat 
+mengungkap niat mereka.3 Rentang harga yang terbentuk secara efektif 
+menciptakan​
+liquidity pools (kumpulan stop-loss) di atas high rentang (buy-side liquidity) dan 
+di bawah low rentang (sell-side liquidity), yang akan menjadi target pada fase 
+berikutnya.4 
+
+ 
+
+Fase 2: Manipulasi (The Judas Swing & Liquidity Grab) 
+ 
+
+Fase Manipulasi adalah bagian paling menipu dari siklus PO3, di mana jebakan 
+dipasang. 
+●​ Aksi Harga: Fase ini ditandai oleh pergerakan harga yang tajam, cepat, dan 
+
+seringkali tidak menentu yang menembus salah satu batas dari rentang 
+akumulasi.2 Pergerakan ini adalah​
+false breakout (penembusan palsu) dan dirancang untuk bergerak ke arah yang 
+berlawanan dengan arah pergerakan yang sebenarnya diinginkan.4 Pergerakan 
+manipulatif ini sering disebut sebagai​
+Judas Swing—sebuah "pengkhianatan" terhadap arah breakout yang tampak 
+jelas.13 
+
+●​ Volatilitas & Volume: Volatilitas dan volume perdagangan meningkat secara 
+signifikan dan tiba-tiba selama fase ini.2 Lonjakan ini disebabkan oleh eksekusi 
+
+
+
+massal stop-loss dan masuknya trader breakout yang agresif ke pasar.7 
+
+●​ Waktu & Lokasi: Manipulasi paling sering terjadi selama Sesi London, terutama 
+dalam jendela waktu yang dikenal sebagai London Killzone (sekitar 2:00-5:00 AM 
+EST atau 06:00-09:00 UTC).15 Sesi London dikenal sebagai sesi yang sering 
+menetapkan tinggi atau rendahnya hari perdagangan melalui pergerakan 
+manipulatif ini.1 
+
+●​ Tujuan Institusional: Tujuan dari fase ini adalah multifaset: (1) Stop Hunting: 
+Secara aktif memburu dan memicu stop-loss dari trader ritel yang terperangkap 
+dalam rentang akumulasi. (2) Inducement: Mendorong trader breakout untuk 
+membuka posisi ke arah yang salah, percaya bahwa tren baru telah dimulai. (3) 
+Liquidity Engineering: Gabungan dari kedua tindakan ini menciptakan genangan 
+likuiditas yang dalam. Jika Smart Money ingin membeli, mereka mendorong harga 
+turun untuk memicu stop-loss penjual dan menarik penjual baru, menyediakan 
+likuiditas jual yang mereka butuhkan untuk mengisi pesanan beli besar mereka 
+dengan harga yang lebih baik (diskonto). Proses sebaliknya berlaku jika mereka 
+ingin menjual.5 
+
+ 
+
+Fase 3: Distribusi (The Real Move & Price Expansion) 
+ 
+
+Fase Distribusi adalah puncak dari siklus, di mana niat sebenarnya dari Smart Money 
+terungkap. 
+●​ Aksi Harga: Fase ini ditandai oleh pergerakan tren yang jelas, kuat, berkelanjutan, 
+
+dan berekspansi ke arah yang berlawanan dari fase manipulasi.2 Pergerakan ini 
+dikenal sebagai​
+displacement, yang secara visual muncul sebagai serangkaian candle dengan 
+badan besar dan sumbu (wick) minimal, semuanya bergerak ke arah yang sama.1 
+
+●​ Volatilitas & Volume: Volatilitas tetap tinggi, tetapi sekarang lebih terarah dan 
+tidak menentu seperti pada fase manipulasi. Volume yang tinggi dan 
+berkelanjutan mendukung arah pergerakan, yang mengkonfirmasi partisipasi 
+institusional dan kekuatan tren.3 
+
+●​ Waktu & Lokasi: Fase distribusi sering dimulai pada paruh kedua Sesi London 
+dan berlanjut dengan momentum terkuat ke dalam Sesi New York, terutama 
+selama NY Killzone (sekitar 7:00-10:00 AM EST atau 11:00-14:00 UTC).1 Sesi New 
+York seringkali menjadi sesi di mana tren harian mencapai puncaknya atau 
+mengalami kelanjutan yang signifikan. 
+
+●​ Tujuan Institusional: Tujuan utama di sini adalah untuk merealisasikan 
+
+
+
+keuntungan dengan melepas atau mendistribusikan posisi yang telah mereka 
+bangun selama fase akumulasi dan manipulasi.5 Pada saat tren ini menjadi jelas 
+dan очевиден bagi sebagian besar trader ritel, Smart Money sudah berada dalam 
+posisi yang sangat menguntungkan dan mulai keluar dari pasar sementara 
+partisipan yang terlambat masuk mendorong harga lebih jauh ke arah yang 
+menguntungkan mereka.5 
+
+ 
+
+1.3. Tabel Kunci: Matriks Karakteristik Fase PO3 untuk Pemrograman 
+ 
+
+Untuk menerjemahkan konsep kualitatif ini ke dalam kerangka kerja yang dapat 
+diprogram untuk AI, karakteristik setiap fase harus dikuantifikasi. Tabel berikut 
+menyajikan matriks referensi yang dapat digunakan oleh pengembang sebagai dasar 
+untuk membangun fungsi deteksi fase. 
+
+Karakteristik Fase 1: Akumulasi Fase 2: Manipulasi Fase 3: Distribusi 
+
+Aksi Harga Pergerakan Penembusan tajam di Pergerakan tren yang 
+menyamping luar rentang, diikuti kuat dan berekspansi 
+(ranging) dalam oleh pembalikan (displacement). 
+batas yang jelas. cepat (false 
+
+breakout). 
+
+Volatilitas Rendah dan Lonjakan volatilitas Volatilitas tinggi yang 
+cenderung menurun. yang tajam dan berkelanjutan dan 
+
+tiba-tiba. terarah. 
+
+Volume Rendah atau Lonjakan volume Volume tinggi yang 
+menurun. yang signifikan saat mendukung arah 
+
+breakout terjadi. tren. 
+
+Sesi Tipikal (UTC) Sesi Asia (00:00 - Sesi London (06:00 - Sesi New York (11:00 
+04:00 UTC). 09:00 UTC). - 14:00 UTC). 
+
+Tujuan Institusional Membangun posisi Memicu stop-loss, Merealisasikan 
+secara diam-diam. menjebak trader, dan keuntungan dengan 
+
+merekayasa likuiditas. melepas posisi. 
+
+Istilah Kunci ICT Asian Range, Judas Swing, Stop Expansion, 
+
+
+
+Consolidation. Hunt, Liquidity Grab. Displacement, The 
+Real Move. 
+
+Analisis yang lebih dalam mengungkapkan hubungan sebab-akibat yang ketat antara 
+fase-fase ini. Fase Akumulasi adalah penyebab yang menciptakan kondisi yang 
+diperlukan—yaitu, likuiditas yang terperangkap di atas dan di bawah rentang. Fase 
+Manipulasi adalah pemicu yang secara aktif "memanen" likuiditas tersebut. Fase 
+Distribusi adalah akibat logis dari posisi institusional yang kini telah terisi penuh dan 
+siap untuk bergerak ke target harga mereka. Tanpa akumulasi yang efektif, manipulasi 
+tidak memiliki "bahan bakar" (likuiditas) yang cukup untuk menjadi signifikan, dan 
+akibatnya, distribusi tidak akan terjadi dengan kekuatan atau momentum yang besar. 
+
+Ketergantungan sekuensial ini merupakan batasan kritis untuk pengembangan AI. 
+Algoritma tidak boleh mencari fase-fase ini secara terisolasi. Sebaliknya, ia harus 
+beroperasi sebagai state machine (mesin keadaan). Logikanya harus mengikuti 
+urutan: JIKA Keadaan == Akumulasi_Terkonfirmasi MAKA Pantau_Sinyal_Manipulasi. 
+Selanjutnya, JIKA Keadaan == Manipulasi_Terkonfirmasi MAKA 
+Persiapkan_Untuk_Distribusi. Pendekatan yang bergantung pada keadaan ini secara 
+drastis mengurangi kemungkinan identifikasi sinyal palsu dan memastikan bahwa 
+model AI beroperasi sesuai dengan logika pasar yang mendasarinya. 
+
+ 
+
+Bagian 2: Kerangka Kerja Analisis Top-Down: Fondasi untuk 
+Eksekusi Probabilitas Tinggi 
+ 
+Model PO3 tidak dapat diperdagangkan secara efektif dalam ruang hampa. 
+Kekuatannya bergantung sepenuhnya pada konteks yang disediakan oleh analisis 
+kerangka waktu yang lebih tinggi (higher timeframe - HTF). Tanpa pemahaman yang 
+jelas tentang ke mana harga kemungkinan besar akan ditarik dalam skala yang lebih 
+besar, apa yang tampak seperti setup PO3 yang sempurna pada grafik 15-menit bisa 
+dengan mudah menjadi jebakan.2 Oleh karena itu, langkah pertama dan paling krusial 
+dalam menerapkan strategi ini adalah melakukan analisis top-down yang sistematis 
+untuk menentukan bias arah harian ( 
+
+daily bias). 
+
+
+
+ 
+
+2.1. Prioritas Utama: Menentukan Bias Harian (Daily Bias) 
+ 
+
+Menentukan daily bias adalah landasan dari seluruh proses perdagangan. Penting 
+untuk dipahami bahwa daily bias bukanlah prediksi tentang bagaimana candle harian 
+akan ditutup (misalnya, bullish atau bearish), melainkan sebuah antisipasi terdidik 
+tentang ke arah mana harga kemungkinan besar akan ditarik untuk mencari likuiditas 
+(draw on liquidity) pada hari itu.10 Tanpa bias yang benar, seorang trader (atau 
+algoritma) akan terus-menerus terperangkap di sisi yang salah dari pergerakan 
+institusional, salah menafsirkan distribusi sebagai manipulasi, atau sebaliknya.10 
+
+Proses untuk menentukan bias ini dimulai dari kerangka waktu tertinggi (Mingguan, 
+Harian) dan turun ke H4. 
+
+Analisis Alur Pesanan (Order Flow) Timeframe Tinggi (HTF): Alur pesanan 
+dianggap sebagai tulang punggung arah pasar dalam konsep ICT.10 Ini adalah analisis 
+tentang bagaimana harga bereaksi terhadap zona support dan resistance 
+institusional. 
+●​ Alur Pesanan Bullish: Harga secara konsisten menghormati Bullish Order Blocks 
+
+(blok pesanan bullish) dan Fair Value Gaps (FVG) sebagai area support. Setiap kali 
+harga turun ke zona ini, ia menemukan dukungan dan kemudian bergerak untuk 
+menciptakan struktur pasar yang lebih tinggi (higher highs dan higher lows).10 Ini 
+menandakan bahwa institusi sedang membeli saat harga turun dan mendukung 
+pergerakan ke atas. 
+
+●​ Alur Pesanan Bearish: Sebaliknya, harga secara konsisten menghormati Bearish 
+Order Blocks (blok pesanan bearish) dan FVG sebagai area resistance. Setiap kali 
+harga naik ke zona ini, ia ditolak dan kemudian bergerak untuk menciptakan 
+struktur pasar yang lebih rendah (lower lows dan lower highs).10 Ini menandakan 
+bahwa institusi sedang menjual saat harga naik dan menekan pergerakan ke 
+bawah. 
+
+ 
+
+2.2. Pemetaan Peta Jalan Likuiditas: Dealing Range & Liquidity Pools 
+ 
+
+Setelah alur pesanan umum diidentifikasi, langkah selanjutnya adalah memetakan 
+"peta jalan" likuiditas. Harga tidak bergerak secara acak; ia bergerak dengan tujuan, 
+
+
+
+yaitu dari satu liquidity pool ke liquidity pool berikutnya.10 
+
+Konsep Dealing Range: Dealing range adalah rentang harga antara swing high dan 
+swing low yang signifikan pada kerangka waktu tertentu. Teori ICT menyatakan bahwa 
+setelah harga mengambil likuiditas di salah satu sisi rentang (misalnya, di atas swing 
+high), ia cenderung akan berbalik dan menargetkan likuiditas di sisi yang berlawanan 
+(misalnya, di bawah swing low).10 Mengidentifikasi 
+
+dealing range saat ini pada grafik Harian dan H4 memberikan skrip yang jelas untuk 
+pergerakan harga yang diharapkan. 
+
+Identifikasi Liquidity Pools Kunci: Liquidity pools adalah area di mana sejumlah 
+besar pesanan (terutama stop-loss) terkonsentrasi. Ini adalah target utama bagi 
+Smart Money. Untuk tujuan algoritmik, level-level berikut harus ditandai secara 
+otomatis pada grafik sebagai target potensial (draw on liquidity) atau area di mana 
+manipulasi kemungkinan besar akan terjadi: 
+●​ Buy-Side Liquidity (BSL): Area di atas level-level harga berikut: 
+
+○​ Swing highs sebelumnya. 
+○​ Equal highs (EQH), di mana dua atau lebih puncak memiliki ketinggian yang 
+
+sama, menciptakan target yang jelas. 
+○​ Level tertinggi dari 1 hingga 3 hari perdagangan sebelumnya (Previous Day's 
+
+High, PDH).10 
+
+●​ Sell-Side Liquidity (SSL): Area di bawah level-level harga berikut: 
+○​ Swing lows sebelumnya. 
+○​ Equal lows (EQL), di mana dua atau lebih lembah memiliki kedalaman yang 
+
+sama. 
+○​ Level terendah dari 1 hingga 3 hari perdagangan sebelumnya (Previous Day's 
+
+Low, PDL).10 
+
+ 
+
+2.3. Identifikasi Zona Reaksi Institusional (PD Arrays) 
+ 
+
+Selain liquidity pools, Smart Money juga meninggalkan jejak kaki mereka dalam bentuk 
+ketidakefisienan harga dan zona pesanan yang signifikan. Ini dikenal sebagai PD 
+Arrays (Premium/Discount Arrays) dan bertindak sebagai magnet atau zona reaksi 
+bagi harga. 
+●​ Order Blocks (OB): Sebuah order block adalah candle terakhir yang berlawanan 
+
+
+
+arah sebelum pergerakan harga yang kuat dan impulsif (displacement). 
+○​ Bullish OB: Candle bearish terakhir sebelum pergerakan naik yang kuat. Ini 
+
+mewakili area di mana institusi melakukan pembelian besar-besaran.10 
+
+○​ Bearish OB: Candle bullish terakhir sebelum pergerakan turun yang kuat. Ini 
+mewakili area di mana institusi melakukan penjualan besar-besaran.10​
+​
+Harga sering kali kembali untuk menguji ulang (retest) zona-zona ini sebelum 
+melanjutkan pergerakannya. 
+
+●​ Fair Value Gaps (FVG) / Imbalances: FVG adalah pola tiga candle di mana 
+sumbu (wick) dari candle pertama dan ketiga tidak tumpang tindih, meninggalkan 
+"celah" atau "ketidakseimbangan" dalam pengiriman harga di candle kedua.15 
+Kesenjangan ini dibuat oleh pergerakan harga yang sangat cepat dan impulsif. 
+Teori ICT menyatakan bahwa pasar cenderung kembali untuk "mengisi" atau 
+"menyeimbangkan kembali" kesenjangan ini di masa depan. Oleh karena itu, FVG 
+bertindak sebagai magnet harga yang kuat dan merupakan zona probabilitas 
+tinggi untuk reaksi harga.10 
+
+ 
+
+2.4. Sesi Asia sebagai Proksi Akumulasi dan Indikator Manipulasi 
+ 
+
+Dalam siklus harian PO3, Sesi Asia memainkan peran yang sangat spesifik dan 
+prediktif. 
+●​ Definisi Rentang Asia: Untuk tujuan algoritmik, periode waktu yang tepat untuk 
+
+Sesi Asia harus didefinisikan dengan jelas, misalnya, dari pukul 19:00 hingga 
+00:00 EST (waktu New York) atau 00:00 hingga 04:00 UTC.12 Indikator kustom 
+dapat dengan mudah memplot rentang ini (high dan low) secara otomatis di 
+grafik.16 Konsolidasi selama sesi ini dianggap sebagai fase Akumulasi harian.10 
+
+●​ Hipotesis Manipulasi: Rentang Asia menjadi dasar untuk mengantisipasi 
+manipulasi Sesi London. 
+○​ Jika Daily Bias Bullish: Ekspektasi yang logis adalah harga akan turun 
+
+selama Sesi London untuk menyapu (sweep) low dari Sesi Asia. Pergerakan ini 
+bertujuan untuk mengambil sell-side liquidity yang terakumulasi di bawah 
+rentang tersebut sebelum memulai pergerakan naik yang sebenarnya 
+(distribusi).10 
+
+○​ Jika Daily Bias Bearish: Ekspektasi yang logis adalah harga akan naik selama 
+Sesi London untuk menyapu high dari Sesi Asia. Pergerakan ini bertujuan 
+untuk mengambil buy-side liquidity yang terakumulasi di atas rentang tersebut 
+
+
+
+sebelum memulai pergerakan turun yang sebenarnya.10 
+
+Kekuatan sebenarnya dari analisis top-down ini muncul ketika beberapa faktor HTF 
+bertemu di satu titik. Ini disebut sebagai konfluensi. Sebagai contoh, skenario dengan 
+probabilitas tertinggi terjadi ketika daily bias adalah bullish, dan low dari Sesi Asia 
+secara kebetulan berada tepat di dalam atau di dekat Bullish Order Block atau FVG 
+pada grafik H4. Dalam kasus ini, sweep ke bawah selama Sesi London tidak hanya 
+mengambil likuiditas SSL di bawah low Asia, tetapi juga menguji ulang zona 
+institusional HTF yang signifikan. Ini adalah konvergensi dari dua konsep probabilitas 
+tinggi, yang secara drastis meningkatkan kemungkinan bahwa pergerakan turun ini 
+adalah manipulasi, bukan awal dari tren turun yang baru. 
+
+Untuk pengembangan AI, ini menyiratkan perlunya sistem pembobotan atau penilaian 
+(scoring system). Sebuah setup di mana manipulasi hanya menyapu low Asia akan 
+memiliki skor probabilitas yang lebih rendah daripada setup di mana manipulasi 
+menyapu low Asia DAN secara bersamaan masuk ke dalam FVG Harian. Algoritma 
+harus diprogram untuk tidak hanya memeriksa kondisi secara biner (ya/tidak), tetapi 
+untuk menilai kualitas dan kekuatan setup berdasarkan jumlah faktor konvergen yang 
+ada. Ini adalah langkah penting untuk membedakan antara setup A+ dan setup yang 
+lebih lemah. 
+
+Bagian 3: Panduan Implementasi Mekanis dan Aturan Eksekusi 
+Algoritmik 
+Tujuan utama dari riset ini adalah untuk mengubah strategi PO3 yang bersifat 
+diskresioner menjadi serangkaian aturan mekanis yang dapat dieksekusi oleh 
+algoritma. Bagian ini menyediakan kerangka kerja langkah-demi-langkah dan aturan 
+yang jelas untuk entri, manajemen risiko, dan penentuan target, yang dirancang untuk 
+implementasi dalam sistem perdagangan otomatis. 
+
+ 
+
+3.1. Panduan Langkah-demi-Langkah Terperinci (Proses Algoritmik) 
+ 
+
+Berikut adalah proses logis yang harus diikuti oleh algoritma untuk setiap hari 
+perdagangan: 
+1.​ Tahap 1: Analisis Pra-Sesi London (Konteks HTF) 
+
+○​ Waktu Eksekusi: Sebelum dimulainya London Killzone (misalnya, pada pukul 
+05:00 UTC). 
+
+
+
+○​ Tindakan: Algoritma menjalankan analisis pada kerangka waktu Mingguan 
+(W), Harian (D), dan 4-Jam (H4). Tujuannya adalah untuk menentukan Daily 
+Bias (Bullish/Bearish) berdasarkan alur pesanan, dan untuk memetakan 
+semua PD Arrays (FVG, Order Blocks) dan Liquidity Pools (PDH/PDL, 
+EQH/EQL) yang relevan pada grafik.10 Hasil dari tahap ini adalah "peta jalan" 
+untuk hari itu. 
+
+2.​ Tahap 2: Identifikasi Rentang Akumulasi (Sesi Asia) 
+○​ Waktu Eksekusi: Pada akhir Sesi Asia (misalnya, pukul 04:00 UTC). 
+○​ Tindakan: Algoritma mengidentifikasi dan menandai level harga tertinggi 
+
+(High) dan terendah (Low) yang terbentuk selama periode Sesi Asia yang 
+telah ditentukan (misalnya, 00:00-04:00 UTC).16 Rentang ini sekarang 
+menjadi zona Akumulasi harian. 
+
+3.​ Tahap 3: Pemantauan Fase Manipulasi (Sesi London) 
+○​ Waktu Eksekusi: Selama London Killzone (06:00-09:00 UTC). 
+○​ Tindakan: Algoritma secara aktif memantau harga. Ia menunggu harga untuk 
+
+menembus salah satu batas Rentang Asia. Penembusan ini harus terjadi ke 
+arah yang berlawanan dengan Daily Bias yang telah ditentukan di Tahap 1. 
+■​ Jika Bias Bullish: Tunggu harga menembus di bawah Low Sesi Asia.10 
+
+■​ Jika Bias Bearish: Tunggu harga menembus di atas High Sesi Asia.10 
+
+4.​ Tahap 4: Konfirmasi Penyelesaian Manipulasi (Sinyal Pembalikan) 
+○​ Waktu Eksekusi: Setelah penembusan di Tahap 3 terjadi. 
+○​ Tindakan: Algoritma beralih ke kerangka waktu eksekusi yang lebih rendah 
+
+(misalnya, M15 atau M5) untuk mencari sinyal konfirmasi bahwa manipulasi 
+telah berakhir dan pembalikan akan segera dimulai. Sinyal utama yang dicari 
+adalah Market Structure Shift (MSS).1 
+
+5.​ Tahap 5: Eksekusi Entri (Awal Fase Distribusi) 
+○​ Waktu Eksekusi: Setelah MSS dikonfirmasi di Tahap 4. 
+○​ Tindakan: Algoritma tidak langsung masuk ke pasar. Ia menunggu harga 
+
+untuk melakukan pullback (penarikan kembali) ke zona entri yang valid 
+(inefisiensi) yang terbentuk selama pergerakan MSS tersebut. Setelah harga 
+mencapai zona ini, pesanan dieksekusi.1 
+
+6.​ Tahap 6: Manajemen Perdagangan (SL dan TP) 
+○​ Waktu Eksekusi: Segera setelah pesanan diisi. 
+○​ Tindakan: Algoritma secara otomatis menempatkan order Stop Loss (SL) dan 
+
+Take Profit (TP) berdasarkan aturan yang telah ditentukan sebelumnya.4 
+
+ 
+
+3.2. Aturan Pemicu Entri yang Dapat Diprogram 
+
+
+
+ 
+
+Langkah 4 dan 5 adalah inti dari eksekusi. Aturan untuk pemicu entri harus sangat 
+spesifik dan tidak ambigu. 
+●​ Market Structure Shift (MSS / CHoCH - Change of Character): Ini adalah 
+
+konfirmasi pertama dan paling vital bahwa momentum telah bergeser dari 
+manipulasi ke distribusi.1 
+
+○​ Definisi Bullish MSS: Setelah harga menyapu level terendah (misalnya, low 
+Sesi Asia atau SSL lainnya), ia kemudian berbalik arah dan menembus ke atas 
+swing high jangka pendek terakhir yang valid. Penembusan ini harus disertai 
+dengan displacement—pergerakan yang kuat dan impulsif yang idealnya 
+meninggalkan FVG.23 
+
+○​ Definisi Bearish MSS: Setelah harga menyapu level tertinggi (misalnya, high 
+Sesi Asia atau BSL lainnya), ia kemudian berbalik arah dan menembus ke 
+bawah swing low jangka pendek terakhir yang valid. Penembusan ini juga 
+harus disertai dengan displacement.23​
+​
+MSS adalah sinyal bahwa "tangan yang lebih lemah" yang mendorong 
+manipulasi telah kehabisan tenaga, dan "tangan yang lebih kuat" (Smart 
+Money) kini mengambil alih kendali. 
+
+●​ Entri pada Retracement ke Inefficiency: Mengejar harga setelah MSS adalah 
+praktik yang berisiko. Entri dengan probabilitas tertinggi terjadi ketika harga 
+kembali untuk menguji ulang ketidakefisienan (inefficiency) yang dibuat selama 
+pergerakan MSS itu sendiri. Algoritma harus diprogram untuk menempatkan limit 
+order di dalam salah satu zona berikut 1: 
+○​ Fair Value Gap (FVG): Ini adalah zona entri yang paling umum dan andal. 
+
+Setelah MSS, seringkali ada FVG yang jelas terbentuk. Algoritma harus 
+menargetkan area ini untuk entri.1 
+
+○​ Order Block (OB): Candle yang memulai pergerakan MSS itu sendiri dapat 
+bertindak sebagai zona support/resistance yang kuat untuk entri.1 
+
+○​ Breaker Block: Jika ada order block yang gagal (misalnya, bearish order 
+block yang ditembus ke atas selama Bullish MSS), zona ini dapat berubah 
+fungsi menjadi support (bullish breaker) dan menjadi area entri yang valid.1 
+
+○​ Optimal Trade Entry (OTE): Sebagai konfluensi tambahan, algoritma dapat 
+menggunakan alat Fibonacci retracement yang ditarik dari awal hingga akhir 
+pergerakan MSS. Zona entri OTE yang ideal berada di antara level 62% dan 
+79% (0.62 dan 0.79), yang sering kali tumpang tindih dengan FVG atau OB.10 
+
+
+
+ 
+
+3.3. Aturan Manajemen Risiko yang Ketat 
+ 
+
+Manajemen risiko yang disiplin adalah elemen yang tidak dapat ditawar dalam sistem 
+perdagangan algoritmik apa pun. 
+●​ Penempatan Stop Loss (SL): Aturan untuk SL sangat sederhana dan mutlak: SL 
+
+ditempatkan beberapa pips di luar titik ekstrim dari sumbu (wick) manipulasi.4 
+
+○​ Untuk Posisi Beli (Long): SL ditempatkan tepat di bawah titik terendah dari 
+Judas Swing ke bawah. 
+
+○​ Untuk Posisi Jual (Short): SL ditempatkan tepat di atas titik tertinggi dari 
+Judas Swing ke atas.​
+Logikanya jelas: jika harga kembali dan menembus titik ekstrim manipulasi, 
+maka seluruh premis perdagangan (bahwa itu adalah manipulasi) menjadi 
+tidak valid, dan posisi harus segera ditutup. 
+
+●​ Penentuan Take Profit (TP): Target keuntungan harus logis dan berbasis pada 
+likuiditas, bukan pada rasio risiko/imbalan (R:R) yang arbitrer seperti 2:1 atau 3:1, 
+meskipun setup PO3 yang baik sering kali menghasilkan R:R yang 
+menguntungkan.1 Target harus merupakan​
+draw on liquidity yang telah diidentifikasi dalam analisis HTF. 
+○​ TP 1 (Target Konservatif/Parsial): Level high atau low dari Rentang 
+
+Akumulasi (Sesi Asia) yang berlawanan. Misalnya, setelah sweep low dan entri 
+beli, TP1 dapat ditempatkan di high Sesi Asia.4 
+
+○​ TP 2 (Target Utama): Liquidity pool HTF berikutnya yang paling jelas, yang 
+diidentifikasi selama analisis top-down. Ini bisa berupa Previous Day's 
+High/Low (PDH/PDL), equal highs/lows (EQH/EQL) pada grafik H4, atau FVG 
+Harian yang belum terisi.1 
+
+ 
+
+3.4. Tabel Kunci: Kerangka Aturan Eksekusi Algoritmik (Bullish vs. Bearish) 
+ 
+
+Tabel ini menyaring seluruh proses menjadi format IF-THEN yang ringkas, berfungsi 
+sebagai pseudo-code atau cetak biru logis untuk tim pengembangan AI. Ini adalah 
+jembatan langsung antara analisis konseptual dan implementasi praktis dalam kode. 
+
+
+
+Parameter Skenario Bullish (Beli) Skenario Bearish (Jual) 
+
+Daily Bias Alur pesanan HTF (D, H4) Alur pesanan HTF (D, H4) 
+adalah Bullish. Harga adalah Bearish. Harga 
+menghormati OB/FVG bullish. menghormati OB/FVG bearish. 
+
+Akumulasi Harga berkonsolidasi selama Harga berkonsolidasi selama 
+Sesi Asia. Sesi Asia. 
+
+Manipulasi Harga menyapu (sweep) di Harga menyapu (sweep) di 
+bawah Low Sesi Asia selama atas High Sesi Asia selama 
+Sesi London, idealnya masuk Sesi London, idealnya masuk 
+ke zona SSL atau PD Array ke zona BSL atau PD Array 
+Bullish HTF (misalnya, FVG Bearish HTF (misalnya, FVG 
+H4). H4). 
+
+Pemicu Entri 1. Konfirmasi: Terjadi Bullish 1. Konfirmasi: Terjadi Bearish 
+Market Structure Shift (MSS) Market Structure Shift (MSS) 
+pada timeframe M15 (harga pada timeframe M15 (harga 
+menembus swing high menembus swing low 
+terakhir). 2. Entri: Tunggu terakhir). 2. Entri: Tunggu 
+harga melakukan pullback dan harga melakukan pullback dan 
+masuk ke Fair Value Gap masuk ke Fair Value Gap 
+(FVG) yang terbentuk selama (FVG) yang terbentuk selama 
+MSS. MSS. 
+
+Stop Loss (SL) Ditempatkan beberapa pips di Ditempatkan beberapa pips di 
+bawah titik terendah dari atas titik tertinggi dari sumbu 
+sumbu (wick) manipulasi. (wick) manipulasi. 
+
+Take Profit (TP) Target utama adalah Buy-Side Target utama adalah Sell-Side 
+Liquidity (BSL) HTF berikutnya Liquidity (SSL) HTF berikutnya 
+yang teridentifikasi, seperti yang teridentifikasi, seperti 
+Previous Day's High (PDH) Previous Day's Low (PDL) atau 
+atau swing high H4. swing low H4. 
+
+Dengan mengubah PO3 dari strategi yang memerlukan "mata yang terlatih" menjadi 
+serangkaian pemeriksaan logis yang dapat diautomatisasi, tabel ini menyediakan 
+fondasi yang kuat untuk sistem perdagangan algoritmik. AI dapat menjalankan 
+pemeriksaan ini secara real-time di berbagai pasangan mata uang. Setiap kali urutan 
+kondisi dalam salah satu baris tabel terpenuhi, sinyal perdagangan yang valid dan 
+dapat diuji secara objektif dapat dihasilkan. 
+
+
+
+ 
+
+Bagian 4: Analisis Skenario dan Adaptasi Kondisi Pasar 
+ 
+Teori dan aturan mekanis menjadi hidup ketika diterapkan pada grafik nyata dan diuji 
+terhadap berbagai kondisi pasar. Bagian ini akan memberikan contoh visual, 
+membahas bagaimana strategi PO3 beradaptasi dengan lingkungan pasar yang 
+berbeda, dan yang paling penting, menganalisis skenario kegagalan untuk 
+membangun model AI yang lebih tangguh. 
+
+ 
+
+4.1. Studi Kasus Grafik Beranotasi (Walkthrough Visual) 
+ 
+
+Untuk memberikan kejelasan maksimal, proses eksekusi akan diilustrasikan melalui 
+studi kasus langkah-demi-langkah. 
+
+ 
+
+Contoh Bullish PO3 (EUR/USD) 
+ 
+
+Berikut adalah walkthrough hipotetis dari setup beli pada EUR/USD, yang 
+divisualisasikan melalui serangkaian grafik beranotasi: 
+1.​ Grafik Harian (D1) & H4: Analisis menunjukkan alur pesanan bullish. Harga baru 
+
+saja memantul dari Bullish Order Block harian dan bergerak ke atas. Draw on 
+liquidity yang paling jelas adalah Previous Day's High (PDH) dan serangkaian 
+equal highs di atasnya. Daily Bias ditetapkan sebagai Bullish. 
+
+2.​ Grafik M15 - Sesi Asia: Harga berkonsolidasi dalam rentang yang sempit antara 
+pukul 00:00 dan 04:00 UTC. High dan Low dari rentang ini ditandai sebagai zona 
+Akumulasi. 
+
+3.​ Grafik M15 - Sesi London: Sekitar pukul 07:30 UTC, harga turun tajam, 
+menembus di bawah Low Sesi Asia. Ini adalah Judas Swing ke bawah, yang 
+merupakan fase Manipulasi yang diantisipasi.1 Pergerakan ini mengambil​
+sell-side liquidity yang ada di bawah rentang Asia. 
+
+4.​ Grafik M15 - Konfirmasi & Entri: Setelah menyapu low, harga berbalik dengan 
+kuat ke atas, menciptakan pergerakan displacement. Pergerakan ini berhasil 
+
+
+
+menembus swing high jangka pendek terakhir, mengkonfirmasi Bullish Market 
+Structure Shift (MSS). Selama pergerakan naik ini, sebuah Fair Value Gap (FVG) 
+yang jelas terbentuk. Algoritma akan menempatkan buy limit order di dalam FVG 
+ini, menunggu harga untuk pullback.1 
+
+5.​ Manajemen Perdagangan: 
+○​ Stop Loss: Ditempatkan tepat di bawah sumbu terendah dari pergerakan 
+
+manipulasi (Judas Swing).4 
+
+○​ Take Profit: Ditempatkan pada target likuiditas HTF yang diidentifikasi pada 
+langkah 1, yaitu Previous Day's High (PDH).10 
+
+○​ Hasil: Harga kembali ke FVG, memicu entri beli, dan kemudian melanjutkan 
+fase Distribusi ke atas sepanjang Sesi New York, akhirnya mencapai target TP 
+di PDH. 
+
+ 
+
+Contoh Bearish PO3 (GBP/USD) 
+ 
+
+Proses yang sama diulang untuk skenario jual pada GBP/USD: 
+1.​ Grafik Harian (D1) & H4: Analisis menunjukkan alur pesanan bearish. Harga baru 
+
+saja ditolak dari Bearish Order Block H4 dan berada dalam tren turun yang jelas. 
+Draw on liquidity yang paling logis adalah Previous Day's Low (PDL). Daily Bias 
+ditetapkan sebagai Bearish. 
+
+2.​ Grafik M15 - Sesi Asia: Harga berkonsolidasi di atas harga pembukaan harian, 
+membentuk rentang Akumulasi.1 
+
+3.​ Grafik M15 - Sesi London: Selama London Killzone, harga melonjak ke atas, 
+menembus High Sesi Asia. Ini adalah fase Manipulasi (Judas Swing ke atas) yang 
+mengambil buy-side liquidity.1 
+
+4.​ Grafik M15 - Konfirmasi & Entri: Setelah menyapu high, harga berbalik tajam ke 
+bawah dengan displacement, menembus swing low jangka pendek terakhir dan 
+mengkonfirmasi Bearish Market Structure Shift (MSS). Sebuah FVG bearish 
+terbentuk selama penurunan ini. Algoritma menempatkan sell limit order di dalam 
+FVG tersebut.1 
+
+5.​ Manajemen Perdagangan: 
+○​ Stop Loss: Ditempatkan tepat di atas sumbu tertinggi dari pergerakan 
+
+manipulasi.4 
+
+○​ Take Profit: Ditempatkan pada target likuiditas HTF, yaitu Previous Day's Low 
+(PDL).10 
+
+○​ Hasil: Harga kembali ke FVG, memicu entri jual, dan kemudian memasuki fase 
+
+
+
+Distribusi ke bawah, mencapai target TP. 
+
+ 
+
+4.2. Implementasi dalam Berbagai Rezim Pasar 
+ 
+
+Sebuah algoritma yang tangguh harus dapat beradaptasi. Model PO3 tidak diterapkan 
+dengan cara yang sama persis di setiap kondisi pasar. AI harus terlebih dahulu 
+mengklasifikasikan rezim pasar saat ini (trending atau ranging) berdasarkan analisis 
+struktur HTF. 
+
+ 
+
+Pasar Trending (Pro-Trend PO3) 
+ 
+●​ Konteks: Daily Bias sangat kuat dan jelas. Harga secara konsisten membuat 
+
+higher highs dan higher lows (uptrend) atau lower lows dan lower highs 
+(downtrend) pada grafik H4 dan Harian.29 
+
+●​ Model Aplikasi: Dalam konteks ini, manipulasi PO3 berfungsi sebagai pullback 
+yang direkayasa secara cerdas. Judas Swing akan menyapu likuiditas 
+counter-trend jangka pendek untuk "mengisi bahan bakar" dari pergerakan 
+institusional dan memungkinkan mereka untuk menambah posisi searah dengan 
+tren utama dengan harga yang lebih baik. Entri selalu diambil searah dengan tren 
+HTF.5 
+
+●​ Logika Target: Target utama adalah External Range Liquidity. Dalam tren naik, 
+targetnya adalah untuk menembus swing high sebelumnya dan menciptakan 
+higher high yang baru. Dalam tren turun, targetnya adalah menembus swing low 
+sebelumnya. 
+
+ 
+
+Pasar Ranging (Mean Reversion PO3) 
+ 
+●​ Konteks: Harga terkonsolidasi dalam rentang yang besar dan terdefinisi dengan 
+
+baik pada kerangka waktu tinggi (misalnya, grafik Harian atau Mingguan). Daily 
+Bias bersifat netral, rotasional, atau tidak jelas.29 
+
+●​ Model Aplikasi: Di sini, PO3 berfungsi sebagai model pembalikan (reversal) atau 
+mean reversion. Judas Swing akan menyapu likuiditas di salah satu ujung rentang 
+
+
+
+HTF (misalnya, menyapu di atas high rentang). Setelah manipulasi ini, harga 
+diperkirakan akan berbalik dan bergerak melintasi seluruh rentang untuk 
+menargetkan ujung yang berlawanan.30 
+
+●​ Logika Target: Target utama adalah Internal Range Liquidity. Jika manipulasi 
+terjadi di atas high rentang, targetnya adalah low rentang. Jika manipulasi terjadi 
+di bawah low rentang, targetnya adalah high rentang. 
+
+ 
+
+4.3. Analisis Kegagalan Setup (Penting untuk Manajemen Risiko AI) 
+ 
+
+Tidak ada strategi yang 100% akurat. Menganalisis mengapa setup gagal sama 
+pentingnya dengan memahami mengapa setup berhasil. Ini memungkinkan 
+pembangunan filter negatif untuk AI, yaitu aturan yang memberitahu sistem kapan 
+harus menahan diri dari perdagangan. 
+
+ 
+
+Kondisi Kegagalan Umum: 
+ 
+●​ Kesalahan Identifikasi Daily Bias: Ini adalah penyebab kegagalan nomor satu.22 
+
+Trader (atau algoritma) mungkin mengasumsikan bias bullish dan menafsirkan 
+pergerakan turun sebagai "manipulasi beli". Namun, jika konteks HTF sebenarnya 
+bearish, pergerakan turun itu adalah awal dari fase Distribusi HTF yang 
+sebenarnya, dan posisi beli akan dengan cepat dihentikan.31 
+
+●​ Konteks Berita Berdampak Tinggi: Rilis berita ekonomi fundamental yang 
+signifikan (misalnya, Non-Farm Payrolls, data CPI, keputusan suku bunga bank 
+sentral) dapat membatalkan semua analisis teknis. Volatilitas yang ekstrim dapat 
+menyebabkan pergerakan yang tidak terduga yang tidak mengikuti template 
+PO3.32 
+
+●​ Manipulasi yang Berlanjut Menjadi Tren: Terkadang, apa yang tampak seperti 
+sweep likuiditas tidak berbalik tetapi malah menjadi awal dari tren baru yang kuat 
+ke arah tersebut. Ini sering kali merupakan gejala dari Daily Bias yang salah 
+diidentifikasi. 
+
+●​ Pasar yang Sangat "Choppy" atau Tidak Menentu: Dalam kondisi volatilitas 
+yang sangat rendah atau pasar yang bergerak tanpa arah yang jelas (bukan 
+dalam rentang yang bersih), fase Akumulasi mungkin tidak terdefinisi dengan baik. 
+Akibatnya, pergerakan Manipulasi mungkin tidak memiliki cukup "bahan bakar" 
+
+
+
+likuiditas untuk memulai fase Distribusi yang bersih dan terarah.30 
+
+ 
+
+Contoh Grafik Gagal: 
+ 
+
+Analisis akan mencakup contoh grafik di mana setup PO3 tampak terbentuk tetapi 
+gagal. Misalnya, sebuah grafik akan menunjukkan: "Bias Bullish diasumsikan 
+berdasarkan struktur M15. Harga menyapu low Asia. Namun, perdagangan gagal dan 
+stop loss terkena. Analisis pasca-perdagangan pada grafik H4 menunjukkan bahwa 
+harga sebenarnya berada tepat di bawah Bearish Order Block Harian yang besar. Oleh 
+karena itu, sweep ke bawah bukanlah manipulasi untuk naik, melainkan awal dari 
+kelanjutan tren bearish HTF yang lebih besar." 
+
+Dengan mengkatalogkan kondisi-kondisi kegagalan ini, kita dapat membangun filter 
+negatif yang kuat untuk AI. Misalnya: JIKA Daily_Bias_Tidak_Jelas (misalnya, harga 
+berada di tengah rentang HTF) MAKA Nonaktifkan_Perdagangan. Atau, JIKA 
+Ada_Berita_Merah_Dalam_30_Menit MAKA Nonaktifkan_Perdagangan. Filter-filter ini 
+secara signifikan meningkatkan ketahanan (robustness) dan keandalan sistem dalam 
+jangka panjang dengan memprogram "pengalaman" dan "kebijaksanaan" untuk 
+menghindari kondisi pasar yang beracun bagi strategi ini. 
+
+ 
+
+Bagian 5: Kesimpulan dan Rekomendasi untuk Pengembangan 
+Algoritmik 
+ 
+Laporan ini telah menguraikan strategi Power of Three (PO3) dari konsep kualitatif 
+menjadi kerangka kerja kuantitatif yang dirancang untuk implementasi algoritmik. 
+Dengan memahami PO3 sebagai model rekayasa likuiditas institusional, bukan 
+sekadar pola grafik, kita dapat membangun sistem AI yang beroperasi berdasarkan 
+logika pasar yang mendasar. Kesimpulan berikut dan rekomendasi ditujukan untuk 
+memandu tim pengembangan dalam membangun, menguji, dan menyempurnakan 
+sistem perdagangan otomatis berdasarkan prinsip-prinsip ini. 
+
+ 
+
+
+
+5.1. Sintesis Aturan Inti yang Dapat Dikodifikasi 
+ 
+
+Sebagai ringkasan, berikut adalah daftar periksa parameter paling kritis yang harus 
+dikodekan ke dalam algoritma sebagai logika inti: 
+●​ Definisi Sesi: Tetapkan waktu UTC yang tepat dan tidak ambigu untuk Sesi Asia 
+
+(Akumulasi), London Killzone (potensi Manipulasi), dan New York Killzone (potensi 
+Distribusi).1 
+
+●​ Analisis Bias HTF: Algoritma harus secara otomatis menganalisis struktur pasar 
+(HH/HL atau LH/LL) dan reaksi terhadap PD Arrays (FVG, OB) pada grafik D1 dan 
+H4 untuk menetapkan Daily Bias.10 
+
+●​ Identifikasi Rentang Akumulasi: Secara otomatis memplot High dan Low dari 
+Sesi Asia yang telah ditentukan.16 
+
+●​ Kriteria Manipulasi: Manipulasi dianggap valid hanya jika harga menembus batas 
+Rentang Asia ke arah yang berlawanan dengan Daily Bias.10 
+
+●​ Kriteria Market Structure Shift (MSS): MSS harus didefinisikan secara 
+kuantitatif. Ini adalah penembusan swing high/low jangka pendek terakhir dengan 
+candle yang menutup di luarnya, idealnya disertai dengan pergerakan 
+displacement (misalnya, pergerakan yang melebihi 1.5x ATR 14 periode).23 
+
+●​ Aturan Entri FVG: Entri hanya diambil pada pullback ke Fair Value Gap (FVG) 
+yang valid yang terbentuk selama pergerakan MSS. Ukuran minimum FVG (dalam 
+pips atau sebagai persentase dari ATR) harus ditentukan.1 
+
+●​ Logika Stop Loss (SL): SL ditempatkan secara non-diskresioner beberapa pips 
+di luar titik ekstrim dari sumbu (wick) manipulasi.4 
+
+●​ Logika Take Profit (TP): TP utama harus menargetkan liquidity pool HTF yang 
+telah diidentifikasi sebelumnya (misalnya, PDH/PDL, EQH/EQL), bukan rasio R:R 
+yang tetap.1 
+
+ 
+
+5.2. Identifikasi Variabel untuk Pengujian dan Optimasi 
+ 
+
+Meskipun aturan inti harus tetap, beberapa parameter dapat disesuaikan dan 
+dioptimalkan melalui backtesting untuk menemukan pengaturan yang paling sesuai 
+untuk berbagai pasangan mata uang dan kondisi pasar: 
+●​ Periode Lookback: Periode lookback yang digunakan untuk mengidentifikasi 
+
+swing highs dan swing lows yang relevan untuk MSS (misalnya, 5 candle, 10 
+
+
+
+candle). 
+●​ Definisi Waktu Sesi: Waktu mulai dan berakhir yang tepat untuk Sesi Asia dapat 
+
+diuji (misalnya, 00:00-04:00 UTC vs. 00:00-05:00 UTC) untuk melihat mana 
+yang memberikan rentang akumulasi yang lebih andal. 
+
+●​ Threshold Displacement: Ambang batas kuantitatif untuk mengkonfirmasi 
+pergerakan displacement (misalnya, pergerakan harus X kali ATR, atau 
+menghasilkan FVG dengan ukuran Y pips). 
+
+●​ Sensitivitas Deteksi FVG: Menentukan ukuran minimum FVG yang akan 
+dianggap valid oleh algoritma. FVG yang terlalu kecil mungkin tidak signifikan. 
+
+●​ Pengaturan Risk:Reward (Alternatif TP): Sebagai alternatif atau tambahan 
+pada target berbasis likuiditas, pengujian dapat dilakukan pada target TP 
+berbasis rasio R:R yang tetap (misalnya, 2:1, 3:1) untuk mengevaluasi dampaknya 
+terhadap profitabilitas dan win-rate.4 
+
+●​ Parameter ATR untuk SL: Jarak SL dari sumbu manipulasi dapat dibuat dinamis 
+berdasarkan volatilitas saat ini (misalnya, low of manipulation - 0.2 * ATR(14)). 
+
+ 
+
+5.3. Pertimbangan Lanjutan untuk Ketahanan Model 
+ 
+
+Untuk membangun sistem yang benar-benar tangguh dan dapat bertahan dalam 
+jangka panjang, pertimbangan berikut sangat direkomendasikan: 
+●​ Integrasi Filter Eksternal: 
+
+○​ Filter Kalender Ekonomi: Algoritma harus memiliki akses ke kalender 
+ekonomi dan diprogram untuk menonaktifkan perdagangan secara otomatis 
+selama periode waktu tertentu sebelum dan sesudah rilis berita berdampak 
+tinggi (misalnya, 30 menit sebelum dan sesudah NFP, CPI, atau pengumuman 
+suku bunga) untuk menghindari volatilitas yang tidak dapat diprediksi.32 
+
+○​ Filter Volatilitas: Menggunakan indikator seperti Average True Range (ATR) 
+untuk membangun filter. Perdagangan dapat dinonaktifkan jika volatilitas 
+terlalu rendah (pasar choppy, risiko pergerakan tidak signifikan) atau terlalu 
+tinggi (pasar tidak menentu, risiko slippage dan spread yang melebar). 
+
+●​ Manajemen Portofolio dan Korelasi: Daripada hanya berfokus pada satu 
+pasangan mata uang, model ini harus diterapkan pada sekeranjang pasangan 
+mata uang utama (misalnya, EUR/USD, GBP/USD, AUD/USD). Namun, algoritma 
+harus menyadari korelasi antar pasangan. Misalnya, jika sinyal beli yang valid 
+muncul pada EUR/USD dan GBP/USD secara bersamaan, sistem harus dapat 
+memutuskan apakah akan mengambil kedua perdagangan (dengan risiko yang 
+
+
+
+disesuaikan) atau hanya mengambil setup dengan skor probabilitas tertinggi 
+untuk menghindari eksposur berlebihan terhadap pergerakan Dolar AS. 
+
+●​ Potensi Pembelajaran Mesin (Machine Learning): Sebagai pengembangan 
+lebih lanjut, teknik machine learning dapat dieksplorasi untuk meningkatkan 
+beberapa aspek diskresioner dari model ini. Misalnya: 
+○​ Sebuah model klasifikasi dapat dilatih untuk menentukan Daily Bias atau 
+
+mengklasifikasikan rezim pasar (trending vs. ranging) secara lebih dinamis 
+daripada aturan berbasis struktur yang kaku. 
+
+○​ Sebuah model regresi dapat digunakan untuk memprediksi probabilitas 
+keberhasilan sebuah setup berdasarkan konvergensi berbagai faktor (kualitas 
+FVG, kedekatan dengan OB HTF, waktu dalam sesi, dll.), yang memungkinkan 
+sistem untuk hanya mengambil perdagangan dengan probabilitas tertinggi. 
+
+Dengan mengikuti kerangka kerja yang terstruktur ini—mulai dari dekonstruksi 
+konseptual, analisis top-down, aturan eksekusi mekanis, hingga pengujian dan 
+penyempurnaan yang cermat—pengembangan sistem AI auto trading berdasarkan 
+strategi Power of Three memiliki fondasi yang kuat untuk mencapai konsistensi dan 
+profitabilitas dalam lingkungan pasar yang dinamis. 
+
+Karya yang dikutip 
+
+1.​ ICT Power of 3 (PO3): What It Is and How to Trade AMD - XS, diakses Juli 22, 2025, 
+https://www.xs.com/en/blog/ict-power-of-3-po3/ 
+
+2.​ ICT Power of 3 (PO3): What Is It and How to Use it? - HowToTrade, diakses Juli 22, 
+2025, https://howtotrade.com/blog/power-of-3-ict/ 
+
+3.​ Accumulation Manipulation Distribution: Full Trading Guide - EBC Financial Group, 
+diakses Juli 22, 2025, 
+https://www.ebc.com/forex/accumulation-manipulation-distribution-full-trading-
+guide 
+
+4.​ ICT Power of Three Strategy Explained: How to Identify and Trade It - Flux Charts, 
+diakses Juli 22, 2025, 
+https://www.fluxcharts.com/articles/trading-strategies/ict-strategies/ict-power-o
+f-three 
+
+5.​ Mastering the ICT Power of 3 concept - How to use it in trading! for 
+BYBIT:BTCUSDT.P by Youriverse - TradingView, diakses Juli 22, 2025, 
+https://www.tradingview.com/chart/BTCUSDT.P/V2ZxaDfs-Mastering-the-ICT-Po
+wer-of-3-concept-How-to-use-it-in-trading/ 
+
+6.​ Accumulation Manipulation Distribution (AMD) in Trading - XS, diakses Juli 22, 
+2025, 
+https://www.xs.com/en/blog/accumulation-manipulation-distribution-amd-tradin
+g/ 
+
+7.​ What Is ICT PO3, and How Do Traders Use It? | Market Pulse - FXOpen UK, diakses 
+Juli 22, 2025, 
+
+
+
+https://fxopen.com/blog/en/what-is-ict-po3-and-how-do-traders-use-it/ 
+8.​ This Stupid Simple ICT Strategy Works Every Day - YouTube, diakses Juli 22, 2025, 
+
+https://www.youtube.com/watch?v=qITC4uQzlTM 
+9.​ The Forex 3-session Trading System - Investopedia, diakses Juli 22, 2025, 
+
+https://www.investopedia.com/articles/forex/08/3-market-system.asp 
+10.​How To Identify Daily Bias Using ICT Concepts, diakses Juli 22, 2025, 
+
+https://citytradersimperium.com/daily-bias-ict-concepts/ 
+11.​What Is ICT Trading: Overview, Key Concepts, and Tips - FBS, diakses Juli 22, 
+
+2025, 
+https://fbs.com/fbs-academy/traders-blog/mastering-the-ict-trading-strategy-ke
+y-techniques 
+
+12.​Asian Session PO3; Accumulation, Manipulation & Distribution | PDF - Scribd, 
+diakses Juli 22, 2025, 
+https://www.scribd.com/document/853272136/Asian-Session-PO3-Accumulation-
+Manipulation-Distribution 
+
+13.​High Win Rate ICT Judas Swing Strategy To Quit Your Job [Full Guide] - YouTube, 
+diakses Juli 22, 2025, https://www.youtube.com/watch?v=xMg1zRrQNgU 
+
+14.​Halaman 6 | Ict — Indikator dan Strategi - TradingView, diakses Juli 22, 2025, 
+https://id.tradingview.com/scripts/ict/page-6/ 
+
+15.​ICT TRADING STRATEGY [PDF] - HowToTrade, diakses Juli 22, 2025, 
+https://howtotrade.com/wp-content/uploads/2023/11/ICT-Trading-Strategy-1.pdf 
+
+16.​ICT Asian Range and Killzones — Indikator von ICTFusion - TradingView, diakses 
+Juli 22, 2025, 
+https://de.tradingview.com/script/k1qv9OWl-ICT-Asian-Range-and-Killzones/ 
+
+17.​Trading ICT Kill Zones in Forex: Complete Guide for 2025 - HowToTrade, diakses 
+Juli 22, 2025, https://howtotrade.com/blog/ict-kill-zones/ 
+
+18.​PO3 Trading Strategy: How to Identify Market Manipulation | EBC Financial Group, 
+diakses Juli 22, 2025, 
+https://www.ebc.com/forex/po-trading-strategy-how-to-identify-market-manipul
+ation 
+
+19.​Accumulation Manipulation Distribtuion: Refined | PDF | Business - Scribd, diakses 
+Juli 22, 2025, https://www.scribd.com/document/518378232/Amd 
+
+20.​The Secret Timing Hack Pro Traders Use for Day Trading (ICT Killzones Explained!), 
+diakses Juli 22, 2025, https://www.youtube.com/watch?v=wWepftCZqfg 
+
+21.​What Is the Smart Money Concept and How Does the ICT Trading Strategy Work? 
+- ATAS, diakses Juli 22, 2025, 
+https://atas.net/technical-analysis/what-is-the-smart-money-concept-and-how-
+does-the-ict-trading-strategy-work/ 
+
+22.​Use This Easy ICT Trading Strategy In 2025 To Quit Your Job In 60 Days! - 
+YouTube, diakses Juli 22, 2025, 
+https://www.youtube.com/watch?v=08Tv4nOccCg&pp=0gcJCfwAo7VqN5tD 
+
+23.​The ICT Market Structure Shift is Transforming Trading Strategies - Opofinance 
+Blog, diakses Juli 22, 2025, 
+https://blog.opofinance.com/en/ict-market-structure-shift/ 
+
+24.​Mastering Order Blocks: The Ultimate Guide for Traders, diakses Juli 22, 2025, 
+
+
+
+https://eplanetbrokers.com/training/mastering-order-blocks/ 
+25.​ICT — The Asian Range. Market Maker Primer course - Medium, diakses Juli 22, 
+
+2025, https://medium.com/@badrdata37/ict-the-asian-range-f2bae7e49c5e 
+26.​To all the profitable ICT traders : r/InnerCircleTraders - Reddit, diakses Juli 22, 
+
+2025, 
+https://www.reddit.com/r/InnerCircleTraders/comments/1e0hoeo/to_all_the_profit
+able_ict_traders/ 
+
+27.​Catch 1:10RR Trades With This ICT Trading Strategy! (ICT PO3) - YouTube, diakses 
+Juli 22, 2025, https://www.youtube.com/watch?v=tKjhWnFib-w 
+
+28.​British Pound to U.S. Dollar - GBP/USD Exchange Rate Chart - FOREX.com, diakses 
+Juli 22, 2025, https://www.forex.com/en-us/forex-trading/gbp-usd/ 
+
+29.​What is a Trending & Ranging Market? - Trendo, diakses Juli 22, 2025, 
+https://fxtrendo.com/blog/830/Trending-And-Ranging-Market 
+
+30.​How to determine if you are in a range (chopping) vs trending? : r/FuturesTrading 
+- Reddit, diakses Juli 22, 2025, 
+https://www.reddit.com/r/FuturesTrading/comments/16t8hab/how_to_determine_i
+f_you_are_in_a_range_chopping/ 
+
+31.​I tried everything in Trading, failed with ICT, and then a mechanical strategy 
+changed everything : r/InnerCircleTraders - Reddit, diakses Juli 22, 2025, 
+https://www.reddit.com/r/InnerCircleTraders/comments/1icukud/i_tried_everythin
+g_in_trading_failed_with_ict_and/ 
+
+32.​Mastering the ICT Judas Swing - Opofinance Blog, diakses Juli 22, 2025, 
+https://blog.opofinance.com/en/the-ict-judas-swing/

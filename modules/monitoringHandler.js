@@ -22,9 +22,13 @@ let isClosing = false;
 async function ensureDir(dir) {
     try {
         await fs.access(dir);
+        log.debug(`📁 Direktori verified: ${dir}`);
     } catch (_) {
         await fs.mkdir(dir, { recursive: true });
-        log.info(`[MONITORING] Direktori dibuat: ${dir}`);
+        log.info(`📁 Direktori dibuat: ${dir}`, { 
+            directory: dir, 
+            timestamp: new Date().toISOString() 
+        });
     }
 }
 
@@ -33,9 +37,16 @@ async function ensureDir(dir) {
  */
 const broadcast = (message) => {
     if (global.broadcastMessage) {
+        log.debug('📢 Broadcasting message to recipients', { 
+            messageLength: message.length,
+            timestamp: new Date().toISOString()
+        });
         global.broadcastMessage(message);
     } else {
-        log.warn('[MONITORING] Peringatan: fungsi broadcastMessage global tidak ditemukan.');
+        log.warn('⚠️ Peringatan: fungsi broadcastMessage global tidak ditemukan', { 
+            message,
+            timestamp: new Date().toISOString()
+        });
     }
 };
 
@@ -44,11 +55,16 @@ const broadcast = (message) => {
  */
 async function evaluateActiveTrades() {
     if (isEvaluating) {
-        log.warn('[MONITORING] Evaluasi masih berjalan, siklus dilewati.');
+        log.warn('⚠️ Evaluasi masih berjalan, siklus dilewati', { 
+            timestamp: new Date().toISOString() 
+        });
         return;
     }
 
     isEvaluating = true;
+    log.info('🔍 Memulai evaluasi posisi aktif', { 
+        timestamp: new Date().toISOString() 
+    });
 
     try {
         await ensureDir(POSITIONS_DIR);
@@ -57,12 +73,22 @@ async function evaluateActiveTrades() {
         const tradeFiles = files.filter(f => f.endsWith('.json'));
 
         if (tradeFiles.length === 0) {
-            log.debug('[MONITORING] Tidak ada posisi aktif untuk dievaluasi.');
+            log.debug('📊 Tidak ada posisi aktif untuk dievaluasi', { 
+                positionsDir: POSITIONS_DIR,
+                timestamp: new Date().toISOString()
+            });
             isEvaluating = false;
             return;
         }
 
-        log.info(`[MONITORING] Mengevaluasi ${tradeFiles.length} posisi aktif...`);
+        log.info(`📊 Mengevaluasi ${tradeFiles.length} posisi aktif`, { 
+            tradeFiles, 
+            positionsDir: POSITIONS_DIR,
+            timestamp: new Date().toISOString()
+        });
+
+        // Kirim notifikasi awal evaluasi
+        broadcast(`🔍 *EVALUASI POSISI AKTIF*\n📊 Checking ${tradeFiles.length} trades...\n⏳ Mengambil data dari broker...`);
 
         // Dapatkan semua posisi aktif dari broker
         const activePositions = await broker.getActivePositions();

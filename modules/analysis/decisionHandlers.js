@@ -1,54 +1,148 @@
 const path = require('path');
 const broker = require('../brokerHandler');
 const journalingHandler = require('../journalingHandler');
+const circuitBreaker = require('../circuitBreaker');
 const { getLogger } = require('../logger');
 const { writeJsonFile, readJsonFile, PENDING_DIR, POSITIONS_DIR, JOURNAL_DIR } = require('./helpers');
 const log = getLogger('DecisionHandlers');
 
 async function saveOrderData(orderData, initialAnalysisText, meta = {}) {
     const { ticket, symbol } = orderData;
-    log.info(`Menyimpan data untuk order #${ticket} (${symbol}).`);
+    log.info(`💾 Menyimpan data untuk order #${ticket} (${symbol})`, { 
+        orderData, 
+        meta, 
+        timestamp: new Date().toISOString() 
+    });
+    
     const isPending = orderData.type.includes('LIMIT') || orderData.type.includes('STOP');
     const targetDir = isPending ? PENDING_DIR : POSITIONS_DIR;
     const fileName = `trade_${symbol}.json`;
     const orderFilePath = path.join(targetDir, fileName);
     const journalFilePath = path.join(JOURNAL_DIR, `journal_data_${symbol}.json`);
+    
+    log.debug(`📁 Target directory: ${targetDir}`, { 
+        isPending, 
+        orderFilePath, 
+        journalFilePath 
+    });
+    
     try {
         await writeJsonFile(orderFilePath, { ...orderData, meta });
         let journalData = await readJsonFile(journalFilePath) || {};
         journalData[ticket] = initialAnalysisText;
         await writeJsonFile(journalFilePath, journalData);
-        log.info(`Pencatatan untuk order #${ticket} selesai.`);
+        
+        log.info(`✅ Pencatatan untuk order #${ticket} selesai`, { 
+            orderFile: orderFilePath, 
+            journalFile: journalFilePath,
+            journalTextLength: initialAnalysisText ? initialAnalysisText.length : 0
+        });
     } catch (err) {
-        log.error(`Gagal menyimpan data untuk order #${ticket}.`, err);
+        log.error(`❌ Gagal menyimpan data untuk order #${ticket}`, { 
+            error: err.message, 
+            stack: err.stack, 
+            orderData, 
+            orderFilePath, 
+            journalFilePath 
+        });
+        throw err;
     }
 }
 
 async function handleOpenDecision(extractedData, narrativeAnalysisResult, whatsappSocket, recipientIds, analysisMeta = {}) {
     const { pair, arah, harga, sl, tp } = extractedData;
-    log.info(`AI memutuskan OPEN. Mencoba eksekusi trade untuk ${pair}...`);
-    const orderPayload = { symbol: pair, type: arah, price: harga || 0, sl, tp, volume: parseFloat(process.env.TRADE_VOLUME) || 0.01, comment: `BotV7 | ${pair}` };
-    log.debug('Payload order yang dikirim ke broker:', orderPayload);
+    
+    // 🚨 CIRCUIT BREAKER CHECK - CRITICAL PROTECTION
+    const isCircuitTripped = await circuitBreaker.isTripped();
+    if (isCircuitTripped) {
+        const blockMessage = `🚨 CIRCUIT BREAKER AKTIF - TRADE DIBLOKIR untuk ${pair}`;
+        log.warn(blockMessage, { 
+            extractedData, 
+            reason: 'Consecutive losses exceeded limit' 
+        });
+        
+        if (global.broadcastMessage) {
+            global.broadcastMessage(`🚨 *CIRCUIT BREAKER AKTIF*\n❌ Trade ${pair} diblokir\n🛡️ Proteksi dari kerugian beruntun\n⏰ Reset otomatis besok pagi`);
+        }
+        return; // STOP EXECUTION - NO TRADE
+    }
+    
+    log.info(`🚀 AI memutuskan OPEN untuk ${pair}`, { 
+        extractedData, 
+        analysisMeta, 
+        recipientCount: recipientIds ? recipientIds.length : 0 
+    });
+    
+    const orderPayload = { 
+        symbol: pair, 
+        type: arah, 
+        price: harga || 0, 
+        sl, 
+        tp, 
+        volume: parseFloat(process.env.TRADE_VOLUME) || 0.01, 
+        comment: `BotV7 | ${pair}` 
+    };
+    
+    log.debug('📤 Payload order yang dikirim ke broker:', { 
+        orderPayload, 
+        timestamp: new Date().toISOString(),
+        narrativeLength: narrativeAnalysisResult ? narrativeAnalysisResult.length : 0
+    });
+    
+    // Kirim notifikasi sebelum eksekusi
+    if (global.broadcastMessage) {
+        global.broadcastMessage(`⚡ *EKSEKUSI ORDER: ${pair}*\n📊 Arah: ${arah}\n💰 Harga: ${harga}\n🛡️ SL: ${sl}\n🎯 TP: ${tp}\n⏳ Mengirim ke broker...`);
+    }
+    
     const brokerResult = await broker.openOrder(orderPayload);
+    
+    log.debug('📥 Response dari broker:', { 
+        brokerResult, 
+        timestamp: new Date().toISOString() 
+    });
+    
     const ticketId = brokerResult.order || brokerResult.deal || brokerResult.ticket;
-    if (!ticketId) throw new Error('Eksekusi order berhasil, tetapi gagal mendapatkan ticket ID dari broker.');
-    log.info(`Broker berhasil mengeksekusi order. Tiket: #${ticketId}`);
+    
+    if (!ticketId) {
+        const errorMsg = 'Eksekusi order berhasil, tetapi gagal mendapatkan ticket ID dari broker';
+        log.error(`❌ ${errorMsg}`, { brokerResult, orderPayload });
+        throw new Error(errorMsg);
+    }
+    
+    log.info(`✅ Broker berhasil mengeksekusi order`, { 
+        ticket: ticketId, 
+        pair, 
+        arah, 
+        brokerResult 
+    });
+    
     const finalOrderData = { ...orderPayload, ticket: ticketId };
     await saveOrderData(finalOrderData, narrativeAnalysisResult, analysisMeta);
     
     // Use global broadcast function for consistency
     if (global.broadcastMessage) {
-        global.broadcastMessage(`✅ *AKSI DIAMBIL!* Order ${pair} (${arah}) telah dieksekusi.\n*Tiket:* #${ticketId}`);
+        global.broadcastMessage(`🎉 *ORDER BERHASIL DIBUKA!*\n💰 Pair: ${pair}\n📊 Arah: ${arah}\n🎫 Tiket: #${ticketId}\n💰 Entry: ${harga}\n🛡️ SL: ${sl}\n🎯 TP: ${tp}`);
     }
 }
 
 async function handleCloseDecision(extractedData, activeTrade, whatsappSocket, recipientIds) {
     const pair = activeTrade ? activeTrade.symbol : extractedData.pair;
-    log.info(`AI memutuskan CLOSE_MANUAL untuk ${pair}.`);
+    log.info(`🔴 AI memutuskan CLOSE_MANUAL untuk ${pair}`, { 
+        extractedData, 
+        activeTrade, 
+        recipientCount: recipientIds ? recipientIds.length : 0 
+    });
+    
     if (!activeTrade || !activeTrade.ticket) {
-        log.warn(`AI menyarankan tutup, tapi tidak ada data trade aktif tercatat untuk ${pair}.`);
+        const warnMsg = `AI menyarankan tutup, tapi tidak ada data trade aktif tercatat untuk ${pair}`;
+        log.warn(`⚠️ ${warnMsg}`, { 
+            extractedData, 
+            activeTrade,
+            availableTradeData: activeTrade ? Object.keys(activeTrade) : null
+        });
+        
         if (global.broadcastMessage) {
-            global.broadcastMessage(`ℹ️ *Info:* Analisis menyarankan tutup, tetapi tidak ada posisi aktif yang tercatat untuk ${pair}. Mungkin sudah ditutup manual.`);
+            global.broadcastMessage(`ℹ️ *PERINGATAN: ${pair}*\n⚠️ AI menyarankan tutup posisi\n❌ Tidak ada posisi aktif tercatat\n💡 Kemungkinan sudah ditutup manual`);
         }
         return;
     }

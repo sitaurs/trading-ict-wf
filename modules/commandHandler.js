@@ -55,59 +55,79 @@ async function updateBotStatus(patch) {
 // --- FUNGSI-FUNGSI COMMAND HANDLER ---
 
 async function handleMenuCommand(whatsappSocket, chatId, supportedPairs = []) {
-    log.info('Menampilkan menu bantuan bot trading', { chatId });
-    const menuText = `
-🤖 *MENU BANTUAN BOT TRADING ICT PO3* 🤖
-
-*ANALISIS MANUAL PO3*
-▫️ \`/stage1\` : Force analisis bias harian (Stage 1)
-▫️ \`/stage2\` : Force deteksi manipulasi (Stage 2)
-▫️ \`/stage3\` : Force konfirmasi entri (Stage 3)
-▫️ \`/holdeod\` : Force analisis hold/close untuk semua pair
-▫️ \`/fullcycle\` : Jalankan semua stage PO3 secara berurutan
-
-*KONTROL INDIVIDUAL*
-▫️ \`/${supportedPairs.join(', /').toLowerCase()}\` : Info progress pair spesifik
-▫️ \`/news\` : Cari berita ekonomi terbaru
-▫️ \`/context PAIR\` : Lihat konteks harian pair
-▫️ \`/analyze PAIR\` : Analisis spesifik satu pair
-
-*MANAJEMEN & LAPORAN*
-▫️ \`/status\` : Status PO3 lengkap bot
-▫️ \`/cls PAIR\` : Menutup trade aktif
-▫️ \`/profit_today\` : Laporan profit/loss hari ini
-▫️ \`/positions\` : Lihat semua posisi aktif
-▫️ \`/pending\` : Lihat semua pending orders
-
-*KONTROL BOT*
-▫️ \`/pause\` : Menghentikan sementara trading terjadwal
-▫️ \`/resume\` : Melanjutkan trading terjadwal
-▫️ \`/restart\` : Restart sistem bot
-
-*NOTIFIKASI*
-▫️ \`/list_recipients\`
-▫️ \`/add_recipient <ID>\`
-▫️ \`/del_recipient <ID>\`
-
-*PENGATURAN*
-▫️ \`/setting berita <on|off>\`
-▫️ \`/sesi <on|off>\`
-▫️ \`/filter <on|off>\`
-
-*DEBUG & MAINTENANCE*
-▫️ \`/resetcontext PAIR\` : Reset konteks harian pair
-▫️ \`/forceeod\` : Force tutup semua posisi (EOD manual)
-▫️ \`/clearcache\` : Clear analysis cache
-▫️ \`/health\` : Health check sistem
-
-Gunakan \`/help\` kapan saja untuk melihat menu ini lagi.
-    `;
+    log.info('🎯 Menampilkan menu bantuan bot trading', { 
+        chatId,
+        timestamp: new Date().toISOString(),
+        supportedPairsCount: supportedPairs.length
+    });
     
+    const menuText = `🤖 *TRADING BOT ICT PO3 STRATEGY*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 *Powered by AI & Machine Learning*
+
+📊 *ANALISIS & TRADING COMMANDS*
+• \`/stage1\` - 🎯 Analisis bias harian (Stage 1)
+• \`/stage2\` - ⚡ Deteksi manipulasi London (Stage 2)  
+• \`/stage3\` - 🚀 Konfirmasi entry (Stage 3)
+• \`/analyze [PAIR]\` - 📈 Analisis lengkap spesifik pair
+• \`/fullcycle\` - 🔄 Jalankan semua stage PO3
+
+� *MONITORING & POSISI*
+• \`/status\` - 📊 Status bot & posisi aktif
+• \`/positions\` - 💼 Lihat semua posisi terbuka
+• \`/pending\` - ⏳ Lihat pending orders
+• \`/profit_today\` - 💰 Laporan profit hari ini
+• \`/cls [PAIR]\` - ❌ Tutup posisi manual
+
+⚙️ *PENGATURAN & KONTROL BOT*
+• \`/pause\` - ⏸️ Pause trading otomatis
+• \`/resume\` - ▶️ Resume trading otomatis
+• \`/add_recipient [NOMOR]\` - ➕ Tambah penerima notif
+• \`/del_recipient [NOMOR]\` - ➖ Hapus penerima notif
+• \`/list_recipients\` - 📋 Lihat daftar penerima
+
+📰 *INFORMASI & UTILITAS*
+• \`/news\` - 📰 Berita ekonomi forex terkini
+• \`/health\` - 🏥 Status kesehatan sistem
+• \`/context [PAIR]\` - 📝 Status konteks pair harian
+• \`/clearcache\` - 🗑️ Bersihkan cache analisis
+
+🔧 *ADVANCED & MAINTENANCE*
+• \`/holdeod\` - 🌅 Analisis hold/close EOD
+• \`/forceeod\` - 🚨 Paksa tutup semua posisi
+• \`/resetcontext [PAIR]\` - 🔄 Reset konteks pair
+• \`/restart\` - 🔄 Restart sistem bot
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+� *Supported Pairs:* ${supportedPairs.join(', ')}
+⏰ *Current Time:* ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })} WIB
+🌍 *Server Time:* ${new Date().toLocaleString('en-US', { timeZone: 'UTC' })} UTC
+
+💡 *Tips:* 
+• Ganti [PAIR] dengan kode mata uang (contoh: USDJPY)
+• Semua command case-insensitive
+• Bot bekerja 24/5 mengikuti jadwal forex
+
+🆘 *Butuh bantuan?* Ketik */help* kapan saja!`;
+
     try {
-        await whatsappSocket.sendMessage(chatId, { text: menuText.trim() });
-        log.info('Menu bantuan berhasil dikirim', { chatId, totalCommands: 25 });
+        await whatsappSocket.sendMessage(chatId, { text: menuText });
+        log.info('✅ Menu bantuan berhasil dikirim', { 
+            chatId,
+            totalCommands: 25,
+            supportedPairs: supportedPairs.length,
+            messageLength: menuText.length,
+            timestamp: new Date().toISOString()
+        });
     } catch (error) {
-        log.error('Gagal mengirim menu bantuan:', { error: error.message, chatId, stack: error.stack });
+        log.error('❌ Gagal mengirim menu bantuan', {
+            error: error.message,
+            chatId,
+            stack: error.stack,
+            messageLength: menuText?.length || 0,
+            supportedPairs: supportedPairs,
+            timestamp: new Date().toISOString()
+        });
         throw new Error(`Gagal mengirim menu: ${error.message}`);
     }
 }

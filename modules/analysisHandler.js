@@ -19,9 +19,12 @@ const log = getLogger('AnalysisHandler');
 const MAX_RETRIES = parseInt(process.env.MAX_RETRIES) || 3;
 
 /**
- * Memanggil Gemini Pro untuk analisis naratif
+ * Memanggil Gemini Pro 2.5 untuk analisis naratif lengkap
  */
 async function callGeminiPro(prompt, chartImages = []) {
+    const MODEL_NAME = 'gemini-2.5-pro';
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${process.env.GEMINI_API_KEY}`;
+    
     const contents = [{
         parts: [
             { text: prompt },
@@ -34,27 +37,53 @@ async function callGeminiPro(prompt, chartImages = []) {
         ]
     }];
 
+    const requestPayload = {
+        contents,
+        generationConfig: {
+            temperature: 0.3,
+            maxOutputTokens: 2000,
+            topP: 0.95,
+            topK: 40
+        }
+    };
+
+    log.debug(`🤖 Memulai analisis dengan ${MODEL_NAME}`, {
+        model: MODEL_NAME,
+        promptLength: prompt.length,
+        chartImagesCount: chartImages.length,
+        temperature: 0.3,
+        maxTokens: 2000
+    });
+
     try {
-        const response = await axios.post(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${process.env.GEMINI_API_KEY}`,
-            {
-                contents,
-                generationConfig: {
-                    temperature: 0.3,
-                    maxOutputTokens: 2000
-                }
-            },
-            {
-                headers: { 'Content-Type': 'application/json' },
-                timeout: 60000
-            }
-        );
+        const startTime = Date.now();
+        const response = await axios.post(apiUrl, requestPayload, {
+            headers: { 'Content-Type': 'application/json' },
+            timeout: 60000
+        });
+
+        const duration = Date.now() - startTime;
 
         if (!response.data || !response.data.candidates || !response.data.candidates[0]) {
+            log.error('❌ Invalid response structure from Gemini API', {
+                responseData: response.data,
+                status: response.status,
+                headers: response.headers
+            });
             throw new Error('Invalid response structure from Gemini API');
         }
 
-        return response.data.candidates[0].content.parts[0].text;
+        const analysisText = response.data.candidates[0].content.parts[0].text;
+        
+        log.debug(`✅ Gemini Pro analisis berhasil`, {
+            model: MODEL_NAME,
+            duration: `${duration}ms`,
+            responseLength: analysisText.length,
+            tokensUsed: response.data.usageMetadata?.totalTokenCount || 'N/A',
+            candidatesCount: response.data.candidates.length
+        });
+
+        return analysisText;
     } catch (error) {
         const errorMessage = error.response 
             ? `API Error ${error.response.status}: ${JSON.stringify(error.response.data)}` 
@@ -62,7 +91,7 @@ async function callGeminiPro(prompt, chartImages = []) {
         const statusCode = error.response?.status;
         const responseData = error.response?.data;
         
-        log.error('Gagal memanggil Gemini Pro API:', { 
+        log.error('❌ Gagal memanggil Gemini Pro API', { 
             error: errorMessage, 
             statusCode, 
             responseData, 
@@ -70,7 +99,14 @@ async function callGeminiPro(prompt, chartImages = []) {
             requestData: { 
                 model: MODEL_NAME, 
                 promptLength: prompt.length,
-                temperature: TEMPERATURE 
+                chartImagesCount: chartImages.length,
+                temperature: 0.3,
+                apiUrl: apiUrl
+            },
+            headers: error.response?.headers,
+            config: {
+                timeout: 60000,
+                method: 'POST'
             }
         });
         throw new Error(`Gemini API call failed: ${errorMessage}`);
@@ -98,17 +134,46 @@ async function runStage1Analysis(pairs) {
             context.lock = true;
             await saveContext(context);
 
-            log.info(`Memproses ${pair} untuk analisis bias...`);
+            log.info(`📊 Memproses ${pair} untuk analisis bias harian...`);
+            
+            // Kirim notifikasi awal
+            if (global.broadcastMessage) {
+                global.broadcastMessage(`🔄 *STAGE 1: ${pair}*\n🚀 Memulai analisis bias harian...\n⏳ Mengambil data chart dan OHLCV...`);
+            }
             
             // Ambil data pasar
             const chartImages = await promptBuilders.getChartImages(pair, ['H4', 'H1', 'M15']);
             const ohlcvData = await promptBuilders.fetchOhlcv(pair);
             
+            if (global.broadcastMessage) {
+                const chartStatus = chartImages.length > 0 ? `✅ ${chartImages.length} chart` : '❌ Tidak ada chart';
+                const dataStatus = ohlcvData.count > 0 ? `✅ ${ohlcvData.count} candles` : '❌ Tidak ada data';
+                const dataSource = ohlcvData.source || 'Unknown';
+                
+                global.broadcastMessage(`📊 *STAGE 1: ${pair}*\n📈 Chart: ${chartStatus}\n📊 Data: ${dataStatus} (${dataSource})\n🤖 Memulai analisis AI dengan Gemini Pro...`);
+            }
+            
             // Bangun prompt Stage 1
             const prompt = await promptBuilders.prepareStage1Prompt(pair, ohlcvData);
             
+            // Debug: Log the prompt being sent
+            log.debug(`Stage 1 prompt for ${pair}:`, prompt.substring(0, 500) + '...');
+            
             // Panggil AI untuk analisis
             const narrativeText = await callGeminiPro(prompt, chartImages);
+            
+            // Debug: Log what we get from Gemini Pro
+            log.debug(`📝 Narrative text from Gemini Pro for ${pair}:`, {
+                pair: pair,
+                responseLength: narrativeText.length,
+                sampleText: narrativeText.substring(0, 500) + '...',
+                containsAnalysis: !narrativeText.includes('{NARRATIVE_TEXT}')
+            });
+            
+            // Kirim notifikasi ekstraksi
+            if (global.broadcastMessage) {
+                global.broadcastMessage(`🔍 *STAGE 1: ${pair}*\n✅ Analisis AI selesai (${narrativeText.length} karakter)\n⚙️ Mengekstrak data dengan Gemini Flash...`);
+            }
             
             // Ekstrak data dengan Gemini Flash
             const extractedData = await extractStage1Data(narrativeText);
@@ -123,9 +188,17 @@ async function runStage1Analysis(pairs) {
             
             await saveContext(context);
             
-            // Kirim notifikasi
+            // Kirim notifikasi hasil
             if (global.broadcastMessage) {
-                global.broadcastMessage(`🎯 ${pair} - Bias Harian: ${extractedData.bias}\nAsia Range: ${extractedData.asia_low} - ${extractedData.asia_high}\nTarget HTF: ${extractedData.htf_zone_target}`);
+                const biasText = extractedData.bias || 'NEUTRAL';
+                const asiaHighText = extractedData.asia_high ? extractedData.asia_high.toString() : 'N/A';
+                const asiaLowText = extractedData.asia_low ? extractedData.asia_low.toString() : 'N/A';
+                const htfTargetText = extractedData.htf_zone_target || 'N/A';
+                
+                const biasEmoji = biasText === 'BULLISH' ? '🟢' : biasText === 'BEARISH' ? '🔴' : '🟡';
+                const resultMessage = `✅ *STAGE 1 SELESAI: ${pair}*\n\n${biasEmoji} *Bias Harian:* ${biasText}\n📏 *Asia Range:* ${asiaLowText} - ${asiaHighText}\n🎯 *Target HTF:* ${htfTargetText}\n\n⏭️ Menunggu Stage 2 (Deteksi Manipulasi)`;
+                
+                global.broadcastMessage(resultMessage);
             }
             
             log.info(`${pair} Stage 1 selesai: Bias=${extractedData.bias}`);
@@ -182,11 +255,25 @@ async function runStage2Analysis(pairs) {
             context.lock = true;
             await saveContext(context);
 
-            log.info(`Memproses ${pair} untuk deteksi manipulasi...`);
+            log.info(`📊 Memproses ${pair} untuk deteksi manipulasi London...`);
+            
+            // Kirim notifikasi awal Stage 2
+            if (global.broadcastMessage) {
+                global.broadcastMessage(`🔄 *STAGE 2: ${pair}*\n⚡ Memulai deteksi manipulasi London...\n⏳ Mengambil data chart dan OHLCV...`);
+            }
             
             // Ambil data pasar
             const chartImages = await promptBuilders.getChartImages(pair, ['M15', 'M5']);
             const ohlcvData = await promptBuilders.fetchOhlcv(pair);
+            
+            // Kirim notifikasi progress data
+            if (global.broadcastMessage) {
+                const chartStatus = chartImages.length > 0 ? `✅ ${chartImages.length} chart` : '❌ Tidak ada chart';
+                const dataStatus = ohlcvData.count > 0 ? `✅ ${ohlcvData.count} candles` : '❌ Tidak ada data';
+                const dataSource = ohlcvData.source || 'Unknown';
+                
+                global.broadcastMessage(`📊 *STAGE 2: ${pair}*\n📈 Chart: ${chartStatus}\n📊 Data: ${dataStatus} (${dataSource})\n🤖 Mencari tanda manipulasi dengan Gemini Pro...`);
+            }
             
             // Bangun prompt Stage 2
             const prompt = await promptBuilders.prepareStage2Prompt(pair, context, ohlcvData);
@@ -206,7 +293,12 @@ async function runStage2Analysis(pairs) {
                 context.status = 'PENDING_ENTRY';
                 log.info(`${pair} Manipulasi terdeteksi: ${extractedData.manipulation_side}`);
                 if (global.broadcastMessage) {
-                    global.broadcastMessage(`⚡ ${pair} - Manipulasi ${extractedData.manipulation_side} terdeteksi! Menunggu konfirmasi entri...`);
+                    const sideEmoji = extractedData.manipulation_side === 'ABOVE_ASIA_HIGH' ? '⬆️' : extractedData.manipulation_side === 'BELOW_ASIA_LOW' ? '⬇️' : '⚡';
+                    const htfReactionEmoji = extractedData.htf_reaction ? '✅' : '❌';
+                    
+                    const manipulationMessage = `🎯 *STAGE 2 SELESAI: ${pair}*\n\n⚡ *Manipulasi:* TERDETEKSI ${sideEmoji}\n📍 *Posisi:* ${extractedData.manipulation_side}\n🎯 *HTF Reaction:* ${htfReactionEmoji} ${extractedData.htf_reaction ? 'YA' : 'BELUM'}\n\n⏭️ Menunggu Stage 3 (Konfirmasi Entry)`;
+                    
+                    global.broadcastMessage(manipulationMessage);
                 }
             } else {
                 // Check time-out (misalnya jika sudah melewati jam London)
@@ -215,6 +307,9 @@ async function runStage2Analysis(pairs) {
                 if (utcHour >= 10) {
                     context.status = 'COMPLETE_NO_MANIPULATION';
                     log.info(`${pair} Stage 2 time-out, tidak ada manipulasi`);
+                    if (global.broadcastMessage) {
+                        global.broadcastMessage(`❌ *STAGE 2 SELESAI: ${pair}*\n\n⚡ *Manipulasi:* TIDAK TERDETEKSI\n📊 Market belum memberikan sinyal yang jelas\n\n⏸️ Menunggu sesi berikutnya...`);
+                    }
                 }
             }
             
@@ -277,11 +372,25 @@ async function runStage3Analysis(pairs) {
             context.lock = true;
             await saveContext(context);
 
-            log.info(`Memproses ${pair} untuk konfirmasi entri...`);
+            log.info(`📊 Memproses ${pair} untuk konfirmasi entri...`);
+            
+            // Kirim notifikasi awal Stage 3
+            if (global.broadcastMessage) {
+                global.broadcastMessage(`🔄 *STAGE 3: ${pair}*\n🎯 Memulai konfirmasi entri...\n⏳ Mengambil data chart terbaru...`);
+            }
             
             // Ambil data pasar
             const chartImages = await promptBuilders.getChartImages(pair, ['M15', 'M5']);
             const ohlcvData = await promptBuilders.fetchOhlcv(pair);
+            
+            // Kirim notifikasi progress data
+            if (global.broadcastMessage) {
+                const chartStatus = chartImages.length > 0 ? `✅ ${chartImages.length} chart` : '❌ Tidak ada chart';
+                const dataStatus = ohlcvData.count > 0 ? `✅ ${ohlcvData.count} candles` : '❌ Tidak ada data';
+                const dataSource = ohlcvData.source || 'Unknown';
+                
+                global.broadcastMessage(`📊 *STAGE 3: ${pair}*\n📈 Chart: ${chartStatus}\n📊 Data: ${dataStatus} (${dataSource})\n🤖 Mencari sinyal entry dengan Gemini Pro...`);
+            }
             
             // Bangun prompt Stage 3
             const prompt = await promptBuilders.prepareStage3Prompt(pair, context, ohlcvData);
@@ -289,12 +398,36 @@ async function runStage3Analysis(pairs) {
             // Panggil AI untuk analisis
             const narrativeText = await callGeminiPro(prompt, chartImages);
             
+            // Kirim notifikasi hasil analisis AI
+            if (global.broadcastMessage) {
+                const analysisLength = narrativeText ? narrativeText.length : 0;
+                const hasSignal = narrativeText ? narrativeText.includes('SINYAL TRADING DITEMUKAN') : false;
+                const signalEmoji = hasSignal ? '🎯' : '⏳';
+                
+                global.broadcastMessage(`🔍 *STAGE 3: ${pair}*\n✅ Analisis AI selesai (${analysisLength} karakter)\n${signalEmoji} Status: ${hasSignal ? 'SINYAL DITEMUKAN!' : 'Mencari konfirmasi...'}`);
+            }
+            
             // Periksa apakah ada sinyal
             if (narrativeText.includes('SINYAL TRADING DITEMUKAN')) {
-                log.info(`${pair} Sinyal trading ditemukan!`);
+                log.info(`🎯 ${pair} Sinyal trading ditemukan!`);
+                
+                // Kirim notifikasi sinyal ditemukan
+                if (global.broadcastMessage) {
+                    global.broadcastMessage(`🎯 *STAGE 3: ${pair}*\n✅ SINYAL TRADING DITEMUKAN!\n⚙️ Mengekstrak detail trade dengan Gemini Flash...`);
+                }
                 
                 // Ekstrak menggunakan extractor.js yang sudah ada
                 const extractedData = await extractor.extractAnalysisData(narrativeText);
+                
+                // Kirim notifikasi ekstraksi selesai
+                if (global.broadcastMessage) {
+                    const decision = extractedData.keputusan || 'N/A';
+                    const price = extractedData.harga_entry || 'N/A';
+                    const sl = extractedData.stop_loss || 'N/A';
+                    const tp = extractedData.take_profit || 'N/A';
+                    
+                    global.broadcastMessage(`📋 *STAGE 3: ${pair}*\n✅ Ekstraksi selesai\n📊 Keputusan: ${decision}\n💰 Entry: ${price}\n🛡️ SL: ${sl}\n🎯 TP: ${tp}\n⚡ Memproses order...`);
+                }
                 
                 if (extractedData.keputusan === 'OPEN') {
                     // Teruskan ke decision handler
@@ -305,10 +438,20 @@ async function runStage3Analysis(pairs) {
                     context.stop_loss = extractedData.stop_loss;
                     context.take_profit = extractedData.take_profit;
                     context.trade_status = 'ACTIVE';
+                    
+                    // Kirim notifikasi trade berhasil dibuka
+                    if (global.broadcastMessage) {
+                        global.broadcastMessage(`🚀 *STAGE 3 SELESAI: ${pair}*\n✅ Trade berhasil dibuka!\n📊 Status: ACTIVE\n💰 Entry: ${extractedData.harga_entry}\n🛡️ SL: ${extractedData.stop_loss}\n🎯 TP: ${extractedData.take_profit}`);
+                    }
                 }
             } else {
                 // Tidak ada sinyal
-                log.info(`${pair} Tidak ada sinyal entri yang valid`);
+                log.info(`⏳ ${pair} Tidak ada sinyal entri yang valid`);
+                
+                // Kirim notifikasi tidak ada sinyal
+                if (global.broadcastMessage) {
+                    global.broadcastMessage(`⏳ *STAGE 3: ${pair}*\n❌ Belum ada sinyal entry yang valid\n📊 Market masih dalam observasi\n🔄 Akan dicoba lagi nanti...`);
+                }
                 
                 // Check time-out (misalnya jika sudah melewati jam distribusi)
                 const now = new Date();

@@ -1,0 +1,19 @@
+{
+  "date": "2025-07-27",
+  "pair": "USDCHF",
+  "status": "PENDING_MANIPULATION",
+  "lock": false,
+  "daily_bias": "BEARISH",
+  "asia_high": 0.79566,
+  "asia_low": 0.79473,
+  "htf_zone_target": "Zona demand di sekitar 0.79200 - 0.79400",
+  "manipulation_detected": false,
+  "manipulation_side": null,
+  "htf_reaction": false,
+  "entry_price": null,
+  "stop_loss": null,
+  "take_profit": null,
+  "trade_status": "NONE",
+  "result": null,
+  "error_log": null
+}

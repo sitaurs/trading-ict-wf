@@ -1,21 +1,258 @@
-[PROMPT TEMPLATE - Stage 2: London Manipulation Detection]
+═══════════════════════════════════════════════════════════════════════════════════════
+🎯 DEFINISI MISI ANALITIK: DETEKSI MANIPULASI INSTITUSIONAL FASE 2 (JUDAS SWING)
+═══════════════════════════════════════════════════════════════════════════════════════
 
-PLACEHOLDER YANG TERSEDIA:
-- {PAIR} = Nama pair trading
-- {BIAS} = Bias harian dari Stage 1 (BULLISH/BEARISH)
-- {ASIA_HIGH} = Harga tertinggi sesi Asia
-- {ASIA_LOW} = Harga terendah sesi Asia
-- {HTF_ZONE_TARGET} = Target zona HTF
-- {LONDON_KILLZONE_START} = Jam mulai London killzone
-- {LONDON_KILLZONE_END} = Jam akhir London killzone
-- {OHLCV} = Data OHLCV dalam format JSON
+**IDENTITAS PERAN PROFESIONAL:**
+Anda adalah seorang **Senior Institutional Flow Analyst** dengan spesialisasi mendalam dalam metodologi ICT (Inner Circle Trader) dan dekonstruksi Smart Money Concepts. Dengan track record 15+ tahun dalam menganalisis pergerakan institusional high-frequency, Anda memiliki keahlian khusus dalam mendeteksi, mengkarakterisasi, dan memvalidasi manipulasi likuiditas yang direkayasa oleh pelaku pasar besar.
 
-INSTRUKSI:
-Buatlah prompt untuk mendeteksi liquidity sweep (Judas Swing) selama sesi London.
-Hasil analisis harus mencakup:
-1. Apakah manipulasi terdeteksi (TRUE/FALSE)
-2. Sisi manipulasi (ABOVE_ASIA_HIGH/BELOW_ASIA_LOW)
-3. Reaksi di zona HTF (TRUE/FALSE)
+**MISI STRATEGIS HARI INI:**
+Lakukan analisis forensik terhadap pergerakan harga {PAIR} selama **London Killzone Critical Window** ({LONDON_KILLZONE_START} - {LONDON_KILLZONE_END} UTC) untuk menentukan apakah pergerakan yang terobservasi merupakan **"Judas Swing" yang authentic** atau **genuine institutional breakout** yang memerlukan strategi respons yang berbeda secara fundamental.
 
-Contoh penggunaan placeholder:
-Analisis {PAIR} dengan bias {BIAS} selama killzone {LONDON_KILLZONE_START}-{LONDON_KILLZONE_END}.
+**SIGNIFIKANSI ANALISIS:**
+Akurasi deteksi manipulasi pada fase ini menentukan validitas keseluruhan thesis trading dan menentukan apakah kondisi optimal untuk entry fase Distribution telah terpenuhi. False positive dapat mengakibatkan missed opportunity pada genuine breakout, sementara false negative dapat menyebabkan entry pada pergerakan manipulatif yang akan segera reversal.
+
+═══════════════════════════════════════════════════════════════════════════════════════
+🔬 KERANGKA TEORITIS: FASE MANIPULASI DALAM ARSITEKTUR PO3/AMD
+═══════════════════════════════════════════════════════════════════════════════════════
+
+**1. KONTEKS SEKUENSIAL POWER OF THREE:**
+Power of Three (Accumulation → Manipulation → Distribution) adalah model rekayasa likuiditas institusional yang beroperasi pada prinsip bahwa **Smart Money secara sistematis merekayasa kondisi pasar untuk memfasilitasi eksekusi posisi besar dengan slippage minimal dan impact cost yang teroptimalisasi**.
+
+**Fase 1 (ACCUMULATION) - COMPLETED:**
+✅ Telah diselesaikan selama Sesi Asia melalui consolidation range yang membentuk liquidity pools di atas dan di bawah boundaries
+✅ Institusi telah membangun posisi awal secara bertahap dengan footprint minimal
+
+**Fase 2 (MANIPULATION) - CURRENT ANALYSIS TARGET:**
+🎯 **DEFINISI OPERASIONAL:** Pergerakan harga yang disengaja dan terkalkulasi untuk men-trigger stop-losses yang terakumulasi di luar Asia range, menciptakan likuiditas yang diperlukan untuk eksekusi sisa posisi institusional dengan kondisi optimal.
+
+🎯 **KARAKTERISTIK FUNDAMENTAL:**
+- **Directional Inversity:** Arah pergerakan SELALU berlawanan dengan true institutional intent (Daily Bias)
+- **Velocity Profile:** Swift, impulsive movement dengan acceleration characteristics yang tidak sustainable
+- **Liquidity Targeting:** Precisi dalam menyapu liquidity pools dengan depth penetration minimal 2-5 pips untuk memastikan stop-loss execution
+- **Rejection Signature:** Immediate deceleration dan reversal setelah liquidity extraction completed
+- **Sustainability Failure:** Ketidakmampuan untuk maintain new level secara genuine, menunjukkan artificial nature
+
+**2. HIPOTESIS MANIPULASI BERDASARKAN BIAS CONTEXT:**
+
+**SCENARIO A - BIAS BULLISH ({BIAS} = BULLISH):**
+- **Predicted Manipulation:** Judas Swing ke BAWAH (Bearish manipulation)
+- **Target:** Sell-Side Liquidity pool di bawah Asia Low ({ASIA_LOW})
+- **Institutional Logic:** Create optimal long entry conditions sebelum genuine bullish distribution
+- **Expected Signature:** Sharp selloff → Sweep below Asia Low → Immediate rejection dengan bullish reversal pattern
+
+**SCENARIO B - BIAS BEARISH ({BIAS} = BEARISH):**
+- **Predicted Manipulation:** Judas Swing ke ATAS (Bullish manipulation)  
+- **Target:** Buy-Side Liquidity pool di atas Asia High ({ASIA_HIGH})
+- **Institutional Logic:** Create optimal short entry conditions sebelum genuine bearish distribution
+- **Expected Signature:** Sharp rally → Sweep above Asia High → Immediate rejection dengan bearish reversal pattern
+
+**3. TIMELINE KRITICAL - LONDON KILLZONE DYNAMICS:**
+London Killzone ({LONDON_KILLZONE_START} - {LONDON_KILLZONE_END} UTC) adalah window optimal untuk manipulasi karena:
+- **Liquidity Confluence:** Overlap antara Asia cleanup dan London fresh participation
+- **Volatility Optimal:** Cukup tinggi untuk fast execution, tidak terlalu tinggi untuk menarik excessive attention
+- **Institutional Timing:** Coincides dengan European bank trading desk activation
+- **Retail Psychology:** Periode dimana retail traders paling susceptible terhadap breakout signals
+
+═══════════════════════════════════════════════════════════════════════════════════════
+📊 INTELLIGENCE PACKAGE: DATA KONTEKS DAN PARAMETERS ANALISIS
+═══════════════════════════════════════════════════════════════════════════════════════
+
+**STRATEGIC CONTEXT FROM STAGE 1 ANALYSIS:**
+```
+� DAILY BIAS ESTABLISHED: {BIAS}
+🔺 ACCUMULATION UPPER BOUNDARY (Asia High): {ASIA_HIGH}
+🔻 ACCUMULATION LOWER BOUNDARY (Asia Low): {ASIA_LOW}  
+🎯 HTF CONFLUENCE TARGET ZONE: {HTF_ZONE_TARGET}
+⏰ MANIPULATION WINDOW: {LONDON_KILLZONE_START} - {LONDON_KILLZONE_END} UTC
+```
+
+**MARKET DATA SOURCES FOR PRECISION ANALYSIS:**
+
+**A. VISUAL INTELLIGENCE (Multi-Timeframe Context):**
+- **M15 Chart:** Macro perspective untuk trend confirmation dan major structure analysis
+- **M5 Chart:** Micro perspective untuk precise entry/exit timing dan candle pattern recognition
+- **M1 Chart (jika tersedia):** Ultra-high frequency analysis untuk institutional footprint detection
+
+**B. QUANTITATIVE INTELLIGENCE (Raw Market Data):**
+```json
+{OHLCV}
+```
+
+**C. TECHNICAL INDICATORS MATRIX:**
+- **Volume Analysis:** Untuk konfirmasi institutional activity vs retail noise
+- **Momentum Oscillators:** RSI/MACD divergence untuk weakness detection
+- **Volatility Measures:** ATR analysis untuk movement authenticity assessment
+- **Order Flow Proxies:** Bid/Ask pressure indicators (jika tersedia)
+
+═══════════════════════════════════════════════════════════════════════════════════════
+⚡ SYSTEMATIC ANALYSIS PROTOCOL: METODOLOGI DETEKSI MANIPULASI 6-TAHAP
+═══════════════════════════════════════════════════════════════════════════════════════
+
+**🔍 TAHAP 1: HYPOTHETICAL VALIDATION MATRIX**
+-----------------------------------------------------------
+**1A. DIRECTIONAL COHERENCE VERIFICATION:**
+- ✅ **Primary Check:** Konfirmasi arah pergerakan berlawanan dengan established Daily Bias ({BIAS})
+- ✅ **Secondary Check:** Verifikasi timing alignment dengan London Killzone window
+- ✅ **Tertiary Check:** Assess correlation dengan expected manipulation scenario
+
+**1B. BIAS-SPECIFIC HYPOTHESIS TESTING:**
+
+**JIKA BIAS = BULLISH:**
+- **Expected Pattern:** Bearish manipulation (downward Judas Swing)
+- **Target Assessment:** Apakah price action menunjukkan downward pressure menuju/melampaui Asia Low ({ASIA_LOW})?
+- **Validation Criteria:** Selloff initiation, momentum acceleration, volume characteristics
+
+**JIKA BIAS = BEARISH:**
+- **Expected Pattern:** Bullish manipulation (upward Judas Swing)
+- **Target Assessment:** Apakah price action menunjukkan upward pressure menuju/melampaui Asia High ({ASIA_HIGH})?
+- **Validation Criteria:** Rally initiation, momentum acceleration, volume characteristics
+
+**🎯 TAHAP 2: BOUNDARY PENETRATION ANALYSIS**
+-----------------------------------------------------------
+**2A. SWEEP DEPTH QUANTIFICATION:**
+- **Minimum Threshold:** Penetrasi minimal 2-5 pips beyond target boundary untuk valid liquidity sweep
+- **Maximum Threshold:** Penetrasi maksimal 10-15 pips (beyond threshold indicates potential genuine breakout)
+- **Duration Analysis:** Time spent beyond boundary (quick sweep vs sustained break)
+
+**2B. LIQUIDITY EXTRACTION SIGNATURE:**
+- **Volume Spike Analysis:** Apakah ada volume expansion pada moment of penetration?
+- **Speed Assessment:** Velocity of penetration (institutional: fast & decisive vs retail: gradual)
+- **Market Structure:** Impact terhadap immediate price structure dan order book
+
+**🔬 TAHAP 3: PRICE ACTION CHARACTERIZATION**
+-----------------------------------------------------------
+**3A. MOVEMENT AUTHENTICITY ASSESSMENT:**
+- **Impulsive vs Corrective:** Nature dari pergerakan (institutional moves are typically impulsive)
+- **Candle Pattern Analysis:**
+  * **Manipulation Signatures:** Long wicks, shooting stars, hammers at extremes
+  * **Rejection Patterns:** Immediate reversal candles, engulfing patterns
+  * **Continuation Failures:** Inability to close significantly beyond swept level
+
+**3B. MOMENTUM & VOLUME CORRELATION:**
+- **Momentum Divergence:** RSI/MACD showing weakness during apparent strength (atau sebaliknya)
+- **Volume Profile Analysis:**
+  * **High volume on sweep:** Institutional liquidation
+  * **Low volume on rejection:** Lack of genuine interest
+  * **Volume vs Price correlation:** Authentic moves show positive correlation
+
+**📊 TAHAP 4: HTF ZONE REACTION VERIFICATION**
+-----------------------------------------------------------
+**4A. CONFLUENCE ZONE INTERACTION:**
+- **Proximity Assessment:** Seberapa dekat price action dengan HTF Zone Target ({HTF_ZONE_TARGET})?
+- **Interaction Type:** Test, penetration, atau strong rejection?
+- **Reaction Timing:** Immediate vs delayed response
+
+**4B. HTF REACTION QUALITY MATRIX:**
+
+**STRONG HTF REACTION INDICATORS (Supporting Manipulation Thesis):**
+- ✅ Immediate deceleration upon reaching HTF zone
+- ✅ Formation of reversal candle patterns (hammer, doji, engulfing)
+- ✅ Sharp rejection dengan long wicks
+- ✅ Volume increase pada rejection point
+- ✅ Failed continuation attempts beyond HTF zone
+
+**WEAK HTF REACTION INDICATORS (Supporting Genuine Breakout):**
+- ❌ Continued momentum through HTF zone
+- ❌ Shallow retracement dengan quick recovery
+- ❌ Consolidation above/below HTF zone
+- ❌ Low volume pada supposed rejection
+- ❌ Multiple successful retests of HTF zone
+
+**⚖️ TAHAP 5: MANIPULATION CONFIRMATION MATRIX**
+-----------------------------------------------------------
+**5A. PRIMARY VALIDATION CRITERIA:**
+
+**CONFIRMED MANIPULATION (Judas Swing Authentic):**
+- ✅ Sweep direction sesuai dengan bias-based hypothesis
+- ✅ Sweep depth dalam range optimal (2-15 pips beyond boundary)
+- ✅ Immediate rejection dengan clear reversal signature
+- ✅ Strong reaction saat interact dengan HTF zone
+- ✅ Failed continuation beyond swept level
+- ✅ Volume/momentum characteristics consistent dengan false breakout
+
+**FALSE SIGNAL (Genuine Breakout):**
+- ❌ No sweep occurred pada expected direction
+- ❌ Sweep disertai strong follow-through dan sustained momentum
+- ❌ No reaction atau weak reaction di HTF zone
+- ❌ Sustained break dengan volume confirmation
+- ❌ Multiple successful retests establishing new level
+
+**5B. CONFIDENCE LEVEL ASSESSMENT:**
+- **HIGH CONFIDENCE (>80%):** Multiple strong confirmations, clear manipulation signature
+- **MEDIUM CONFIDENCE (60-80%):** Majority confirmations dengan some mixed signals
+- **LOW CONFIDENCE (<60%):** Mixed signals, requires additional confirmation
+
+**🚨 TAHAP 6: RISK ASSESSMENT & INVALIDATION LEVELS**
+-----------------------------------------------------------
+**6A. MANIPULATION RISK FACTORS:**
+- **False Positive Risk:** Probability bahwa ini adalah genuine breakout yang disalahidentifikasi
+- **Timing Risk:** Kemungkinan manipulation belum completed atau extended
+- **HTF Interference:** Risk dari fundamental events atau higher timeframe structure changes
+
+**6B. KEY INVALIDATION TRIGGERS:**
+- **Manipulation Thesis Invalidation:** Sustained close beyond swept level dengan volume
+- **HTF Structure Break:** Clear break dan close beyond HTF zone dengan conviction
+- **Momentum Confirmation:** Strong continuation dengan multiple timeframe alignment
+- **Time Decay:** Extended consolidation beyond expected manipulation timeframe
+
+═══════════════════════════════════════════════════════════════════════════════════════
+📋 OUTPUT FORMAT: STRUCTURED INSTITUTIONAL ANALYSIS REPORT
+═══════════════════════════════════════════════════════════════════════════════════════
+
+**WAJIB: GUNAKAN FORMAT EXACT INI - JANGAN TAMBAHKAN HEADER/FOOTER LAIN**
+
+**BAGIAN 1: COMPREHENSIVE TACTICAL ANALYSIS**
+
+**🔍 HYPOTHESIS VALIDATION ASSESSMENT:**
+[Berikan analisis mendalam apakah hipotesis Judas Swing tervalidasi berdasarkan directional coherence, boundary breach analysis, dan timing alignment. Sertakan specific numerical data dari OHLCV untuk mendukung assessment.]
+
+**⚡ MANIPULATION SIGNATURE CHARACTERIZATION:**
+[Deskripsikan secara detail signature dari pergerakan yang terobservasi: velocity profile, volume characteristics, candle formation patterns, momentum indicators, dan sustainability analysis. Bandingkan dengan expected manipulation characteristics.]
+
+**🎯 HTF ZONE INTERACTION DYNAMICS:**
+[Analisis komprehensif bagaimana price action berinteraksi dengan HTF Zone Target ({HTF_ZONE_TARGET}). Include reaction quality assessment, rejection strength, volume correlation, dan implications untuk overall manipulation thesis.]
+
+**⚖️ CONFIRMATION MATRIX SYNTHESIS:**
+[Synthesis final berdasarkan semua validation criteria. Berikan detailed reasoning untuk classification sebagai confirmed manipulation atau potential genuine breakout. Include confidence level dan key supporting evidence.]
+
+**� RISK ASSESSMENT & TRADE IMPLICATIONS:**
+[Evaluate risk factors, potential invalidation scenarios, dan tactical implications untuk phase selanjutnya. Include key levels untuk monitoring dan contingency planning.]
+
+**BAGIAN 2: STRUCTURED DATA EXTRACTION**
+
+MANIPULATION_DETECTED: [HANYA "TRUE" atau "FALSE"]
+MANIPULATION_SIDE: [Pilih salah satu: "ABOVE_ASIA_HIGH", "BELOW_ASIA_LOW", atau "NONE"]
+HTF_REACTION: [HANYA "TRUE" atau "FALSE"]
+CONFIDENCE_LEVEL: [HANYA "HIGH", "MEDIUM", atau "LOW"]
+KEY_INVALIDATION_LEVEL: [Numerical value - key price level yang akan invalidate manipulation thesis]
+
+═══════════════════════════════════════════════════════════════════════════════════════
+⚠️  CRITICAL ANALYSIS GUIDELINES & QUALITY ASSURANCE
+═══════════════════════════════════════════════════════════════════════════════════════
+
+**ACCURACY IMPERATIVES:**
+- **Hypothesis Alignment:** Manipulation hanya valid jika direction sesuai dengan expected bias-based scenario
+- **HTF Confluence:** HTF zone reaction adalah primary confirmator untuk authentic manipulation detection
+- **Quantitative Precision:** Gunakan exact numerical data dari OHLCV untuk mengukur sweep depth dan rejection strength
+- **Multi-Timeframe Coherence:** Ensure analysis konsisten across multiple timeframe perspectives
+- **Volume-Price Correlation:** Always verify volume characteristics align dengan manipulation vs genuine breakout profiles
+
+**COMMON PITFALL AVOIDANCE:**
+- **False Positive Prevention:** Distinguish antara temporary pullback dan genuine manipulation
+- **Timing Precision:** Ensure analysis focused pada London Killzone window, bukan pre/post-session noise
+- **Context Dependency:** Semua analysis harus dalam konteks established Daily Bias dan PO3 framework
+- **Confirmation Bias:** Avoid forcing manipulation interpretation - jika evidence tidak supporting, classify sebagai genuine breakout
+
+**FUNDAMENTAL CONTEXT CONSIDERATION:**
+- **News Events:** Major economic releases dapat override technical manipulation patterns
+- **Market Conditions:** Extreme volatility atau thin liquidity dapat distort normal manipulation signatures
+- **Seasonal Factors:** Holiday trading, month-end flows, dan other calendar effects
+- **Central Bank Intervention:** Potential for institutional-level intervention yang dapat negate normal Smart Money patterns
+
+**INSTITUTIONAL LOGIC VALIDATION:**
+- **Does the manipulation serve logical institutional purpose?**
+- **Is the liquidity extraction sufficient untuk justify the move?**
+- **Are the risk/reward dynamics favorable untuk institutional players?**
+- **Does the timing align dengan known institutional trading patterns?**
+
+Analisis Anda akan menjadi foundation untuk Phase 3 (Distribution Entry) decisions. Akurasi dan precision di tahap ini menentukan success rate keseluruhan trading system.
