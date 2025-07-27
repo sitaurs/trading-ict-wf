@@ -11,6 +11,9 @@ const cron = require('node-cron');
 const { getLogger } = require('./modules/logger');
 const log = getLogger('Main');
 
+// Impor restart handler untuk Pterodactyl
+const RestartHandler = require('./restart-handler');
+
 // Impor modul yang sudah ada
 const { startWhatsAppClient } = require('./modules/whatsappClient');
 const analysisHandler = require('./modules/analysisHandler');
@@ -366,8 +369,23 @@ async function main() { // PERBAIKAN: Kurung kurawal pembuka dipindahkan ke sini
 
 } // PERBAIKAN: Kurung kurawal penutup untuk fungsi main()
 
-// Panggil fungsi main untuk memulai bot
-main().catch(error => {
-    log.error('Gagal total saat memulai bot:', error);
-    process.exit(1);
-});
+// Fungsi untuk menjalankan bot dengan restart protection
+async function startBot() {
+    try {
+        log.info('🔧 Initializing Pterodactyl restart protection...');
+        
+        // Initialize restart handler
+        const restartHandler = new RestartHandler();
+        await restartHandler.initialize();
+        
+        log.info('🚀 Starting main bot application...');
+        await main();
+        
+    } catch (error) {
+        log.error('❌ Critical startup error:', error);
+        process.exit(1);
+    }
+}
+
+// Panggil fungsi startBot untuk memulai bot dengan protection
+startBot();

@@ -16,7 +16,71 @@ const promptBuilders = require('./analysis/promptBuilders');
 
 const log = getLogger('AnalysisHandler');
 
+// Gemini API retry configuration
+const GEMINI_RETRY_CONFIG = {
+    maxRetries: 3,
+    baseDelay: 1000, // 1 second
+    maxDelay: 10000, // 10 seconds
+    backoffMultiplier: 2
+};
+
+/**
+ * Exponential backoff delay calculator
+ */
+function calculateDelay(attempt) {
+    const delay = Math.min(
+        GEMINI_RETRY_CONFIG.baseDelay * Math.pow(GEMINI_RETRY_CONFIG.backoffMultiplier, attempt),
+        GEMINI_RETRY_CONFIG.maxDelay
+    );
+    return delay + Math.random() * 1000; // Add jitter
+}
+
+/**
+ * Sleep utility function
+ */
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 const MAX_RETRIES = parseInt(process.env.MAX_RETRIES) || 3;
+
+/**
+ * Memanggil Gemini Pro 2.5 untuk analisis naratif lengkap dengan retry logic
+ */
+async function callGeminiProWithRetry(prompt, chartImages = []) {
+    let lastError;
+    
+    for (let attempt = 0; attempt < GEMINI_RETRY_CONFIG.maxRetries; attempt++) {
+        try {
+            if (attempt > 0) {
+                const delay = calculateDelay(attempt - 1);
+                log.warn(`🔄 Retry attempt ${attempt + 1}/${GEMINI_RETRY_CONFIG.maxRetries} after ${Math.round(delay)}ms delay`, {
+                    attempt: attempt + 1,
+                    delay: Math.round(delay),
+                    lastError: lastError?.message
+                });
+                await sleep(delay);
+            }
+            
+            return await callGeminiPro(prompt, chartImages);
+        } catch (error) {
+            lastError = error;
+            log.error(`❌ Gemini Pro attempt ${attempt + 1} failed`, {
+                attempt: attempt + 1,
+                error: error.message,
+                willRetry: attempt < GEMINI_RETRY_CONFIG.maxRetries - 1
+            });
+            
+            // Don't retry on certain errors
+            if (error.message.includes('blocked') || error.message.includes('safety')) {
+                log.error('🚫 Non-retryable error detected, stopping retries', { error: error.message });
+                break;
+            }
+        }
+    }
+    
+    throw new Error(`Gemini Pro failed after ${GEMINI_RETRY_CONFIG.maxRetries} attempts: ${lastError?.message}`);
+}
 
 /**
  * Memanggil Gemini Pro 2.5 untuk analisis naratif lengkap
@@ -41,7 +105,7 @@ async function callGeminiPro(prompt, chartImages = []) {
         contents,
         generationConfig: {
             temperature: 0.3,
-            maxOutputTokens: 2000,
+            maxOutputTokens: 7000,
             topP: 0.95,
             topK: 40
         }
@@ -52,7 +116,7 @@ async function callGeminiPro(prompt, chartImages = []) {
         promptLength: prompt.length,
         chartImagesCount: chartImages.length,
         temperature: 0.3,
-        maxTokens: 2000
+        maxTokens: 7000
     });
 
     try {
@@ -68,12 +132,46 @@ async function callGeminiPro(prompt, chartImages = []) {
             log.error('❌ Invalid response structure from Gemini API', {
                 responseData: response.data,
                 status: response.status,
-                headers: response.headers
+                headers: response.headers,
+                fullResponse: JSON.stringify(response.data, null, 2)
             });
             throw new Error('Invalid response structure from Gemini API');
         }
 
-        const analysisText = response.data.candidates[0].content.parts[0].text;
+        const candidate = response.data.candidates[0];
+        
+        // Check for content blocking or safety issues
+        if (candidate.finishReason && candidate.finishReason !== 'STOP') {
+            log.error('❌ Gemini API response blocked or terminated', {
+                finishReason: candidate.finishReason,
+                safetyRatings: candidate.safetyRatings,
+                candidateData: candidate
+            });
+            throw new Error(`Gemini API response blocked: ${candidate.finishReason}`);
+        }
+
+        if (!candidate.content || !candidate.content.parts || !candidate.content.parts[0] || !candidate.content.parts[0].text) {
+            log.error('❌ Empty or missing text content from Gemini API', {
+                candidate: candidate,
+                content: candidate.content,
+                parts: candidate.content?.parts,
+                fullResponse: JSON.stringify(response.data, null, 2)
+            });
+            throw new Error('Gemini API returned empty content');
+        }
+
+        const analysisText = candidate.content.parts[0].text.trim();
+        
+        // Additional validation for empty response
+        if (!analysisText || analysisText.length < 10) {
+            log.error('❌ Gemini API returned very short or empty analysis', {
+                analysisText: analysisText,
+                textLength: analysisText?.length || 0,
+                candidate: candidate,
+                fullResponse: JSON.stringify(response.data, null, 2)
+            });
+            throw new Error(`Gemini API returned insufficient content: "${analysisText}"`);
+        }
         
         log.debug(`✅ Gemini Pro analisis berhasil`, {
             model: MODEL_NAME,
@@ -160,7 +258,7 @@ async function runStage1Analysis(pairs) {
             log.debug(`Stage 1 prompt for ${pair}:`, prompt.substring(0, 500) + '...');
             
             // Panggil AI untuk analisis
-            const narrativeText = await callGeminiPro(prompt, chartImages);
+            const narrativeText = await callGeminiProWithRetry(prompt, chartImages);
             
             // Debug: Log what we get from Gemini Pro
             log.debug(`📝 Narrative text from Gemini Pro for ${pair}:`, {
@@ -279,7 +377,7 @@ async function runStage2Analysis(pairs) {
             const prompt = await promptBuilders.prepareStage2Prompt(pair, context, ohlcvData);
             
             // Panggil AI untuk analisis
-            const narrativeText = await callGeminiPro(prompt, chartImages);
+            const narrativeText = await callGeminiProWithRetry(prompt, chartImages);
             
             // Ekstrak data dengan Gemini Flash
             const extractedData = await extractStage2Data(narrativeText);
@@ -396,7 +494,7 @@ async function runStage3Analysis(pairs) {
             const prompt = await promptBuilders.prepareStage3Prompt(pair, context, ohlcvData);
             
             // Panggil AI untuk analisis
-            const narrativeText = await callGeminiPro(prompt, chartImages);
+            const narrativeText = await callGeminiProWithRetry(prompt, chartImages);
             
             // Kirim notifikasi hasil analisis AI
             if (global.broadcastMessage) {

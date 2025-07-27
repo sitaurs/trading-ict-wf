@@ -80,12 +80,39 @@ async function extractStage1Data(narrativeText) {
             log.error('❌ Invalid response structure from Gemini Flash API', {
                 responseData: response.data,
                 status: response.status,
-                headers: response.headers
+                headers: response.headers,
+                fullResponse: JSON.stringify(response.data, null, 2),
+                candidate: response.data?.candidates?.[0],
+                finishReason: response.data?.candidates?.[0]?.finishReason
             });
-            throw new Error('Invalid response structure from Gemini API');
+            
+            // Check for content blocking
+            if (response.data?.candidates?.[0]?.finishReason) {
+                const finishReason = response.data.candidates[0].finishReason;
+                if (finishReason !== 'STOP') {
+                    log.error('❌ Gemini Flash response blocked or terminated', {
+                        finishReason: finishReason,
+                        safetyRatings: response.data.candidates[0].safetyRatings
+                    });
+                    throw new Error(`Gemini Flash response blocked: ${finishReason}`);
+                }
+            }
+            
+            throw new Error('Invalid response structure from Gemini Flash API');
         }
 
         const rawText = response.data.candidates[0].content.parts[0].text.trim();
+        
+        // Check for empty or very short response
+        if (!rawText || rawText.length < 5) {
+            log.error('❌ Gemini Flash returned empty or very short response', {
+                rawText: rawText,
+                textLength: rawText?.length || 0,
+                candidate: response.data.candidates[0],
+                fullResponse: JSON.stringify(response.data, null, 2)
+            });
+            throw new Error(`Gemini Flash returned insufficient content: "${rawText}"`);
+        }
         
         log.debug(`✅ Gemini Flash ekstraksi berhasil`, {
             model: MODEL_NAME,

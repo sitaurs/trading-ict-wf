@@ -1,15 +1,24 @@
 # 🤖 Trading AI Bot - ICT Power of Three (PO3) Strategy
 
-**Version**: 3.2.0 (Python MT5 API Integration & Compatibility Verified)  
-**Last Updated**: July 27, 2025  
-**Status**: ✅ Production Ready with Python MT5 API Compatibility
+**Version**: 3.3.0 (Pterodactyl Deployment Ready)  
+**Last Updated**: January 15, 2025  
+**Status**: ✅ Production Ready - Optimized for Pterodactyl Node.js 21
 
-> Bot trading otomatis menggunakan strategi ICT Power of Three (PO3) dengan AI Gemini Pro, Python MT5 API self-hosted, enhanced logging system, dan notifikasi WhatsApp yang interaktif.
+> Bot trading otomatis menggunakan strategi ICT Power of Three (PO3) dengan AI Gemini Pro, Python MT5 API self-hosted, enhanced logging system, dan notifikasi WhatsApp yang interaktif. **Fully optimized untuk deployment di Pterodactyl Panel dengan Node.js 21 egg.**
 
-## ✨ **LATEST UPDATES (v3.2.0)**
+## ✨ **LATEST UPDATES (v3.3.0)**
+
+### 🦅 **Pterodactyl Optimization & Production Deployment**
+- ✅ **Pterodactyl Ready**: Optimized untuk deployment di Pterodactyl Panel dengan Node.js 21 egg
+- ✅ **Auto-Restart Protection**: Intelligent restart loop detection dan exponential backoff
+- ✅ **Memory Optimization**: Node.js flags `--max-old-space-size=512 --optimize-for-size`
+- ✅ **Health Monitoring**: Real-time health check endpoints dan performance metrics
+- ✅ **Graceful Shutdown**: Proper signal handling untuk container restart scenarios
+- ✅ **Performance Monitoring**: Comprehensive system metrics dan resource usage tracking
+- ✅ **Container Resilience**: Robust startup sequence dengan retry mechanisms
 
 ### 🔥 **Major Enhancements - Python MT5 API Integration**
-- ✅ **Python MT5 API Compatibility**: Full compatibility verification with self-hosted Python Flask MT5 API
+- ✅ **Python MT5 API Compatibility**: Full compatibility verification dengan self-hosted Python Flask MT5 API
 - ✅ **API Compatibility Checker**: Automated tools untuk verifikasi endpoint dan data format compatibility  
 - ✅ **Production-Ready Integration**: 97% compatibility score (8/8 endpoints) dengan Python MT5 API
 - ✅ **Enhanced Broker Handler**: Robust request/response handling untuk seamless Python API integration
@@ -2279,6 +2288,175 @@ LOG_LEVEL=INFO              # Balance detail dan performance
 ENABLE_INTERACTIVE_MENU=true
 STAGE3_INTERVAL_MINUTES=30  # Moderate trading frequency
 ```
+
+## 🦅 **PTERODACTYL DEPLOYMENT GUIDE**
+
+### **📦 Pterodactyl Panel Configuration**
+
+**🔧 Server Settings (Recommended)**
+```yaml
+Egg: Generic Node.js 21
+Memory: 1024MB (Minimum: 512MB)
+CPU: 100% (Burst: 200%)
+Disk: 2048MB
+Swap: 512MB
+```
+
+**⚙️ Environment Variables**
+```bash
+# === PTERODACTYL SPECIFIC ===
+MAIN_FILE=index.js
+NODE_ARGS=--max-old-space-size=512 --optimize-for-size
+AUTO_UPDATE=0
+NODE_ENV=production
+
+# === BOT CONFIGURATION ===
+LOG_LEVEL=INFO
+MONITORING_INTERVAL_MINUTES=2
+STAGE3_INTERVAL_MINUTES=30
+STAGE3_START_HOUR=7
+STAGE3_END_HOUR=12
+
+# === PERFORMANCE TUNING ===
+UV_THREADPOOL_SIZE=4
+HEALTH_PORT=3000
+```
+
+**🚀 Startup Configuration**
+```bash
+# Use this startup command in Pterodactyl
+if [[ -d .git ]] && [[ ${AUTO_UPDATE} == "1" ]]; then git pull; fi; if [[ ! -z ${NODE_PACKAGES} ]]; then /usr/local/bin/npm install ${NODE_PACKAGES}; fi; if [[ ! -z ${UNNODE_PACKAGES} ]]; then /usr/local/bin/npm uninstall ${UNNODE_PACKAGES}; fi; if [ -f /home/container/package.json ]; then /usr/local/bin/npm install; fi; /usr/local/bin/node --max-old-space-size=512 --optimize-for-size "/home/container/index.js"
+```
+
+### **🔧 Built-in Pterodactyl Features**
+
+**🛡️ Auto-Restart Protection**
+- ✅ Intelligent restart loop detection
+- ✅ Exponential backoff (30s → 60s → 120s → 300s → 600s)
+- ✅ Graceful shutdown handling
+- ✅ Process cleanup and state management
+
+**📊 Performance Monitoring**
+```bash
+# Monitor bot performance
+npm run monitor
+
+# Check health status
+npm run health
+
+# Quick health check via WhatsApp
+/health
+```
+
+**🏥 Health Endpoints**
+```bash
+# Available health checks
+http://localhost:3000/health    # Basic health status
+http://localhost:3000/metrics   # Detailed metrics
+```
+
+### **📊 Monitoring Commands**
+
+**Bot Health Commands**
+```bash
+# === MANUAL MONITORING ===
+node monitor.js              # Full system report
+node restart-handler.js --health    # Restart protection status
+node restart-handler.js --reset     # Reset restart counter
+
+# === PTERODACTYL SCRIPTS ===
+npm run monitor              # Performance monitoring
+npm run health              # Health check
+npm run pterodactyl         # Optimized startup
+```
+
+**WhatsApp Commands**
+```bash
+/health      # System health check
+/status      # Bot status and positions
+/positions   # Active positions
+/restart     # Restart bot (if needed)
+```
+
+### **🚨 Troubleshooting Pterodactyl Issues**
+
+**📈 High Memory Usage**
+```bash
+# Check current usage
+free -h
+ps aux | grep node
+
+# Optimize Node.js memory
+export NODE_OPTIONS="--max-old-space-size=512 --optimize-for-size"
+
+# Monitor in real-time
+watch -n 5 'ps -o pid,vsz,rss,comm -p $(pgrep node)'
+```
+
+**🔄 Restart Loop Issues**
+```bash
+# Check restart statistics
+node restart-handler.js --health
+
+# Reset restart protection
+node restart-handler.js --reset
+
+# Manual health diagnosis
+node monitor.js
+```
+
+**📱 WhatsApp Connection Issues**
+```bash
+# Clear WhatsApp session
+rm -rf whatsapp-session/*
+
+# Check QR code generation
+grep -i "qr" logs/*.log
+
+# Verify permissions
+ls -la whatsapp-session/
+```
+
+### **🎯 Performance Optimization Tips**
+
+**💾 Memory Optimization**
+- Set memory limit: `512MB` for stable operation
+- Use `--optimize-for-size` flag
+- Monitor with `npm run monitor`
+
+**🖥️ CPU Optimization**  
+- Recommended: `100%` CPU allocation
+- Burst mode: `200%` for analysis peaks
+- Use `UV_THREADPOOL_SIZE=4`
+
+**💽 Disk Management**
+- Monitor with `/health` command
+- Clean cache: `/clearcache`
+- Archive old logs periodically
+
+### **📱 Production Monitoring**
+
+**🔍 Real-time Monitoring**
+```bash
+# System overview
+/health
+
+# Detailed status
+/status
+
+# Performance metrics
+npm run monitor
+
+# Log analysis
+tail -f logs/*.log
+```
+
+**📊 Key Metrics to Monitor**
+- Memory usage < 80%
+- CPU usage during analysis peaks
+- WhatsApp connection stability
+- API response times
+- Restart frequency
 
 ## 🚀 Production Deployment with Python MT5 API
 
