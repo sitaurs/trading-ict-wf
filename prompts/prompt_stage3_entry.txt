@@ -1,0 +1,32 @@
+[PROMPT TEMPLATE - Stage 3: Entry Confirmation]
+
+PLACEHOLDER YANG TERSEDIA:
+- {PAIR} = Nama pair trading
+- {BIAS} = Bias harian (BULLISH/BEARISH)
+- {MANIPULATION} = Status manipulasi (TRUE/FALSE)
+- {SIDE} = Sisi manipulasi
+- {HTF_REACTION} = Reaksi HTF (TRUE/FALSE)
+- {MIN_RRR} = Minimum Risk Reward Ratio
+- {OHLCV} = Data OHLCV dalam format JSON
+
+INSTRUKSI:
+Buatlah prompt untuk konfirmasi entri berdasarkan Market Structure Shift (MSS) dan Fair Value Gap (FVG).
+Hasil harus dalam format khusus:
+
+JIKA ADA SETUP VALID:
+SINYAL TRADING DITEMUKAN
+Pair: {PAIR}
+Arah: BUY/SELL
+Harga Masuk: [harga]
+Stop Loss: [harga]
+Take Profit: [harga]
+RRR: [rasio]
+
+JIKA TIDAK ADA SETUP:
+TIDAK ADA SINYAL
+Pair: {PAIR}
+Status: NO_TRADE
+Alasan: [penjelasan]
+
+Contoh penggunaan placeholder:
+Analisis entri {PAIR} dengan bias {BIAS} setelah manipulasi {MANIPULATION}.

@@ -1,0 +1,18 @@
+[PROMPT TEMPLATE - Stage 1: Daily Bias Analysis]
+
+PLACEHOLDER YANG TERSEDIA:
+- {PAIR} = Nama pair trading (contoh: USDJPY)
+- {ASIA_SESSION_START} = Jam mulai sesi Asia (contoh: 00:00)
+- {ASIA_SESSION_END} = Jam akhir sesi Asia (contoh: 04:00)
+- {OHLCV} = Data OHLCV dalam format JSON
+
+INSTRUKSI:
+Buatlah prompt untuk menganalisis bias harian dan menentukan range sesi Asia.
+Hasil analisis harus mencakup:
+1. Daily Bias (BULLISH/BEARISH)
+2. Asia High (harga tertinggi sesi Asia)
+3. Asia Low (harga terendah sesi Asia) 
+4. HTF Zone Target (zona target higher timeframe)
+
+Contoh placeholder dalam prompt:
+Analisis pair {PAIR} untuk menentukan bias harian berdasarkan sesi Asia {ASIA_SESSION_START}-{ASIA_SESSION_END}.

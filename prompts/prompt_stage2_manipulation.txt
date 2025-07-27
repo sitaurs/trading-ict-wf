@@ -1,0 +1,21 @@
+[PROMPT TEMPLATE - Stage 2: London Manipulation Detection]
+
+PLACEHOLDER YANG TERSEDIA:
+- {PAIR} = Nama pair trading
+- {BIAS} = Bias harian dari Stage 1 (BULLISH/BEARISH)
+- {ASIA_HIGH} = Harga tertinggi sesi Asia
+- {ASIA_LOW} = Harga terendah sesi Asia
+- {HTF_ZONE_TARGET} = Target zona HTF
+- {LONDON_KILLZONE_START} = Jam mulai London killzone
+- {LONDON_KILLZONE_END} = Jam akhir London killzone
+- {OHLCV} = Data OHLCV dalam format JSON
+
+INSTRUKSI:
+Buatlah prompt untuk mendeteksi liquidity sweep (Judas Swing) selama sesi London.
+Hasil analisis harus mencakup:
+1. Apakah manipulasi terdeteksi (TRUE/FALSE)
+2. Sisi manipulasi (ABOVE_ASIA_HIGH/BELOW_ASIA_LOW)
+3. Reaksi di zona HTF (TRUE/FALSE)
+
+Contoh penggunaan placeholder:
+Analisis {PAIR} dengan bias {BIAS} selama killzone {LONDON_KILLZONE_START}-{LONDON_KILLZONE_END}.

@@ -1,0 +1,16 @@
+[PROMPT TEMPLATE - Hold/Close Analysis]
+
+PLACEHOLDER YANG TERSEDIA:
+- {PAIR} = Nama pair trading
+- {TRADE_DETAILS} = Detail trade aktif dalam format JSON
+- {CURRENT_PRICE} = Harga saat ini
+- {OHLCV} = Data OHLCV terbaru dalam format JSON
+
+INSTRUKSI:
+Buatlah prompt untuk mengevaluasi apakah posisi aktif harus ditahan atau ditutup.
+Hasil analisis harus memberikan keputusan:
+- HOLD = Tahan posisi
+- CLOSE_MANUAL = Tutup manual sebelum TP/SL
+
+Contoh penggunaan placeholder:
+Evaluasi posisi {PAIR} pada harga {CURRENT_PRICE} dengan detail: {TRADE_DETAILS}

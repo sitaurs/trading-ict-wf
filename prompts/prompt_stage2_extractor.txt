@@ -1,0 +1,14 @@
+[PROMPT TEMPLATE - Stage 2: Data Extractor]
+
+PLACEHOLDER YANG TERSEDIA:
+- {NARRATIVE_TEXT} = Teks hasil analisis dari Stage 2
+
+INSTRUKSI:
+Buatlah prompt sederhana untuk mengekstrak data terstruktur dari narasi analisis.
+Output harus dalam format KEY: VALUE untuk:
+- MANIPULATION: (TRUE/FALSE)
+- SIDE: (ABOVE_ASIA_HIGH/BELOW_ASIA_LOW)
+- HTF_REACTION: (TRUE/FALSE)
+
+Contoh penggunaan placeholder:
+Ekstrak data manipulasi dari teks berikut: {NARRATIVE_TEXT}
