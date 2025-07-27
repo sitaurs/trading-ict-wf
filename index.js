@@ -232,70 +232,124 @@ async function main() { // PERBAIKAN: Kurung kurawal pembuka dipindahkan ke sini
         }
     });
 
-    // --- Jadwal PO3 Multi-Tahap ---
-    // Stage 1: Daily Bias Analysis (05:00 UTC)
+    // --- Jadwal PO3 Multi-Tahap (Updated Schedule) ---
+    // Konfigurasi fleksibel dari environment variables
+    const STAGE3_INTERVAL = process.env.STAGE3_INTERVAL_MINUTES || 30;
+    const STAGE3_START_HOUR = process.env.STAGE3_START_HOUR || 7;
+    const STAGE3_END_HOUR = process.env.STAGE3_END_HOUR || 12;
+    
+    log.info(`[INIT] 📅 Konfigurasi jadwal PO3: Stage3 interval=${STAGE3_INTERVAL}min, waktu=${STAGE3_START_HOUR}:00-${STAGE3_END_HOUR}:00 UTC`);
+
+    // Stage 1: Daily Bias Analysis (05:00 UTC = 12:00 WIB)
     cron.schedule('0 5 * * 1-5', async () => {
         try {
             const statusData = await fs.readFile(path.join(__dirname, 'config', 'bot_status.json'), 'utf8');
             const status = JSON.parse(statusData);
 
             if (status.isPaused) {
-                log.info("[STAGE1] Analisis bias harian dilewati karena bot dalam mode jeda.");
+                log.info("[STAGE1] Analisis bias harian dilewati - bot dalam mode jeda");
                 return;
             }
 
-            log.info("[STAGE1] --- Menjalankan Analisis Bias Harian ---");
+            log.info("[STAGE1] 🌅 Memulai Analisis Akumulasi (05:00 UTC / 12:00 WIB)");
             await analysisHandler.runStage1Analysis(SUPPORTED_PAIRS);
+            log.info("[STAGE1] ✅ Analisis bias harian selesai");
         } catch (error) {
             if (error.code === 'ENOENT') {
-                log.info("[STAGE1] --- Menjalankan Analisis Bias Harian (file status tidak ditemukan) ---");
+                log.info("[STAGE1] Status file tidak ditemukan, menjalankan analisis...");
                 await analysisHandler.runStage1Analysis(SUPPORTED_PAIRS);
             } else {
-                log.error("[STAGE1] Error saat menjalankan analisis bias:", error);
+                log.error("[STAGE1] ❌ Error analisis akumulasi:", {
+                    error: error.message,
+                    timestamp: new Date().toISOString()
+                });
             }
         }
     });
 
-    // Stage 2: London Manipulation Detection (every 15 mins during London killzone)
-    cron.schedule('*/15 6-9 * * 1-5', async () => {
+    // Stage 2: Manipulation Detection - Early London (06:30 UTC = 13:30 WIB)
+    cron.schedule('30 6 * * 1-5', async () => {
         try {
             const statusData = await fs.readFile(path.join(__dirname, 'config', 'bot_status.json'), 'utf8');
             const status = JSON.parse(statusData);
 
             if (status.isPaused) {
-                log.info("[STAGE2] Deteksi manipulasi dilewati karena bot dalam mode jeda.");
+                log.info("[STAGE2-1] Deteksi manipulasi awal dilewati - bot dalam mode jeda");
                 return;
             }
 
-            log.info("[STAGE2] --- Menjalankan Deteksi Manipulasi London ---");
+            log.info("[STAGE2-1] ⚡ Memulai Deteksi Manipulasi Awal (06:30 UTC / 13:30 WIB)");
             await analysisHandler.runStage2Analysis(SUPPORTED_PAIRS);
+            log.info("[STAGE2-1] ✅ Deteksi manipulasi awal selesai");
         } catch (error) {
             if (error.code === 'ENOENT') {
                 await analysisHandler.runStage2Analysis(SUPPORTED_PAIRS);
             } else {
-                log.error("[STAGE2] Error saat deteksi manipulasi:", error);
+                log.error("[STAGE2-1] ❌ Error deteksi manipulasi awal:", {
+                    error: error.message,
+                    stage: "Early London",
+                    timestamp: new Date().toISOString()
+                });
             }
         }
     });
 
-    // Stage 3: Entry Confirmation (every 5 mins during distribution)
-    cron.schedule('*/5 7-12 * * 1-5', async () => {
+    // Stage 2: Manipulation Detection - Late London (09:00 UTC = 16:00 WIB)
+    cron.schedule('0 9 * * 1-5', async () => {
         try {
             const statusData = await fs.readFile(path.join(__dirname, 'config', 'bot_status.json'), 'utf8');
             const status = JSON.parse(statusData);
 
             if (status.isPaused) {
-                log.info("[STAGE3] Konfirmasi entri dilewati karena bot dalam mode jeda.");
+                log.info("[STAGE2-2] Deteksi manipulasi akhir dilewati - bot dalam mode jeda");
                 return;
             }
 
-            log.info("[STAGE3] --- Menjalankan Konfirmasi Entri ---");
+            log.info("[STAGE2-2] ⚡ Memulai Deteksi Manipulasi Akhir (09:00 UTC / 16:00 WIB)");
+            await analysisHandler.runStage2Analysis(SUPPORTED_PAIRS);
+            log.info("[STAGE2-2] ✅ Deteksi manipulasi akhir selesai");
+        } catch (error) {
+            if (error.code === 'ENOENT') {
+                await analysisHandler.runStage2Analysis(SUPPORTED_PAIRS);
+            } else {
+                log.error("[STAGE2-2] ❌ Error deteksi manipulasi akhir:", {
+                    error: error.message,
+                    stage: "Late London",
+                    timestamp: new Date().toISOString()
+                });
+            }
+        }
+    });
+
+    // Stage 3: Entry Confirmation (Configurable via ENV - Default: 07:00-12:00 UTC setiap 30 menit)
+    cron.schedule(`*/${STAGE3_INTERVAL} ${STAGE3_START_HOUR}-${STAGE3_END_HOUR} * * 1-5`, async () => {
+        try {
+            const statusData = await fs.readFile(path.join(__dirname, 'config', 'bot_status.json'), 'utf8');
+            const status = JSON.parse(statusData);
+
+            if (status.isPaused) {
+                log.info(`[STAGE3] Konfirmasi entri dilewati - bot dalam mode jeda`);
+                return;
+            }
+
+            const now = new Date();
+            const utcTime = `${now.getUTCHours().toString().padStart(2, '0')}:${now.getUTCMinutes().toString().padStart(2, '0')}`;
+            const wibHour = (now.getUTCHours() + 7) % 24;
+            const wibTime = `${wibHour.toString().padStart(2, '0')}:${now.getUTCMinutes().toString().padStart(2, '0')}`;
+            
+            log.info(`[STAGE3] 🚀 Memulai Konfirmasi Entri (${utcTime} UTC / ${wibTime} WIB - Interval: ${STAGE3_INTERVAL} menit)`);
             await analysisHandler.runStage3Analysis(SUPPORTED_PAIRS);
+            log.info(`[STAGE3] ✅ Konfirmasi entri selesai`);
         } catch (error) {
             if (error.code === 'ENOENT') {
                 await analysisHandler.runStage3Analysis(SUPPORTED_PAIRS);
             } else {
-                log.error("[STAGE3] Error saat konfirmasi entri:", error);
+                log.error("[STAGE3] ❌ Error konfirmasi entri:", {
+                    error: error.message,
+                    interval: `${STAGE3_INTERVAL} minutes`,
+                    timeRange: `${STAGE3_START_HOUR}:00-${STAGE3_END_HOUR}:00 UTC`,
+                    timestamp: new Date().toISOString()
+                });
             }
         }
     });
