@@ -27,27 +27,39 @@ async function prepareStage1Prompt(pair, ohlcvData) {
         .replace(/\{OHLCV\}/g, JSON.stringify(ohlcvData, null, 2));
 }
 
-async function prepareStage2Prompt(pair, context, ohlcvData) {
+async function prepareStage2Prompt(pair, context, ohlcvData, fullNarratives = {}) {
     let prompt = await getPrompt('prompt_stage2_manipulation.txt');
+    
+    // Siapkan Stage 1 full narrative jika tersedia
+    const stage1Narrative = fullNarratives.stage1_full_narrative || 'Tidak tersedia - analisis dilakukan pada sesi sebelumnya';
+    
     return prompt
         .replace(/\{PAIR\}/g, pair)
         .replace(/\{BIAS\}/g, context.daily_bias || 'NETRAL')
         .replace(/\{ASIA_HIGH\}/g, context.asia_high || 'N/A')
         .replace(/\{ASIA_LOW\}/g, context.asia_low || 'N/A')
         .replace(/\{HTF_ZONE_TARGET\}/g, context.htf_zone_target || 'N/A')
+        .replace(/\{STAGE1_FULL_NARRATIVE\}/g, stage1Narrative)
         .replace(/\{LONDON_KILLZONE_START\}/g, process.env.LONDON_KILLZONE_START || '06:00')
         .replace(/\{LONDON_KILLZONE_END\}/g, process.env.LONDON_KILLZONE_END || '09:00')
         .replace(/\{OHLCV\}/g, JSON.stringify(ohlcvData, null, 2));
 }
 
-async function prepareStage3Prompt(pair, context, ohlcvData) {
+async function prepareStage3Prompt(pair, context, ohlcvData, fullNarratives = {}) {
     let prompt = await getPrompt('prompt_stage3_entry.txt');
+    
+    // Siapkan full narratives jika tersedia
+    const stage1Narrative = fullNarratives.stage1_full_narrative || 'Tidak tersedia - analisis dilakukan pada sesi sebelumnya';
+    const stage2Narrative = fullNarratives.stage2_full_narrative || 'Tidak tersedia - analisis dilakukan pada sesi sebelumnya';
+    
     return prompt
         .replace(/\{PAIR\}/g, pair)
         .replace(/\{BIAS\}/g, context.daily_bias || 'NETRAL')
         .replace(/\{MANIPULATION\}/g, context.manipulation_detected ? 'TRUE' : 'FALSE')
         .replace(/\{SIDE\}/g, context.manipulation_side || 'N/A')
         .replace(/\{HTF_REACTION\}/g, context.htf_reaction ? 'TRUE' : 'FALSE')
+        .replace(/\{STAGE1_FULL_NARRATIVE\}/g, stage1Narrative)
+        .replace(/\{STAGE2_FULL_NARRATIVE\}/g, stage2Narrative)
         .replace(/\{MIN_RRR\}/g, process.env.MIN_RRR || '2')
         .replace(/\{OHLCV\}/g, JSON.stringify(ohlcvData, null, 2));
 }

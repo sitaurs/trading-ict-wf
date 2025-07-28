@@ -376,9 +376,47 @@ async function handleStage1Command(whatsappSocket, chatId) {
             : ['USDJPY', 'USDCHF', 'GBPUSD'];
             
         log.info('Menjalankan analisis Stage 1 untuk pairs:', { pairs: supportedPairs, triggeredBy: 'manual_command' });
-        await analysisHandler.runStage1Analysis(supportedPairs);
-        await whatsappSocket.sendMessage(chatId, { text: '✅ *STAGE 1 SELESAI*\nAnalisis bias harian untuk semua pair telah diselesaikan.' });
-        log.info('Stage 1 analysis berhasil dijalankan secara manual', { pairs: supportedPairs, chatId });
+        
+        const results = await analysisHandler.runStage1Analysis(supportedPairs);
+        
+        // Generate summary message based on results
+        let summaryMessage = '📊 *STAGE 1 SUMMARY*\n\n';
+        summaryMessage += `📈 *Total Pairs:* ${results.total}\n`;
+        summaryMessage += `✅ *Berhasil:* ${results.successful}\n`;
+        summaryMessage += `❌ *Gagal:* ${results.failed}\n`;
+        summaryMessage += `⏭️ *Dilewati:* ${results.skipped}\n\n`;
+        
+        if (results.successful > 0) {
+            summaryMessage += `🟢 *Pairs Berhasil:*\n${results.successfulPairs.join(', ')}\n\n`;
+        }
+        
+        if (results.failed > 0) {
+            summaryMessage += `🔴 *Pairs Gagal:*\n`;
+            results.failedPairs.forEach(item => {
+                summaryMessage += `• ${item.pair}: ${item.error.substring(0, 50)}...\n`;
+            });
+            summaryMessage += '\n';
+        }
+        
+        // Determine completion status
+        if (results.failed === 0) {
+            summaryMessage += '✅ *STAGE 1 SELESAI*\nSemua analisis bias harian berhasil diselesaikan.';
+        } else if (results.successful === 0) {
+            summaryMessage += '❌ *STAGE 1 GAGAL*\nTidak ada pair yang berhasil dianalisis.';
+        } else {
+            summaryMessage += '⚠️ *STAGE 1 SELESAI SEBAGIAN*\nBeberapa pair berhasil, beberapa gagal.';
+        }
+        
+        await whatsappSocket.sendMessage(chatId, { text: summaryMessage });
+        
+        log.info('Stage 1 analysis completed with results:', { 
+            results, 
+            chatId,
+            successful: results.successful,
+            failed: results.failed,
+            total: results.total
+        });
+        
     } catch (error) {
         log.error('Gagal menjalankan Stage 1 analysis:', { error: error.message, chatId, stack: error.stack });
         await whatsappSocket.sendMessage(chatId, { text: `❌ Gagal menjalankan analisis Stage 1.\n*Error:* ${error.message}` });

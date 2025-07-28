@@ -217,6 +217,15 @@ async function callGeminiPro(prompt, chartImages = []) {
 async function runStage1Analysis(pairs) {
     log.info('=== STAGE 1: Analisis Bias Harian ===');
     
+    const results = {
+        total: pairs.length,
+        successful: 0,
+        failed: 0,
+        skipped: 0,
+        failedPairs: [],
+        successfulPairs: []
+    };
+    
     for (const pair of pairs) {
         let context = null;
         try {
@@ -225,6 +234,7 @@ async function runStage1Analysis(pairs) {
             // Skip jika sudah lock atau bukan status yang tepat
             if (context.lock || context.status !== 'PENDING_BIAS') {
                 log.info(`Melewati ${pair}: lock=${context.lock}, status=${context.status}`);
+                results.skipped++;
                 continue;
             }
 
@@ -276,11 +286,18 @@ async function runStage1Analysis(pairs) {
             // Ekstrak data dengan Gemini Flash
             const extractedData = await extractStage1Data(narrativeText);
             
-            // Update konteks
+            // Update konteks dengan data extracted dan narrative lengkap
             context.daily_bias = extractedData.bias;
             context.asia_high = extractedData.asia_high;
             context.asia_low = extractedData.asia_low;
             context.htf_zone_target = extractedData.htf_zone_target;
+            
+            // Simpan hasil utuh Stage 1
+            if (!context.stage1) context.stage1 = {};
+            context.stage1.extracted_data = extractedData;
+            context.stage1.full_narrative = narrativeText;
+            context.stage1.timestamp = new Date().toISOString();
+            
             context.status = 'PENDING_MANIPULATION';
             context.lock = false;
             
@@ -300,6 +317,8 @@ async function runStage1Analysis(pairs) {
             }
             
             log.info(`${pair} Stage 1 selesai: Bias=${extractedData.bias}`);
+            results.successful++;
+            results.successfulPairs.push(pair);
             
         } catch (error) {
             const errorMessage = error.response 
@@ -329,8 +348,13 @@ async function runStage1Analysis(pairs) {
             if (global.broadcastMessage) {
                 global.broadcastMessage(`❌ ${pair} - Stage 1 Gagal: ${errorMessage}`);
             }
+            
+            results.failed++;
+            results.failedPairs.push({ pair, error: errorMessage });
         }
     }
+    
+    return results;
 }
 
 /**
@@ -373,8 +397,10 @@ async function runStage2Analysis(pairs) {
                 global.broadcastMessage(`📊 *STAGE 2: ${pair}*\n📈 Chart: ${chartStatus}\n📊 Data: ${dataStatus} (${dataSource})\n🤖 Mencari tanda manipulasi dengan Gemini Pro...`);
             }
             
-            // Bangun prompt Stage 2
-            const prompt = await promptBuilders.prepareStage2Prompt(pair, context, ohlcvData);
+            // Bangun prompt Stage 2 dengan Stage 1 full narrative
+            const prompt = await promptBuilders.prepareStage2Prompt(pair, context, ohlcvData, {
+                stage1_full_narrative: context.stage1?.full_narrative || null
+            });
             
             // Panggil AI untuk analisis
             const narrativeText = await callGeminiProWithRetry(prompt, chartImages);
@@ -382,10 +408,16 @@ async function runStage2Analysis(pairs) {
             // Ekstrak data dengan Gemini Flash
             const extractedData = await extractStage2Data(narrativeText);
             
-            // Update konteks
+            // Update konteks dengan data extracted dan narrative lengkap
             context.manipulation_detected = extractedData.manipulation_detected;
             context.manipulation_side = extractedData.manipulation_side;
             context.htf_reaction = extractedData.htf_reaction;
+            
+            // Simpan hasil utuh Stage 2
+            if (!context.stage2) context.stage2 = {};
+            context.stage2.extracted_data = extractedData;
+            context.stage2.full_narrative = narrativeText;
+            context.stage2.timestamp = new Date().toISOString();
             
             if (extractedData.manipulation_detected) {
                 context.status = 'PENDING_ENTRY';
@@ -490,8 +522,11 @@ async function runStage3Analysis(pairs) {
                 global.broadcastMessage(`📊 *STAGE 3: ${pair}*\n📈 Chart: ${chartStatus}\n📊 Data: ${dataStatus} (${dataSource})\n🤖 Mencari sinyal entry dengan Gemini Pro...`);
             }
             
-            // Bangun prompt Stage 3
-            const prompt = await promptBuilders.prepareStage3Prompt(pair, context, ohlcvData);
+            // Bangun prompt Stage 3 dengan full narrative dari Stage 1 & 2
+            const prompt = await promptBuilders.prepareStage3Prompt(pair, context, ohlcvData, {
+                stage1_full_narrative: context.stage1?.full_narrative || null,
+                stage2_full_narrative: context.stage2?.full_narrative || null
+            });
             
             // Panggil AI untuk analisis
             const narrativeText = await callGeminiProWithRetry(prompt, chartImages);
