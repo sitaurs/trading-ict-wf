@@ -1,5 +1,10 @@
 /**
- * @fileoverview Module untuk menangani semua perintah manual dari pengguna via WhatsApp.
+ * @fileoverview Module untuk menangani semua perintah manual dari pe🔍 *MONITORING & POSISI*
+• \`/ictstatus\` - 📊 Status bot & posisi aktif
+• \`/positions\` - 💼 Lihat semua posisi terbuka
+• \`/pending\` - ⏳ Lihat pending orders
+• \`/ictprofit\` - 💰 Laporan profit hari ini
+• \`/ictclose [PAIR]\` - ❌ Tutup posisi manual via WhatsApp.
  * @version 2.3.0 (Perbaikan Final dengan Menu & Status Baru)
  */
 
@@ -80,14 +85,14 @@ async function handleMenuCommand(whatsappSocket, chatId, supportedPairs = []) {
 • \`/cls [PAIR]\` - ❌ Tutup posisi manual
 
 ⚙️ *PENGATURAN & KONTROL BOT*
-• \`/pause\` - ⏸️ Pause trading otomatis
-• \`/resume\` - ▶️ Resume trading otomatis
-• \`/add_recipient [NOMOR]\` - ➕ Tambah penerima notif
-• \`/del_recipient [NOMOR]\` - ➖ Hapus penerima notif
-• \`/list_recipients\` - 📋 Lihat daftar penerima
+• \`/ictpause\` - ⏸️ Pause trading otomatis
+• \`/ictresume\` - ▶️ Resume trading otomatis
+• \`/ictadd [NOMOR]\` - ➕ Tambah penerima notif
+• \`/ictdel [NOMOR]\` - ➖ Hapus penerima notif
+• \`/ictlist\` - 📋 Lihat daftar penerima
 
 📰 *INFORMASI & UTILITAS*
-• \`/news\` - 📰 Berita ekonomi forex terkini
+• \`/ictnews\` - 📰 Berita ekonomi forex terkini
 • \`/health\` - 🏥 Status kesehatan sistem
 • \`/context [PAIR]\` - 📝 Status konteks pair harian
 • \`/clearcache\` - 🗑️ Bersihkan cache analisis
@@ -108,7 +113,7 @@ async function handleMenuCommand(whatsappSocket, chatId, supportedPairs = []) {
 • Semua command case-insensitive
 • Bot bekerja 24/5 mengikuti jadwal forex
 
-🆘 *Butuh bantuan?* Ketik */help* kapan saja!`;
+🆘 *Butuh bantuan?* Ketik */icthelp* kapan saja!`;
 
     try {
         await whatsappSocket.sendMessage(chatId, { text: menuText });

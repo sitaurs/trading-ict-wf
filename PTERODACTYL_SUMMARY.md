@@ -2,7 +2,16 @@
 
 ## ✅ **STATUS DEPLOYMENT: PRODUCTION READY**
 
-Berdasarkan analisis log dan optimisasi yang telah dilakukan, bot trading Anda **SIAP** untuk production deployment di Pterodactyl. Berikut adalah ringkasan lengkap:
+Berdasarkan analisis log dan optimisas## 📱 **COMMAND REFERENCE LENGKAP**
+
+### **🎛️ System Commands**
+```bash
+/ictmenu       # Show all ICT commands
+/health        # System health check
+/ictstatus     # Bot & positions status
+/restart       # Restart bot (if needed)
+/clearcache    # Clear analysis cache
+```ah dilakukan, bot trading Anda **SIAP** untuk production deployment di Pterodactyl. Berikut adalah ringkasan lengkap:
 
 ---
 
@@ -133,9 +142,9 @@ export NODE_OPTIONS="--max-old-space-size=512 --optimize-for-size"
 
 ### **🎛️ System Commands**
 ```bash
-/menu          # Show all commands
+/ictmenu       # Show all commands
 /health        # System health check
-/status        # Bot & positions status
+/ictstatus     # Bot & positions status
 /restart       # Restart bot (if needed)
 /clearcache    # Clear analysis cache
 ```
@@ -152,11 +161,11 @@ export NODE_OPTIONS="--max-old-space-size=512 --optimize-for-size"
 
 ### **⚙️ Configuration Commands**
 ```bash
-/settings      # Bot settings
-/pause         # Pause bot
-/resume        # Resume bot
-/add_recipient # Add notification recipient
-/list_recipients # List recipients
+/ictsettings   # Bot settings
+/ictpause      # Pause bot
+/ictresume     # Resume bot
+/ictadd        # Add notification recipient
+/ictlist       # List recipients
 ```
 
 ---

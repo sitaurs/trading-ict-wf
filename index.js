@@ -137,42 +137,42 @@ async function main() { // PERBAIKAN: Kurung kurawal pembuka dipindahkan ke sini
             
             // PERBAIKAN: Blok switch yang sudah di-upgrade dengan command baru
             switch (command) {
-                case '/menu':
-                case '/help':
+                case '/ictmenu':
+                case '/icthelp':
                     await commandHandler.handleMenuCommand(whatsappSocket, chatId, SUPPORTED_PAIRS);
                     break;
-                case '/status':
+                case '/ictstatus':
                     await commandHandler.handleConsolidatedStatusCommand(SUPPORTED_PAIRS, global.botSettings, whatsappSocket, chatId);
                     break;
-                case '/etr':
+                case '/ictentry':
                     await commandHandler.handleEntryCommand(text, chatId, whatsappSocket);
                     break;
-                case '/cls':
+                case '/ictclose':
                     await commandHandler.handleCloseCommand(text, chatId, whatsappSocket);
                     break;
-                case '/settings':
-                case '/setting':
+                case '/ictsettings':
+                case '/ictsetting':
                     await commandHandler.handleSettingsCommand(text, global.botSettings, chatId, whatsappSocket);
                     break;
-                case '/add_recipient':
+                case '/ictadd':
                     await commandHandler.handleAddRecipient(text, chatId, whatsappSocket);
                     break;
-                case '/del_recipient':
+                case '/ictdel':
                     await commandHandler.handleDelRecipient(text, chatId, whatsappSocket);
                     break;
-                case '/list_recipients':
+                case '/ictlist':
                     await commandHandler.handleListRecipients(chatId, whatsappSocket);
                     break;
-                case '/pause':
+                case '/ictpause':
                     await commandHandler.handlePauseCommand(whatsappSocket, chatId);
                     break;
-                case '/resume':
+                case '/ictresume':
                     await commandHandler.handleResumeCommand(whatsappSocket, chatId);
                     break;
-                case '/profit_today':
+                case '/ictprofit':
                     await commandHandler.handleProfitTodayCommand(whatsappSocket, chatId);
                     break;
-                case '/news':
+                case '/ictnews':
                     await commandHandler.handleNewsCommand(whatsappSocket, chatId);
                     break;
                 // === COMMAND INTERAKTIF BARU ===
