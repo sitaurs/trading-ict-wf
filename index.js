@@ -12,7 +12,7 @@ const { getLogger } = require('./modules/logger');
 const log = getLogger('Main');
 
 // Impor restart handler untuk Pterodactyl
-const RestartHandler = require('./restart-handler');
+const RestartHandler = require('./scripts/restart-handler');
 
 // Impor modul yang sudah ada
 const { startWhatsAppClient } = require('./modules/whatsappClient');
