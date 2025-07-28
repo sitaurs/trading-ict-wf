@@ -123,7 +123,7 @@ async function callGeminiPro(prompt, chartImages = []) {
         const startTime = Date.now();
         const response = await axios.post(apiUrl, requestPayload, {
             headers: { 'Content-Type': 'application/json' },
-            timeout: 60000
+            timeout: 240000
         });
 
         const duration = Date.now() - startTime;
@@ -203,7 +203,7 @@ async function callGeminiPro(prompt, chartImages = []) {
             },
             headers: error.response?.headers,
             config: {
-                timeout: 60000,
+                timeout: 240000,
                 method: 'POST'
             }
         });
