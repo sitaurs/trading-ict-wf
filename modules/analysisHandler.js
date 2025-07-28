@@ -16,6 +16,106 @@ const promptBuilders = require('./analysis/promptBuilders');
 
 const log = getLogger('AnalysisHandler');
 
+// Config path untuk full analysis settings
+const FULL_ANALYSIS_CONFIG_PATH = path.join(__dirname, '..', 'config', 'full_analysis_settings.json');
+
+// Load full analysis settings
+async function loadFullAnalysisSettings() {
+    try {
+        const settingsData = await fs.readFile(FULL_ANALYSIS_CONFIG_PATH, 'utf8');
+        return JSON.parse(settingsData);
+    } catch (error) {
+        // Return default settings if file doesn't exist
+        return {
+            full_analysis_enabled: false,
+            send_full_narrative: false,
+            send_extracted_data: true,
+            last_updated: new Date().toISOString()
+        };
+    }
+}
+
+// Save full analysis settings
+async function saveFullAnalysisSettings(settings) {
+    try {
+        const settingsData = {
+            ...settings,
+            last_updated: new Date().toISOString()
+        };
+        await fs.writeFile(FULL_ANALYSIS_CONFIG_PATH, JSON.stringify(settingsData, null, 2));
+        return true;
+    } catch (error) {
+        log.error('❌ Failed to save full analysis settings', { error: error.message });
+        return false;
+    }
+}
+
+// Toggle full analysis mode
+async function toggleFullAnalysis(enabled) {
+    const settings = await loadFullAnalysisSettings();
+    settings.full_analysis_enabled = enabled;
+    settings.send_full_narrative = enabled;
+    settings.send_extracted_data = true; // Always send extracted data
+    
+    const success = await saveFullAnalysisSettings(settings);
+    if (success) {
+        log.info(`✅ Full analysis mode ${enabled ? 'ENABLED' : 'DISABLED'}`, { settings });
+    }
+    return success;
+}
+
+// Send analysis results based on settings
+async function broadcastAnalysisResults(pair, stage, narrativeText, extractedData = null) {
+    if (!global.broadcastMessage) return;
+    
+    const settings = await loadFullAnalysisSettings();
+    
+    // Jika full analysis mode disabled, skip broadcast
+    if (!settings.full_analysis_enabled) return;
+    
+    let message = `� *STAGE ${stage} ANALYSIS: ${pair}*\n\n`;
+    
+    if (settings.send_extracted_data && extractedData) {
+        message += `📋 *Extracted Data:*\n`;
+        if (stage === 1) {
+            message += `• Bias: ${extractedData.bias || 'N/A'}\n`;
+            message += `• Asia High: ${extractedData.asia_high || 'N/A'}\n`;
+            message += `• Asia Low: ${extractedData.asia_low || 'N/A'}\n`;
+            message += `• HTF Target: ${extractedData.htf_zone_target || 'N/A'}\n`;
+        } else if (stage === 2) {
+            message += `• Manipulasi: ${extractedData.manipulation_detected ? 'TERDETEKSI ✅' : 'TIDAK ❌'}\n`;
+            message += `• Sisi: ${extractedData.manipulation_side || 'N/A'}\n`;
+            message += `• HTF Reaction: ${extractedData.htf_reaction ? 'YA ✅' : 'TIDAK ❌'}\n`;
+        } else if (stage === 3) {
+            message += `• Keputusan: ${extractedData.keputusan || 'N/A'}\n`;
+            message += `• Arah: ${extractedData.arah || 'N/A'}\n`;
+            message += `• Harga: ${extractedData.harga || 'N/A'}\n`;
+            message += `• SL: ${extractedData.sl || 'N/A'}\n`;
+            message += `• TP: ${extractedData.tp || 'N/A'}\n`;
+        }
+        message += `\n`;
+    }
+    
+    if (settings.send_full_narrative && narrativeText) {
+        // Split narrative jika terlalu panjang
+        const maxLength = 2000; // WhatsApp message limit consideration
+        if (narrativeText.length <= maxLength) {
+            message += `📄 *Full Narrative:*\n${narrativeText}\n\n`;
+        } else {
+            // Kirim narrative dalam pesan terpisah
+            message += `📄 *Full Narrative:* (Kirim terpisah karena terlalu panjang)\n\n`;
+            
+            // Kirim narrative sebagai pesan terpisah
+            const narrativeMessage = `📜 *FULL NARRATIVE - STAGE ${stage}: ${pair}*\n\n${narrativeText}`;
+            global.broadcastMessage(narrativeMessage);
+        }
+    }
+    
+    message += `⚙️ *Full Analysis:* ON | Char: ${narrativeText?.length || 0}`;
+    
+    global.broadcastMessage(message);
+}
+
 // Gemini API retry configuration
 const GEMINI_RETRY_CONFIG = {
     maxRetries: 3,
@@ -45,9 +145,9 @@ function sleep(ms) {
 const MAX_RETRIES = parseInt(process.env.MAX_RETRIES) || 3;
 
 /**
- * Simpan full narrative ke analysis cache (daily files, overwrite setiap hari)
+ * Simpan full narrative ke file JSON terpisah per pair dan stage
  */
-async function saveAnalysisCache(pair, stage, narrativeText) {
+async function saveStageNarrative(pair, stage, narrativeText, extractedData = null) {
     try {
         const cacheDir = path.join(__dirname, '..', 'analysis_cache');
         
@@ -59,29 +159,31 @@ async function saveAnalysisCache(pair, stage, narrativeText) {
             log.debug('📁 Created analysis_cache directory', { path: cacheDir });
         }
         
-        // File name tanpa tanggal - akan di-overwrite setiap hari
-        const fileName = `${pair}_stage${stage}.json`;
+        // File name: pair_stageN.json (akan di-overwrite jika stage dijalankan ulang)
+        const fileName = `${pair.toLowerCase()}_stage${stage}.json`;
         const filePath = path.join(cacheDir, fileName);
         
-        const cacheData = {
+        const stageData = {
             pair,
             stage,
             date: new Date().toISOString().split('T')[0],
             timestamp: new Date().toISOString(),
-            narrativeText,
+            full_narrative: narrativeText,
+            extracted_data: extractedData || {},
             charCount: narrativeText.length,
             wordCount: narrativeText.split(' ').length
         };
         
-        await fs.writeFile(filePath, JSON.stringify(cacheData, null, 2));
-        log.debug(`💾 Analysis cache saved for ${pair} Stage ${stage}`, {
+        await fs.writeFile(filePath, JSON.stringify(stageData, null, 2));
+        log.debug(`💾 Stage ${stage} narrative saved for ${pair}`, {
             filePath,
-            charCount: narrativeText.length
+            charCount: narrativeText.length,
+            extractedData: Object.keys(extractedData || {}).length
         });
         
         return filePath;
     } catch (error) {
-        log.error('❌ Failed to save analysis cache', {
+        log.error('❌ Failed to save stage narrative', {
             pair,
             stage,
             error: error.message
@@ -91,26 +193,26 @@ async function saveAnalysisCache(pair, stage, narrativeText) {
 }
 
 /**
- * Load full narrative dari analysis cache (daily files)
+ * Load full narrative dari file JSON terpisah per pair dan stage
  */
-async function loadAnalysisCache(pair, stage) {
+async function loadStageNarrative(pair, stage) {
     try {
         const cacheDir = path.join(__dirname, '..', 'analysis_cache');
-        const fileName = `${pair}_stage${stage}.json`;
+        const fileName = `${pair.toLowerCase()}_stage${stage}.json`;
         const filePath = path.join(cacheDir, fileName);
         
-        const cacheData = JSON.parse(await fs.readFile(filePath, 'utf8'));
+        const stageData = JSON.parse(await fs.readFile(filePath, 'utf8'));
         
         // Cek apakah file masih dari hari ini
         const today = new Date().toISOString().split('T')[0];
-        if (cacheData.date !== today) {
-            log.warn(`⚠️ Cache file for ${pair} Stage ${stage} is from different date: ${cacheData.date}`);
+        if (stageData.date !== today) {
+            log.warn(`⚠️ Stage ${stage} file for ${pair} is from different date: ${stageData.date}`);
             return null;
         }
         
-        return cacheData.narrativeText;
+        return stageData;
     } catch (error) {
-        log.warn(`⚠️ Could not load analysis cache for ${pair} Stage ${stage}`, {
+        log.warn(`⚠️ Could not load stage ${stage} narrative for ${pair}`, {
             error: error.message
         });
         return null;
@@ -359,17 +461,20 @@ async function runStage1Analysis(pairs) {
             // Ekstrak data dengan Gemini Flash
             const extractedData = await extractStage1Data(narrativeText);
             
-            // Update konteks dengan data extracted dan narrative lengkap
+            // Simpan full narrative ke file terpisah
+            await saveStageNarrative(pair, 1, narrativeText, extractedData);
+            
+            // Broadcast hasil analisis jika diaktifkan
+            await broadcastAnalysisResults(pair, 1, narrativeText, extractedData);
+            
+            // Update konteks dengan data extracted saja (tanpa full narrative)
             context.daily_bias = extractedData.bias;
             context.asia_high = extractedData.asia_high;
             context.asia_low = extractedData.asia_low;
             context.htf_zone_target = extractedData.htf_zone_target;
             
-            // Simpan hasil utuh Stage 1
-            if (!context.stage1) context.stage1 = {};
-            context.stage1.extracted_data = extractedData;
-            context.stage1.full_narrative = narrativeText;
-            context.stage1.timestamp = new Date().toISOString();
+            // Hapus stage1 object dari context (sekarang disimpan terpisah)
+            delete context.stage1;
             
             context.status = 'PENDING_MANIPULATION';
             context.lock = false;
@@ -470,9 +575,11 @@ async function runStage2Analysis(pairs) {
                 global.broadcastMessage(`📊 *STAGE 2: ${pair}*\n📈 Chart: ${chartStatus}\n📊 Data: ${dataStatus} (${dataSource})\n🤖 Mencari tanda manipulasi dengan Gemini Pro...`);
             }
             
-            // Bangun prompt Stage 2 dengan Stage 1 full narrative
+            // Bangun prompt Stage 2 dengan Stage 1 full narrative dari file terpisah
+            const stage1Data = await loadStageNarrative(pair, 1);
+            
             const prompt = await promptBuilders.prepareStage2Prompt(pair, context, ohlcvData, {
-                stage1_full_narrative: context.stage1?.full_narrative || null
+                stage1_full_narrative: stage1Data?.full_narrative || null
             });
             
             // Panggil AI untuk analisis
@@ -481,16 +588,19 @@ async function runStage2Analysis(pairs) {
             // Ekstrak data dengan Gemini Flash
             const extractedData = await extractStage2Data(narrativeText);
             
-            // Update konteks dengan data extracted dan narrative lengkap
+            // Simpan full narrative ke file terpisah
+            await saveStageNarrative(pair, 2, narrativeText, extractedData);
+            
+            // Broadcast hasil analisis jika diaktifkan
+            await broadcastAnalysisResults(pair, 2, narrativeText, extractedData);
+            
+            // Update konteks dengan data extracted saja (tanpa full narrative)
             context.manipulation_detected = extractedData.manipulation_detected;
             context.manipulation_side = extractedData.manipulation_side;
             context.htf_reaction = extractedData.htf_reaction;
             
-            // Simpan hasil utuh Stage 2
-            if (!context.stage2) context.stage2 = {};
-            context.stage2.extracted_data = extractedData;
-            context.stage2.full_narrative = narrativeText;
-            context.stage2.timestamp = new Date().toISOString();
+            // Hapus stage2 object dari context (sekarang disimpan terpisah)
+            delete context.stage2;
             
             if (extractedData.manipulation_detected) {
                 context.status = 'PENDING_ENTRY';
@@ -595,14 +705,20 @@ async function runStage3Analysis(pairs) {
                 global.broadcastMessage(`📊 *STAGE 3: ${pair}*\n📈 Chart: ${chartStatus}\n📊 Data: ${dataStatus} (${dataSource})\n🤖 Mencari sinyal entry dengan Gemini Pro...`);
             }
             
-            // Bangun prompt Stage 3 dengan full narrative dari Stage 1 & 2
+            // Bangun prompt Stage 3 dengan full narrative dari Stage 1 & 2 dari file terpisah
+            const stage1Data = await loadStageNarrative(pair, 1);
+            const stage2Data = await loadStageNarrative(pair, 2);
+            
             const prompt = await promptBuilders.prepareStage3Prompt(pair, context, ohlcvData, {
-                stage1_full_narrative: context.stage1?.full_narrative || null,
-                stage2_full_narrative: context.stage2?.full_narrative || null
+                stage1_full_narrative: stage1Data?.full_narrative || null,
+                stage2_full_narrative: stage2Data?.full_narrative || null
             });
             
             // Panggil AI untuk analisis
             const narrativeText = await callGeminiProWithRetry(prompt, chartImages);
+            
+            // Simpan full narrative ke file terpisah
+            await saveStageNarrative(pair, 3, narrativeText);
             
             // Kirim notifikasi hasil analisis AI
             if (global.broadcastMessage) {
@@ -747,5 +863,12 @@ module.exports = {
     runStage1Analysis,
     runStage2Analysis,
     runStage3Analysis,
-    runHoldCloseAnalysis
+    runHoldCloseAnalysis,
+    saveStageNarrative,
+    loadStageNarrative,
+    loadAnalysisCache: loadStageNarrative,  // For backward compatibility
+    toggleFullAnalysis,
+    loadFullAnalysisSettings,
+    saveFullAnalysisSettings,
+    broadcastAnalysisResults
 };

@@ -128,13 +128,27 @@ async function saveContext(context) {
     });
     
     try {
-        await fs.writeFile(contextPath, JSON.stringify(context, null, 2), 'utf8');
+        // Clean up any legacy full narrative data before saving
+        const cleanContext = { ...context };
+        
+        // Remove legacy stage objects that may contain full narratives
+        delete cleanContext.stage1;
+        delete cleanContext.stage2;
+        delete cleanContext.stage3;
+        
+        // Remove any other potential full narrative fields
+        delete cleanContext.full_narrative_stage1;
+        delete cleanContext.full_narrative_stage2;
+        delete cleanContext.full_narrative_stage3;
+        
+        const contextData = JSON.stringify(cleanContext, null, 2);
+        await fs.writeFile(contextPath, contextData, 'utf8');
         
         log.info(`✅ Konteks untuk ${context.pair} berhasil disimpan`, { 
             pair: context.pair, 
             status: context.status,
             lock: context.lock,
-            fileSize: JSON.stringify(context, null, 2).length,
+            fileSize: contextData.length,
             contextPath,
             timestamp: new Date().toISOString()
         });

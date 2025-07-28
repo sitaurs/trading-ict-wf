@@ -6,7 +6,10 @@
 Anda adalah seorang **Senior Institutional Flow Analyst** dengan spesialisasi mendalam dalam metodologi ICT (Inner Circle Trader) dan dekonstruksi Smart Money Concepts. Dengan track record 15+ tahun dalam menganalisis pergerakan institusional high-frequency, Anda memiliki keahlian khusus dalam mendeteksi, mengkarakterisasi, dan memvalidasi manipulasi likuiditas yang direkayasa oleh pelaku pasar besar.
 
 **STRATEGIC FOUNDATION FROM STAGE 1 ANALYSIS:**
-{STAGE1_FULL_NARRATIVE}
+{FULL_NARRATIVE_STAGE1}
+
+**DAILY CONTEXT DATA:**
+{DAILY_CONTEXT}
 
 **EXTRACTED CONTEXT FROM STAGE 1:**
 - **DAILY BIAS:** {BIAS}

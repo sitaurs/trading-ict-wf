@@ -1208,6 +1208,53 @@ async function handleAnalyticsCommand(whatsappSocket, chatId) {
 }
 
 /**
+ * Handle full analysis toggle /fullanly command
+ */
+async function handleFullAnalysisCommand(text, whatsappSocket, chatId) {
+    log.info('Memproses perintah /fullanly - Toggle full analysis mode', { chatId });
+    
+    const parts = text.split(' ');
+    if (parts.length < 2 || !['on', 'off'].includes(parts[1].toLowerCase())) {
+        const currentSettings = await analysisHandler.loadFullAnalysisSettings();
+        const statusText = `🔬 *FULL ANALYSIS SETTINGS*\n\n` +
+            `• Status: ${currentSettings.full_analysis_enabled ? '✅ ON' : '❌ OFF'}\n` +
+            `• Send Full Narrative: ${currentSettings.send_full_narrative ? '✅ ON' : '❌ OFF'}\n` +
+            `• Send Extracted Data: ${currentSettings.send_extracted_data ? '✅ ON' : '❌ OFF'}\n\n` +
+            `💡 *Usage:* \`/fullanly on\` atau \`/fullanly off\`\n\n` +
+            `📝 *What it does:*\n` +
+            `• ON: Kirim hasil analisis lengkap + data extracted\n` +
+            `• OFF: Hanya kirim notifikasi normal\n\n` +
+            `⚠️ *Note:* Mode ini untuk debugging/monitoring analisis AI`;
+        
+        await whatsappSocket.sendMessage(chatId, { text: statusText });
+        return;
+    }
+    
+    const isEnabled = parts[1].toLowerCase() === 'on';
+    
+    try {
+        const success = await analysisHandler.toggleFullAnalysis(isEnabled);
+        
+        if (success) {
+            const statusMessage = `🔬 *FULL ANALYSIS ${isEnabled ? 'ENABLED' : 'DISABLED'}*\n\n` +
+                `✅ Full analysis mode berhasil ${isEnabled ? 'diaktifkan' : 'dinonaktifkan'}\n\n` +
+                `${isEnabled ? 
+                    '📊 Sekarang akan mengirim:\n• Full narrative dari Gemini\n• Data extracted\n• Character count\n\n⚠️ Output akan lebih verbose' :
+                    '📊 Sekarang hanya mengirim:\n• Notifikasi normal\n• Status updates\n\n✅ Output kembali standard'
+                }`;
+            
+            await whatsappSocket.sendMessage(chatId, { text: statusMessage });
+            log.info(`Full analysis mode ${isEnabled ? 'enabled' : 'disabled'} successfully`, { chatId });
+        } else {
+            await whatsappSocket.sendMessage(chatId, { text: '❌ Gagal mengubah setting full analysis mode.' });
+        }
+        
+    } catch (error) {
+        log.error('Gagal toggle full analysis mode:', { error: error.message, chatId, stack: error.stack });
+        await whatsappSocket.sendMessage(chatId, { text: `❌ Error mengubah full analysis mode.\n*Error:* ${error.message}` });
+    }
+}
+/**
  * Handle cache management /ictcache command
  */
 async function handleCacheManagementCommand(whatsappSocket, chatId) {
@@ -1342,5 +1389,6 @@ module.exports = {
     handleDashboardCommand,
     handleScheduleCommand,
     handleAnalyticsCommand,
-    handleCacheManagementCommand
+    handleCacheManagementCommand,
+    handleFullAnalysisCommand
 };

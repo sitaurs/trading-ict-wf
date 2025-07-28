@@ -240,6 +240,9 @@ async function main() { // PERBAIKAN: Kurung kurawal pembuka dipindahkan ke sini
                 case '/clearcache':
                     await commandHandler.handleClearCacheCommand(whatsappSocket, chatId);
                     break;
+                case '/fullanly':
+                    await commandHandler.handleFullAnalysisCommand(text, whatsappSocket, chatId);
+                    break;
                 default:
                     // Manual analysis untuk pair tertentu (opsional untuk testing)
                     const parts = text.split(' ');
