@@ -19,7 +19,7 @@
 ### Individual Analysis
 | Command | Description | Example |
 |---------|-------------|---------|
-| `/analyze [PAIR]` | 📈 Analisis lengkap spesifik pair | `/analyze USDJPY` |
+| `/ictanalyze [PAIR]` | 📈 Analisis lengkap spesifik pair | `/ictanalyze USDJPY` |
 | `/holdeod` | 🌅 Analisis hold/close EOD | `/holdeod` |
 
 ---
@@ -29,8 +29,8 @@
 | Command | Description | Example |
 |---------|-------------|---------|
 | `/ictstatus` | 📊 Status bot & posisi aktif | `/ictstatus` |
-| `/positions` | 💼 Lihat semua posisi terbuka | `/positions` |
-| `/pending` | ⏳ Lihat pending orders | `/pending` |
+| `/ictpositions` | 💼 Lihat semua posisi terbuka | `/ictpositions` |
+| `/ictpending` | ⏳ Lihat pending orders | `/ictpending` |
 | `/ictprofit` | 💰 Laporan profit hari ini | `/ictprofit` |
 | `/ictclose [PAIR]` | ❌ Tutup posisi manual | `/ictclose USDJPY` |
 
@@ -43,7 +43,7 @@
 |---------|-------------|---------|
 | `/ictpause` | ⏸️ Pause trading otomatis | `/ictpause` |
 | `/ictresume` | ▶️ Resume trading otomatis | `/ictresume` |
-| `/restart` | 🔄 Restart sistem bot | `/restart` |
+| `/ictrestart` | 🔄 Restart sistem bot | `/ictrestart` |
 
 ### Recipient Management
 | Command | Description | Example |
@@ -60,8 +60,8 @@
 |---------|-------------|---------|
 | `/ictmenu` / `/icthelp` | 📱 Menampilkan menu bantuan | `/icthelp` |
 | `/ictnews` | 📰 Berita ekonomi forex terkini | `/ictnews` |
-| `/health` | 🏥 Status kesehatan sistem | `/health` |
-| `/context [PAIR]` | 📝 Status konteks pair harian | `/context USDJPY` |
+| `/icthealth` | 🏥 Status kesehatan sistem | `/icthealth` |
+| `/ictcontext [PAIR]` | 📝 Status konteks pair harian | `/ictcontext USDJPY` |
 
 ---
 
@@ -69,9 +69,9 @@
 
 | Command | Description | Example |
 |---------|-------------|---------|
-| `/clearcache` | 🗑️ Bersihkan cache analisis | `/clearcache` |
-| `/forceeod` | 🚨 Paksa tutup semua posisi | `/forceeod` |
-| `/resetcontext [PAIR]` | 🔄 Reset konteks pair | `/resetcontext USDJPY` |
+| `/ictcache` | 🗑️ Bersihkan cache analisis | `/ictcache` |
+| `/icteod` | 🚨 Paksa tutup semua posisi | `/icteod` |
+| `/ictreset [PAIR]` | 🔄 Reset konteks pair | `/ictreset USDJPY` |
 
 ---
 

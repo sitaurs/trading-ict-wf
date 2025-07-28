@@ -191,31 +191,31 @@ async function main() { // PERBAIKAN: Kurung kurawal pembuka dipindahkan ke sini
                 case '/fullcycle':
                     await commandHandler.handleFullCycleCommand(whatsappSocket, chatId);
                     break;
-                case '/analyze':
+                case '/ictanalyze':
                     await commandHandler.handleAnalyzePairCommand(text, whatsappSocket, chatId);
                     break;
-                case '/positions':
+                case '/ictpositions':
                     await commandHandler.handlePositionsCommand(whatsappSocket, chatId);
                     break;
-                case '/pending':
+                case '/ictpending':
                     await commandHandler.handlePendingCommand(whatsappSocket, chatId);
                     break;
-                case '/health':
+                case '/icthealth':
                     await commandHandler.handleHealthCommand(whatsappSocket, chatId);
                     break;
-                case '/clearcache':
+                case '/ictcache':
                     await commandHandler.handleClearCacheCommand(whatsappSocket, chatId);
                     break;
-                case '/restart':
+                case '/ictrestart':
                     await commandHandler.handleRestartCommand(whatsappSocket, chatId);
                     break;
-                case '/context':
+                case '/ictcontext':
                     await commandHandler.handleContextCommand(text, whatsappSocket, chatId);
                     break;
-                case '/resetcontext':
+                case '/ictreset':
                     await commandHandler.handleResetContextCommand(text, whatsappSocket, chatId);
                     break;
-                case '/forceeod':
+                case '/icteod':
                     await commandHandler.handleForceEodCommand(whatsappSocket, chatId);
                     break;
                 default:

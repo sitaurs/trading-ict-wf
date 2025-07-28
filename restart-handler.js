@@ -53,6 +53,27 @@ class RestartHandler {
      * 📈 Record restart attempt
      */
     recordRestart() {
+        // Check for startup flag first
+        const startupFlagPath = path.join(__dirname, '.startup_flag');
+        if (fs.existsSync(startupFlagPath)) {
+            console.log('🏁 Startup flag detected - this is a clean restart');
+            try {
+                fs.unlinkSync(startupFlagPath);
+                console.log('🗑️ Startup flag removed');
+            } catch (error) {
+                console.log('⚠️ Could not remove startup flag:', error.message);
+            }
+            
+            // Don't count this as a problematic restart
+            const cleanStats = {
+                count: 0,
+                lastRestart: Date.now(),
+                restarts: []
+            };
+            this.saveRestartStats(cleanStats);
+            return cleanStats;
+        }
+        
         const stats = this.getRestartStats();
         const now = Date.now();
         

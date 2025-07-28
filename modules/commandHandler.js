@@ -1,5 +1,17 @@
 /**
- * @fileoverview Module untuk menangani semua perintah manual dari pe🔍 *MONITORING & POSISI*
+ * @fileoverview Module untuk menangani semua perintah manual dari 📊 *ANALISIS & TRADING COMMANDS*
+• \`/stage1\` - 🎯 Analisis bias harian (Stage 1)
+• \`/stage2\` - ⚡ Deteksi manipulasi London (Stage 2)  
+• \`/stage3\` - 🚀 Konfirmasi entry (Stage 3)
+• \`/ictanalyze [PAIR]\` - � Analisis lengkap spesifik pair
+• \`/fullcycle\` - 🔄 Jalankan semua stage PO3
+
+�🔍 *MONITORING & POSISI*
+• \`/ictstatus\` - 📊 Status bot & posisi aktif
+• \`/ictpositions\` - 💼 Lihat semua posisi terbuka
+• \`/ictpending\` - ⏳ Lihat pending orders
+• \`/ictprofit\` - 💰 Laporan profit hari ini
+• \`/ictclose [PAIR]\` - ❌ Tutup posisi manualING & POSISI*
 • \`/ictstatus\` - 📊 Status bot & posisi aktif
 • \`/positions\` - 💼 Lihat semua posisi terbuka
 • \`/pending\` - ⏳ Lihat pending orders
@@ -93,15 +105,15 @@ async function handleMenuCommand(whatsappSocket, chatId, supportedPairs = []) {
 
 📰 *INFORMASI & UTILITAS*
 • \`/ictnews\` - 📰 Berita ekonomi forex terkini
-• \`/health\` - 🏥 Status kesehatan sistem
-• \`/context [PAIR]\` - 📝 Status konteks pair harian
-• \`/clearcache\` - 🗑️ Bersihkan cache analisis
+• \`/icthealth\` - 🏥 Status kesehatan sistem
+• \`/ictcontext [PAIR]\` - 📝 Status konteks pair harian
+• \`/ictcache\` - 🗑️ Bersihkan cache analisis
 
 🔧 *ADVANCED & MAINTENANCE*
 • \`/holdeod\` - 🌅 Analisis hold/close EOD
-• \`/forceeod\` - 🚨 Paksa tutup semua posisi
-• \`/resetcontext [PAIR]\` - 🔄 Reset konteks pair
-• \`/restart\` - 🔄 Restart sistem bot
+• \`/icteod\` - 🚨 Paksa tutup semua posisi
+• \`/ictreset [PAIR]\` - 🔄 Reset konteks pair
+• \`/ictrestart\` - 🔄 Restart sistem bot
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 � *Supported Pairs:* ${supportedPairs.join(', ')}
