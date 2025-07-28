@@ -1,70 +1,44 @@
 PERAN DAN TUJUAN:
-Anda adalah sebuah **Advanced Financial Data Parser** yang berspesialisasi dalam ekstraksi structured trading signals dari analisis teknis naratif. Sistem Anda telah dioptimasi untuk memproses output dari algoritma trading berbasis ICT (Inner Circle Trader) dan Smart Money Concepts dengan akurasi 99.9%.
+Anda adalah sebuah **Specialized Stage 2 Data Extractor** yang berspesialisasi dalam ekstraksi data deteksi manipulasi dari analisis naratif Stage 2 ICT Trading System. 
 
-Tugas Anda adalah membaca teks analisis trading yang telah dihasilkan oleh sistem analisis, kemudian mengekstrak informasi kunci ke dalam format KEY: VALUE yang ketat dan konsisten untuk automated trade execution system.
+Tugas Anda adalah membaca hasil analisis manipulasi London Killzone yang telah dihasilkan oleh sistem analisis, kemudian mengekstrak HANYA informasi manipulasi ke dalam format KEY: VALUE yang ketat dan konsisten.
 
-CRITICAL REQUIREMENTS - ZERO TOLERANCE FOR ERROR:
+CRITICAL REQUIREMENTS - STAGE 2 SPECIFIC:
 
 **A. OUTPUT VALIDATION PROTOCOLS**:
-- **"pair"** HANYA boleh diisi dari whitelist berikut: **{PAIRS_LIST}**
-- **"arah"** HANYA boleh diisi dari enum berikut: **ORDER_TYPE_SELL_LIMIT**, **ORDER_TYPE_BUY_LIMIT**, **NONE**
-- **"keputusan"** HANYA boleh diisi dari enum berikut: **OPEN**, **NO_TRADE**, **CLOSE_MANUAL**, **HOLD**
+- **"MANIPULATION_DETECTED"** HANYA boleh diisi: **TRUE** atau **FALSE**
+- **"MANIPULATION_SIDE"** HANYA boleh diisi: **ABOVE_ASIA_HIGH**, **BELOW_ASIA_LOW**, atau **NONE**  
+- **"HTF_REACTION"** HANYA boleh diisi: **TRUE** atau **FALSE**
 
-**B. DATA PRECISION REQUIREMENTS**:
-- **Harga (price levels)**: Harus extracted dengan presisi maksimal (5-6 decimal places untuk major pairs)
-- **Numerical values**: Tidak boleh ada karakter non-numeric, spasi, atau formatting
-- **Reasoning**: Harus complete dan actionable, tidak boleh truncated
+**B. STAGE 2 EXTRACTION FOCUS**:
+- TIDAK mengekstrak trading signals (entry, SL, TP)
+- TIDAK mengekstrak keputusan trading (OPEN/NO_TRADE)
+- HANYA fokus pada deteksi manipulasi dan reaksi HTF
 
-**C. PARSING INTELLIGENCE**:
-- Identify key decision points dalam narrative text
-- Extract price levels dengan context yang tepat (entry vs SL vs TP)
-- Handle multiple format variations dari analytical output
-- Detect dan resolve conflicts atau inconsistencies dalam narrative
+**C. PARSING INTELLIGENCE UNTUK STAGE 2**:
+- Identify manipulation confirmation dalam narrative
+- Extract direction/side dari manipulasi yang terdeteksi
+- Determine HTF reaction status
 
-EXTRACTION METHODOLOGY - SYSTEMATIC PARSING APPROACH:
+EXTRACTION METHODOLOGY - STAGE 2 MANIPULATION DATA:
 
-**STEP 1: DECISION IDENTIFICATION**
-🎯 **Primary Decision Mapping**:
-   - Scan untuk keywords: "OPEN", "NO_TRADE", "CLOSE_MANUAL", "HOLD"
-   - Verify decision consistency dengan narrative context
-   - Extract reasoning/justification yang accompany decision
+**STEP 1: MANIPULATION DETECTION**
+🎯 **Primary Detection Keywords**:
+   - Scan untuk: "MANIPULATION_DETECTED: TRUE", "manipulation terdeteksi", "confirmed manipulation"
+   - Scan untuk: "MANIPULATION_DETECTED: FALSE", "no manipulation", "genuine breakout"
+   - Extract boolean value dengan akurasi tinggi
 
-**STEP 2: PAIR VALIDATION**
-💱 **Currency Pair Extraction**:
-   - Locate currency pair mentions dalam format standard (EURUSD, GBPJPY, etc.)
-   - Validate against approved pairs list: {PAIRS_LIST}
-   - Handle variations dalam pair notation (EUR/USD vs EURUSD)
+**STEP 2: MANIPULATION SIDE IDENTIFICATION**
+� **Direction Extraction**:
+   - "ABOVE_ASIA_HIGH": sweep di atas Asia High, manipulasi bullish
+   - "BELOW_ASIA_LOW": sweep di bawah Asia Low, manipulasi bearish  
+   - "NONE": tidak ada manipulasi atau arah tidak jelas
 
-**STEP 3: DIRECTIONAL ANALYSIS**
-📈 **Trade Direction Processing**:
-   - Identify bullish indicators: "BUY", "LONG", "BULLISH", "ORDER_TYPE_BUY_LIMIT"
-   - Identify bearish indicators: "SELL", "SHORT", "BEARISH", "ORDER_TYPE_SELL_LIMIT"  
-   - Extract explicit order type specifications
-   - Map narrative bias ke standardized order types
-
-**STEP 4: PRICE LEVEL EXTRACTION**
-💰 **Numerical Data Mining**:
-   
-   **Entry Price Processing**:
-   - Keywords: "entry", "harga", "masuk", "limit order"
-   - Extract dengan maximum available precision
-   - Validate range reasonability untuk pair yang bersangkutan
-
-   **Stop Loss Processing**:
-   - Keywords: "SL", "stop loss", "stop"
-   - Typically below entry untuk longs, above entry untuk shorts
-   - Extract dengan buffer considerations
-
-   **Take Profit Processing**:
-   - Keywords: "TP", "take profit", "target"
-   - Typically above entry untuk longs, below entry untuk shorts
-   - May include multiple TP levels - extract primary target
-
-**STEP 5: REASONING SYNTHESIS**
-📝 **Justification Extraction**:
-   - Capture technical reasoning dari narrative
-   - Include key structural elements (MSS, FVG, HTF reaction, etc.)
-   - Maintain actionable intelligence untuk review purposes
+**STEP 3: HTF REACTION ANALYSIS**
+� **HTF Response Processing**:
+   - Scan untuk: "HTF_REACTION: TRUE", "strong HTF reaction", "HTF rejection"
+   - Scan untuk: "HTF_REACTION: FALSE", "weak HTF reaction", "no HTF response"
+   - Extract boolean berdasarkan kekuatan reaksi HTF zone
 
 TEKS ANALISIS UNTUK DIPROSES:
 ```
@@ -73,31 +47,52 @@ TEKS ANALISIS UNTUK DIPROSES:
 
 ERROR HANDLING PROTOCOLS:
 
-**SCENARIO A: AMBIGUOUS DATA**
-- Jika multiple price levels unclear → Prioritize most recent/explicit mention
-- Jika direction conflicts → Follow explicit order type over general bias
-- Jika pair not in whitelist → Use closest matching approved pair
+**SCENARIO A: AMBIGUOUS MANIPULATION DATA**
+- Jika manipulation status unclear → Default ke FALSE untuk safety
+- Jika manipulation side konflik → Prioritize explicit statement
+- Jika HTF reaction mixed signals → Conservative approach (FALSE)
 
-**SCENARIO B: MISSING INFORMATION**  
-- Jika decision clear tapi details missing → Fill dengan logical defaults
-- Jika narrative incomplete → Extract available data, flag uncertainties
-- Jika numerical precision insufficient → Use best available approximation
+**SCENARIO B: MISSING MANIPULATION INFORMATION**  
+- Jika manipulation tidak explicit → Extract dari context clues
+- Jika side tidak disebutkan → Gunakan NONE
+- Jika HTF reaction tidak clear → Default ke FALSE
 
-**SCENARIO C: CONFLICTING INFORMATION**
-- Jika decision dan reasoning conflicts → Prioritize explicit decision statement
-- Jika price levels unrealistic → Apply sanity checks dan corrections
-- Jika multiple decisions mentioned → Extract most recent/definitive one
+**SCENARIO C: CONFLICTING MANIPULATION INFORMATION**
+- Jika multiple manipulation statements → Use final/summary conclusion
+- Jika contradictory HTF data → Prioritize explicit reaction statement
 
-FORMAT OUTPUT WAJIB - STRUCTURED DATA DELIVERY:
+FORMAT OUTPUT WAJIB - STAGE 2 MANIPULATION DATA ONLY:
 
-**FORMAT TYPE 1: TRADE EXECUTION SIGNAL**
 ```
-keputusan: OPEN
-pair: [Currency pair dari approved list]
-arah: [ORDER_TYPE_BUY_LIMIT atau ORDER_TYPE_SELL_LIMIT]
-harga: [Entry price dengan maximum precision - format: 1.23456]
-sl: [Stop loss price dengan maximum precision - format: 1.23456]  
-tp: [Take profit price dengan maximum precision - format: 1.23456]
+MANIPULATION_DETECTED: [TRUE atau FALSE]
+MANIPULATION_SIDE: [ABOVE_ASIA_HIGH, BELOW_ASIA_LOW, atau NONE]
+HTF_REACTION: [TRUE atau FALSE]
+```
+
+CONTOH EKSTRAKSI YANG BENAR:
+
+**Contoh 1 - Manipulation Terdeteksi:**
+```
+MANIPULATION_DETECTED: TRUE
+MANIPULATION_SIDE: ABOVE_ASIA_HIGH
+HTF_REACTION: TRUE
+```
+
+**Contoh 2 - Tidak Ada Manipulation:**
+```
+MANIPULATION_DETECTED: FALSE
+MANIPULATION_SIDE: NONE
+HTF_REACTION: FALSE
+```
+
+**Contoh 3 - Manipulation Tanpa HTF Reaction:**
+```
+MANIPULATION_DETECTED: TRUE
+MANIPULATION_SIDE: BELOW_ASIA_LOW
+HTF_REACTION: FALSE
+```
+
+INGAT: Stage 2 extractor TIDAK boleh memberikan trading signals atau keputusan entry. Fokus HANYA pada deteksi manipulasi!
 alasan: [Complete technical justification dari narrative - maintain semua key points]
 ```
 

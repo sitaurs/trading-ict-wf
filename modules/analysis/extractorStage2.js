@@ -22,9 +22,8 @@ async function extractStage2Data(narrativeText) {
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${process.env.GEMINI_API_KEY}`;
     
     try {
-        let prompt = await getPrompt('prompt_extractor.txt');
+        let prompt = await getPrompt('prompt_stage2_extractor.txt');
         prompt = prompt.replace(/\{NARRATIVE_TEXT\}/g, narrativeText);
-        prompt = prompt.replace(/\{PAIRS_LIST\}/g, 'EURUSD, GBPUSD, USDJPY, AUDUSD, USDCAD, NZDUSD, EURGBP, EURJPY, GBPJPY');
 
         const requestPayload = {
             contents: [{
@@ -71,22 +70,41 @@ async function extractStage2Data(narrativeText) {
             rawResponse: rawText
         });
 
-        // Parse the KEY: VALUE format
-        const lines = rawText.split('\n');
+        // Clean the response text - remove code blocks if present
+        let cleanText = rawText;
+        if (cleanText.includes('```')) {
+            // Extract content between code blocks
+            const codeBlockMatch = cleanText.match(/```[\s\S]*?\n([\s\S]*?)```/);
+            if (codeBlockMatch) {
+                cleanText = codeBlockMatch[1].trim();
+            } else {
+                // Remove all code block markers
+                cleanText = cleanText.replace(/```/g, '').trim();
+            }
+        }
+
+        // Parse the KEY: VALUE format for Stage 2 manipulation data
+        const lines = cleanText.split('\n');
         const extracted = {};
         
         for (const line of lines) {
             const [key, ...valueParts] = line.split(':');
             if (key && valueParts.length > 0) {
-                const cleanKey = key.trim().toLowerCase();
-                const value = valueParts.join(':').trim();
+                const cleanKey = key.trim().toUpperCase();
+                const value = valueParts.join(':').trim().toUpperCase();
                 
-                if (cleanKey === 'manipulation') {
-                    extracted.manipulation_detected = value.toLowerCase().includes('true') || value.toLowerCase().includes('yes');
+                if (cleanKey === 'MANIPULATION_DETECTED') {
+                    extracted.manipulation_detected = value === 'TRUE';
                 }
-                if (cleanKey === 'side') extracted.manipulation_side = value;
-                if (cleanKey === 'htf_reaction') {
-                    extracted.htf_reaction = value.toLowerCase().includes('true') || value.toLowerCase().includes('yes');
+                if (cleanKey === 'MANIPULATION_SIDE') {
+                    if (value === 'ABOVE_ASIA_HIGH' || value === 'BELOW_ASIA_LOW') {
+                        extracted.manipulation_side = value;
+                    } else {
+                        extracted.manipulation_side = null;
+                    }
+                }
+                if (cleanKey === 'HTF_REACTION') {
+                    extracted.htf_reaction = value === 'TRUE';
                 }
             }
         }

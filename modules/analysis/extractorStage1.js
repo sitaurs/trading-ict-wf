@@ -37,7 +37,7 @@ async function extractStage1Data(narrativeText) {
             };
         }
 
-        let prompt = await getPrompt('prompt_extractor.txt');
+        let prompt = await getPrompt('prompt_stage1_extractor.txt');
         prompt = prompt.replace(/\{NARRATIVE_TEXT\}/g, narrativeText);
         prompt = prompt.replace(/\{PAIRS_LIST\}/g, 'EURUSD, GBPUSD, USDJPY, AUDUSD, USDCAD, NZDUSD, EURGBP, EURJPY, GBPJPY');
 
