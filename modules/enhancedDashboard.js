@@ -10,7 +10,7 @@ const AnalysisCacheManager = require('../scripts/cache_manager');
 
 const log = getLogger('Dashboard');
 
-class ICTDashboard {
+class ICTEnhancedDashboard {
     constructor() {
         this.log = log;
         this.cacheManager = new AnalysisCacheManager();
@@ -353,4 +353,4 @@ ${scheduleItems.map(item =>
     }
 }
 
-module.exports = ICTDashboard;
+module.exports = ICTEnhancedDashboard;

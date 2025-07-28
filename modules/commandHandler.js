@@ -337,18 +337,38 @@ async function handleNewsCommand(whatsappSocket, chatId) {
 /**
  * Handle manual Stage 1 Analysis
  */
-async function handleStage1Command(whatsappSocket, chatId) {
+async function handleStage1Command(whatsappSocket, chatId, text = '') {
     log.info('Memproses perintah /stage1 - Force analisis bias harian', { chatId });
     try {
-        await whatsappSocket.sendMessage(chatId, { text: '🔍 *STAGE 1: Memulai analisis bias harian...*' });
+        // Parse untuk pair-specific command
+        const parts = text.split(' ');
+        let targetPairs;
         
-        const supportedPairs = process.env.SUPPORTED_PAIRS
-            ? process.env.SUPPORTED_PAIRS.split(',').map(p => p.trim().toUpperCase())
-            : ['USDJPY', 'USDCHF', 'GBPUSD'];
+        if (parts.length > 1) {
+            // Specific pair requested
+            const requestedPair = parts[1].toUpperCase();
+            const supportedPairs = process.env.SUPPORTED_PAIRS
+                ? process.env.SUPPORTED_PAIRS.split(',').map(p => p.trim().toUpperCase())
+                : ['USDJPY', 'USDCHF', 'GBPUSD'];
+                
+            if (supportedPairs.includes(requestedPair)) {
+                targetPairs = [requestedPair];
+                await whatsappSocket.sendMessage(chatId, { text: `🔍 *STAGE 1: Memulai analisis bias harian untuk ${requestedPair}...*` });
+            } else {
+                await whatsappSocket.sendMessage(chatId, { text: `❌ *ERROR:* Pair ${requestedPair} tidak didukung.\n\n*Supported pairs:* ${supportedPairs.join(', ')}` });
+                return;
+            }
+        } else {
+            // All pairs
+            targetPairs = process.env.SUPPORTED_PAIRS
+                ? process.env.SUPPORTED_PAIRS.split(',').map(p => p.trim().toUpperCase())
+                : ['USDJPY', 'USDCHF', 'GBPUSD'];
+            await whatsappSocket.sendMessage(chatId, { text: '🔍 *STAGE 1: Memulai analisis bias harian...*' });
+        }
             
-        log.info('Menjalankan analisis Stage 1 untuk pairs:', { pairs: supportedPairs, triggeredBy: 'manual_command' });
+        log.info('Menjalankan analisis Stage 1 untuk pairs:', { pairs: targetPairs, triggeredBy: 'manual_command' });
         
-        const results = await analysisHandler.runStage1Analysis(supportedPairs);
+        const results = await analysisHandler.runStage1Analysis(targetPairs);
         
         // Generate summary message based on results
         let summaryMessage = '📊 *STAGE 1 SUMMARY*\n\n';
@@ -397,19 +417,97 @@ async function handleStage1Command(whatsappSocket, chatId) {
 /**
  * Handle manual Stage 2 Analysis
  */
-async function handleStage2Command(whatsappSocket, chatId) {
+async function handleStage2Command(whatsappSocket, chatId, text = '') {
     log.info('Memproses perintah /stage2 - Force deteksi manipulasi', { chatId });
     try {
-        await whatsappSocket.sendMessage(chatId, { text: '🔍 *STAGE 2: Memulai deteksi manipulasi London...*' });
+        // Parse untuk pair-specific command
+        const parts = text.split(' ');
+        let targetPairs;
         
-        const supportedPairs = process.env.SUPPORTED_PAIRS
-            ? process.env.SUPPORTED_PAIRS.split(',').map(p => p.trim().toUpperCase())
-            : ['USDJPY', 'USDCHF', 'GBPUSD'];
+        if (parts.length > 1) {
+            // Specific pair requested
+            const requestedPair = parts[1].toUpperCase();
+            const supportedPairs = process.env.SUPPORTED_PAIRS
+                ? process.env.SUPPORTED_PAIRS.split(',').map(p => p.trim().toUpperCase())
+                : ['USDJPY', 'USDCHF', 'GBPUSD'];
+                
+            if (supportedPairs.includes(requestedPair)) {
+                targetPairs = [requestedPair];
+                await whatsappSocket.sendMessage(chatId, { text: `🔍 *STAGE 2: Memeriksa status ${requestedPair} dan memulai deteksi manipulasi...*` });
+            } else {
+                await whatsappSocket.sendMessage(chatId, { text: `❌ *ERROR:* Pair ${requestedPair} tidak didukung.\n\n*Supported pairs:* ${supportedPairs.join(', ')}` });
+                return;
+            }
+        } else {
+            // All pairs
+            targetPairs = process.env.SUPPORTED_PAIRS
+                ? process.env.SUPPORTED_PAIRS.split(',').map(p => p.trim().toUpperCase())
+                : ['USDJPY', 'USDCHF', 'GBPUSD'];
+            await whatsappSocket.sendMessage(chatId, { text: '🔍 *STAGE 2: Memeriksa status dan memulai deteksi manipulasi...*' });
+        }
             
-        log.info('Menjalankan analisis Stage 2 untuk pairs:', { pairs: supportedPairs, triggeredBy: 'manual_command' });
-        await analysisHandler.runStage2Analysis(supportedPairs);
-        await whatsappSocket.sendMessage(chatId, { text: '✅ *STAGE 2 SELESAI*\nDeteksi manipulasi London untuk semua pair telah diselesaikan.' });
-        log.info('Stage 2 analysis berhasil dijalankan secara manual', { pairs: supportedPairs, chatId });
+        // Validate stage prerequisite untuk setiap pair
+        const { getContext } = require('./contextManager');
+        let validPairs = [];
+        let blockedPairs = [];
+        
+        for (const pair of targetPairs) {
+            try {
+                const context = await getContext(pair);
+                log.info(`Checking context for ${pair}:`, { status: context.status, pair });
+                
+                if (context.status === 'PENDING_MANIPULATION' || 
+                    context.status === 'PENDING_ENTRY' || 
+                    context.status === 'COMPLETE_TRADE_OPENED' ||
+                    context.status === 'COMPLETE_NO_MANIPULATION' ||
+                    context.status === 'COMPLETE_NO_ENTRY') {
+                    validPairs.push(pair);
+                } else if (context.status === 'PENDING_BIAS') {
+                    blockedPairs.push({ pair, reason: 'Perlu Stage 1 (Bias Analysis) terlebih dahulu' });
+                } else {
+                    blockedPairs.push({ pair, reason: `Status: ${context.status} - Unexpected status` });
+                }
+            } catch (error) {
+                log.error(`Error checking context for ${pair}:`, error);
+                blockedPairs.push({ pair, reason: 'Error mengecek status context' });
+            }
+        }
+        
+        // Generate status message
+        let statusMessage = '📊 *STAGE 2 STATUS CHECK*\n\n';
+        
+        if (validPairs.length > 0) {
+            statusMessage += `✅ *Pairs Ready untuk Stage 2:*\n`;
+            validPairs.forEach(pair => {
+                statusMessage += `• ${pair}: Ready for manipulation detection\n`;
+            });
+            statusMessage += '\n';
+        }
+        
+        if (blockedPairs.length > 0) {
+            statusMessage += `❌ *Pairs Tidak Ready:*\n`;
+            blockedPairs.forEach(item => {
+                statusMessage += `• ${item.pair}: ${item.reason}\n`;
+            });
+            statusMessage += '\n';
+        }
+        
+        // Execute Stage 2 only for valid pairs
+        if (validPairs.length > 0) {
+            statusMessage += `⚡ *Menjalankan Stage 2 untuk ${validPairs.length} pair(s)...*`;
+            await whatsappSocket.sendMessage(chatId, { text: statusMessage });
+            
+            log.info('Menjalankan analisis Stage 2 untuk valid pairs:', { pairs: validPairs, triggeredBy: 'manual_command' });
+            await analysisHandler.runStage2Analysis(validPairs);
+            
+            await whatsappSocket.sendMessage(chatId, { text: `✅ *STAGE 2 SELESAI*\nDeteksi manipulasi untuk ${validPairs.length} pair(s) telah diselesaikan.\n\n📋 *Pairs diproses:* ${validPairs.join(', ')}` });
+            log.info('Stage 2 analysis berhasil dijalankan secara manual', { pairs: validPairs, chatId });
+        } else {
+            statusMessage += `⚠️ *TIDAK ADA PAIR YANG READY UNTUK STAGE 2*\n\n💡 *Saran:*\n• Jalankan Stage 1: \`/stage1\`\n• Cek status: \`/ictdash\``;
+            await whatsappSocket.sendMessage(chatId, { text: statusMessage });
+            log.warn('Stage 2 command dijalankan tapi tidak ada pair yang ready', { blockedPairs, chatId });
+        }
+        
     } catch (error) {
         log.error('Gagal menjalankan Stage 2 analysis:', { error: error.message, chatId, stack: error.stack });
         await whatsappSocket.sendMessage(chatId, { text: `❌ Gagal menjalankan analisis Stage 2.\n*Error:* ${error.message}` });
@@ -419,19 +517,97 @@ async function handleStage2Command(whatsappSocket, chatId) {
 /**
  * Handle manual Stage 3 Analysis
  */
-async function handleStage3Command(whatsappSocket, chatId) {
-    log.info('Memproses perintah /stage3 - Force konfirmasi entri', { chatId });
+async function handleStage3Command(whatsappSocket, chatId, text = '') {
+    log.info('Memproses perintah /stage3 - Force konfirmasi entry', { chatId });
     try {
-        await whatsappSocket.sendMessage(chatId, { text: '🔍 *STAGE 3: Memulai konfirmasi entri...*' });
+        // Parse untuk pair-specific command
+        const parts = text.split(' ');
+        let targetPairs;
         
-        const supportedPairs = process.env.SUPPORTED_PAIRS
-            ? process.env.SUPPORTED_PAIRS.split(',').map(p => p.trim().toUpperCase())
-            : ['USDJPY', 'USDCHF', 'GBPUSD'];
+        if (parts.length > 1) {
+            // Specific pair requested
+            const requestedPair = parts[1].toUpperCase();
+            const supportedPairs = process.env.SUPPORTED_PAIRS
+                ? process.env.SUPPORTED_PAIRS.split(',').map(p => p.trim().toUpperCase())
+                : ['USDJPY', 'USDCHF', 'GBPUSD'];
+                
+            if (supportedPairs.includes(requestedPair)) {
+                targetPairs = [requestedPair];
+                await whatsappSocket.sendMessage(chatId, { text: `🔍 *STAGE 3: Memeriksa status ${requestedPair} dan konfirmasi entry...*` });
+            } else {
+                await whatsappSocket.sendMessage(chatId, { text: `❌ *ERROR:* Pair ${requestedPair} tidak didukung.\n\n*Supported pairs:* ${supportedPairs.join(', ')}` });
+                return;
+            }
+        } else {
+            // All pairs
+            targetPairs = process.env.SUPPORTED_PAIRS
+                ? process.env.SUPPORTED_PAIRS.split(',').map(p => p.trim().toUpperCase())
+                : ['USDJPY', 'USDCHF', 'GBPUSD'];
+            await whatsappSocket.sendMessage(chatId, { text: '🔍 *STAGE 3: Memeriksa status dan konfirmasi entry...*' });
+        }
             
-        log.info('Menjalankan analisis Stage 3 untuk pairs:', { pairs: supportedPairs, triggeredBy: 'manual_command' });
-        await analysisHandler.runStage3Analysis(supportedPairs);
-        await whatsappSocket.sendMessage(chatId, { text: '✅ *STAGE 3 SELESAI*\nKonfirmasi entri untuk semua pair telah diselesaikan.' });
-        log.info('Stage 3 analysis berhasil dijalankan secara manual', { pairs: supportedPairs, chatId });
+        // Validate stage prerequisite untuk setiap pair
+        const { getContext } = require('./contextManager');
+        let validPairs = [];
+        let blockedPairs = [];
+        
+        let statusMessage = '📊 *STAGE 3 STATUS CHECK*\n\n';
+        
+        for (const pair of targetPairs) {
+            try {
+                const context = await getContext(pair);
+                log.info(`Checking context for ${pair}:`, { status: context.status, pair });
+                
+                if (context.status === 'PENDING_ENTRY' || context.status === 'COMPLETE_TRADE_OPENED') {
+                    validPairs.push(pair);
+                } else if (context.status === 'PENDING_BIAS') {
+                    blockedPairs.push({ pair, reason: 'Perlu Stage 1 (Bias Analysis) terlebih dahulu' });
+                } else if (context.status === 'PENDING_MANIPULATION') {
+                    blockedPairs.push({ pair, reason: 'Perlu Stage 2 (Manipulation Detection) terlebih dahulu' });
+                } else {
+                    // Status lain seperti COMPLETE_NO_MANIPULATION, COMPLETE_NO_ENTRY
+                    blockedPairs.push({ pair, reason: `Status: ${context.status} - Tidak dapat melanjutkan ke Stage 3` });
+                }
+            } catch (error) {
+                log.error(`Error checking context for ${pair}:`, error);
+                blockedPairs.push({ pair, reason: 'Error mengecek status context' });
+            }
+        }
+        
+        // Generate status message
+        
+        if (validPairs.length > 0) {
+            statusMessage += `✅ *Pairs Ready untuk Stage 3:*\n`;
+            validPairs.forEach(pair => {
+                statusMessage += `• ${pair}: Ready for entry confirmation\n`;
+            });
+            statusMessage += '\n';
+        }
+        
+        if (blockedPairs.length > 0) {
+            statusMessage += `❌ *Pairs Tidak Ready:*\n`;
+            blockedPairs.forEach(item => {
+                statusMessage += `• ${item.pair}: ${item.reason}\n`;
+            });
+            statusMessage += '\n';
+        }
+        
+        // Execute Stage 3 only for valid pairs
+        if (validPairs.length > 0) {
+            statusMessage += `🚀 *Menjalankan Stage 3 untuk ${validPairs.length} pair(s)...*`;
+            await whatsappSocket.sendMessage(chatId, { text: statusMessage });
+            
+            log.info('Menjalankan analisis Stage 3 untuk valid pairs:', { pairs: validPairs, triggeredBy: 'manual_command' });
+            await analysisHandler.runStage3Analysis(validPairs);
+            
+            await whatsappSocket.sendMessage(chatId, { text: `✅ *STAGE 3 SELESAI*\nKonfirmasi entri untuk ${validPairs.length} pair(s) telah diselesaikan.\n\n📋 *Pairs diproses:* ${validPairs.join(', ')}` });
+            log.info('Stage 3 analysis berhasil dijalankan secara manual', { pairs: validPairs, chatId });
+        } else {
+            statusMessage += `⚠️ *TIDAK ADA PAIR YANG READY UNTUK STAGE 3*\n\n💡 *Saran:*\n• Jalankan Stage 1: \`/stage1\`\n• Jalankan Stage 2: \`/stage2\`\n• Cek status: \`/ictdash\``;
+            await whatsappSocket.sendMessage(chatId, { text: statusMessage });
+            log.warn('Stage 3 command dijalankan tapi tidak ada pair yang ready', { blockedPairs, chatId });
+        }
+        
     } catch (error) {
         log.error('Gagal menjalankan Stage 3 analysis:', { error: error.message, chatId, stack: error.stack });
         await whatsappSocket.sendMessage(chatId, { text: `❌ Gagal menjalankan analisis Stage 3.\n*Error:* ${error.message}` });
@@ -678,6 +854,125 @@ async function handleHealthCommand(whatsappSocket, chatId) {
 }
 
 /**
+ * Handle context status overview for all pairs
+ */
+async function handleContextStatusCommand(whatsappSocket, chatId) {
+    log.info('Memproses perintah /ictstatus - Context status overview', { chatId });
+    try {
+        await whatsappSocket.sendMessage(chatId, { text: '📊 *Mengumpulkan status context untuk semua pairs...*' });
+        
+        const supportedPairs = process.env.SUPPORTED_PAIRS
+            ? process.env.SUPPORTED_PAIRS.split(',').map(p => p.trim().toUpperCase())
+            : ['USDJPY', 'USDCHF', 'GBPUSD'];
+            
+        const { getContext } = require('./contextManager');
+        
+        let statusText = '📊 *ICT CONTEXT STATUS OVERVIEW*\n\n';
+        statusText += `⏰ *${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })} WIB*\n\n`;
+        
+        const statusGroups = {
+            'PENDING_BIAS': [],
+            'PENDING_MANIPULATION': [],
+            'PENDING_ENTRY': [],
+            'COMPLETE_TRADE_OPENED': [],
+            'COMPLETE_NO_MANIPULATION': [],
+            'COMPLETE_NO_ENTRY': [],
+            'ERROR': []
+        };
+        
+        for (const pair of supportedPairs) {
+            try {
+                const context = await getContext(pair);
+                if (statusGroups[context.status]) {
+                    statusGroups[context.status].push({
+                        pair,
+                        bias: context.daily_bias,
+                        manipulation: context.manipulation_detected,
+                        tradeStatus: context.trade_status
+                    });
+                } else {
+                    statusGroups['ERROR'].push({ pair, status: context.status });
+                }
+            } catch (error) {
+                statusGroups['ERROR'].push({ pair, error: error.message });
+            }
+        }
+        
+        // Generate status report
+        if (statusGroups['PENDING_BIAS'].length > 0) {
+            statusText += '🌅 *PENDING BIAS (Stage 1 Required):*\n';
+            statusGroups['PENDING_BIAS'].forEach(item => {
+                statusText += `• ${item.pair}: Waiting for bias analysis\n`;
+            });
+            statusText += `💡 *Action:* \`/stage1\`\n\n`;
+        }
+        
+        if (statusGroups['PENDING_MANIPULATION'].length > 0) {
+            statusText += '⚡ *PENDING MANIPULATION (Stage 2 Required):*\n';
+            statusGroups['PENDING_MANIPULATION'].forEach(item => {
+                statusText += `• ${item.pair}: Bias ${item.bias || 'N/A'} - Waiting for manipulation\n`;
+            });
+            statusText += `💡 *Action:* \`/stage2\`\n\n`;
+        }
+        
+        if (statusGroups['PENDING_ENTRY'].length > 0) {
+            statusText += '🚀 *PENDING ENTRY (Stage 3 Ready):*\n';
+            statusGroups['PENDING_ENTRY'].forEach(item => {
+                statusText += `• ${item.pair}: Bias ${item.bias || 'N/A'} - Manipulation ${item.manipulation ? 'Detected' : 'None'}\n`;
+            });
+            statusText += `💡 *Action:* \`/stage3\`\n\n`;
+        }
+        
+        if (statusGroups['COMPLETE_TRADE_OPENED'].length > 0) {
+            statusText += '💰 *ACTIVE TRADES:*\n';
+            statusGroups['COMPLETE_TRADE_OPENED'].forEach(item => {
+                statusText += `• ${item.pair}: ${item.bias || 'N/A'} trade active\n`;
+            });
+            statusText += `💡 *Monitor:* \`/ictpositions\`\n\n`;
+        }
+        
+        if (statusGroups['COMPLETE_NO_MANIPULATION'].length > 0) {
+            statusText += '❌ *NO MANIPULATION DETECTED:*\n';
+            statusGroups['COMPLETE_NO_MANIPULATION'].forEach(item => {
+                statusText += `• ${item.pair}: ${item.bias || 'N/A'} - No manipulation found\n`;
+            });
+            statusText += '\n';
+        }
+        
+        if (statusGroups['COMPLETE_NO_ENTRY'].length > 0) {
+            statusText += '⏭️ *NO ENTRY FOUND:*\n';
+            statusGroups['COMPLETE_NO_ENTRY'].forEach(item => {
+                statusText += `• ${item.pair}: ${item.bias || 'N/A'} - No valid entry\n`;
+            });
+            statusText += '\n';
+        }
+        
+        if (statusGroups['ERROR'].length > 0) {
+            statusText += '🔴 *ERRORS:*\n';
+            statusGroups['ERROR'].forEach(item => {
+                statusText += `• ${item.pair}: ${item.error || item.status}\n`;
+            });
+            statusText += '\n';
+        }
+        
+        // Quick actions
+        statusText += '🎯 *QUICK ACTIONS:*\n';
+        statusText += '• `/stage1` - Force bias analysis\n';
+        statusText += '• `/stage2` - Force manipulation detection\n';  
+        statusText += '• `/stage3` - Force entry confirmation\n';
+        statusText += '• `/ictdash` - Real-time dashboard\n';
+        statusText += '• `/ask market status?` - AI analysis';
+        
+        await whatsappSocket.sendMessage(chatId, { text: statusText });
+        log.info('Context status overview berhasil dikirim', { statusGroups, chatId });
+        
+    } catch (error) {
+        log.error('Gagal mengambil context status overview:', { error: error.message, chatId, stack: error.stack });
+        await whatsappSocket.sendMessage(chatId, { text: `❌ Gagal mengambil status overview.\n*Error:* ${error.message}` });
+    }
+}
+
+/**
  * Handle clear cache
  */
 async function handleClearCacheCommand(whatsappSocket, chatId) {
@@ -844,10 +1139,8 @@ async function handleAskCommand(text, whatsappSocket, chatId) {
     log.info('Memproses AI Assistant request', { question, chatId });
     
     try {
-        await whatsappSocket.sendMessage(chatId, { text: '🤖 *AI ASSISTANT*\n\n🔍 Menganalisis pertanyaan Anda dengan Gemini 2.5 Pro...' });
-        
-        const response = await aiAssistant.handleQuestion(question);
-        await whatsappSocket.sendMessage(chatId, { text: response });
+        // FIX: Gunakan method yang benar dari aiAssistant
+        await aiAssistant.handleAskCommand(question, whatsappSocket, chatId);
         
         log.info('AI Assistant response sent successfully', { question: question.substring(0, 50), chatId });
     } catch (error) {
@@ -1043,6 +1336,7 @@ module.exports = {
     handleContextCommand,
     handleResetContextCommand,
     handleForceEodCommand,
+    handleContextStatusCommand,
     // === NEW FEATURES v3.2.0 ===
     handleAskCommand,
     handleDashboardCommand,

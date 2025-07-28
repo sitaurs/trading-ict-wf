@@ -557,6 +557,33 @@ async function getTodaysProfit() {
   }
 }
 
+/**
+ * [GET /weekly_performance] Mengambil performa mingguan (mock implementation)
+ * ✅ Temporary implementation until broker API supports weekly stats
+ */
+async function getWeeklyPerformance() {
+    try {
+        const todayProfit = await getTodaysProfit();
+        
+        // Mock weekly data based on today's performance
+        // TODO: Implement proper weekly calculation when broker API supports it
+        return {
+            weeklyProfit: todayProfit * 5, // Rough estimate
+            totalTrades: 15, // Mock value
+            winRate: 75, // Mock value
+            todayTrades: 4 // Mock value
+        };
+    } catch (error) {
+        log.error('Failed to get weekly performance:', error.message);
+        return {
+            weeklyProfit: 0,
+            totalTrades: 0,
+            winRate: 0,
+            todayTrades: 0
+        };
+    }
+}
+
 // Ekspor semua fungsi yang akan digunakan oleh modul lain.
 // Sekarang semuanya sudah didefinisikan dengan benar.
 module.exports = {
@@ -567,5 +594,6 @@ module.exports = {
   getOrderStatus,
   getClosingDealInfo,
   getTodaysProfit,
+  getWeeklyPerformance,
   modifyPosition
 };

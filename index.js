@@ -142,7 +142,7 @@ async function main() { // PERBAIKAN: Kurung kurawal pembuka dipindahkan ke sini
                     await commandHandler.handleMenuCommand(whatsappSocket, chatId, SUPPORTED_PAIRS);
                     break;
                 case '/ictstatus':
-                    await commandHandler.handleConsolidatedStatusCommand(SUPPORTED_PAIRS, global.botSettings, whatsappSocket, chatId);
+                    await commandHandler.handleContextStatusCommand(whatsappSocket, chatId);
                     break;
                 case '/ictentry':
                     await commandHandler.handleEntryCommand(text, chatId, whatsappSocket);
@@ -177,13 +177,16 @@ async function main() { // PERBAIKAN: Kurung kurawal pembuka dipindahkan ke sini
                     break;
                 // === COMMAND INTERAKTIF BARU ===
                 case '/stage1':
-                    await commandHandler.handleStage1Command(whatsappSocket, chatId);
+                case '/ictstage1':
+                    await commandHandler.handleStage1Command(whatsappSocket, chatId, text);
                     break;
                 case '/stage2':
-                    await commandHandler.handleStage2Command(whatsappSocket, chatId);
+                case '/ictstage2':
+                    await commandHandler.handleStage2Command(whatsappSocket, chatId, text);
                     break;
                 case '/stage3':
-                    await commandHandler.handleStage3Command(whatsappSocket, chatId);
+                case '/ictstage3':
+                    await commandHandler.handleStage3Command(whatsappSocket, chatId, text);
                     break;
                 case '/holdeod':
                     await commandHandler.handleHoldEodCommand(whatsappSocket, chatId);
@@ -231,7 +234,7 @@ async function main() { // PERBAIKAN: Kurung kurawal pembuka dipindahkan ke sini
                 case '/ictanalytics':
                     await commandHandler.handleAnalyticsCommand(whatsappSocket, chatId);
                     break;
-                case '/ictcache':
+                case '/ictcachemanage':
                     await commandHandler.handleCacheManagementCommand(whatsappSocket, chatId);
                     break;
                 case '/clearcache':
