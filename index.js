@@ -218,6 +218,25 @@ async function main() { // PERBAIKAN: Kurung kurawal pembuka dipindahkan ke sini
                 case '/icteod':
                     await commandHandler.handleForceEodCommand(whatsappSocket, chatId);
                     break;
+                // === NEW FEATURES v3.2.0 ===
+                case '/ask':
+                    await commandHandler.handleAskCommand(text, whatsappSocket, chatId);
+                    break;
+                case '/ictdash':
+                    await commandHandler.handleDashboardCommand(whatsappSocket, chatId);
+                    break;
+                case '/ictschedule':
+                    await commandHandler.handleScheduleCommand(whatsappSocket, chatId);
+                    break;
+                case '/ictanalytics':
+                    await commandHandler.handleAnalyticsCommand(whatsappSocket, chatId);
+                    break;
+                case '/ictcache':
+                    await commandHandler.handleCacheManagementCommand(whatsappSocket, chatId);
+                    break;
+                case '/clearcache':
+                    await commandHandler.handleClearCacheCommand(whatsappSocket, chatId);
+                    break;
                 default:
                     // Manual analysis untuk pair tertentu (opsional untuk testing)
                     const parts = text.split(' ');

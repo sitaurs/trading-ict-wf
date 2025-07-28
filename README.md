@@ -1,6 +1,15 @@
-# ICT Trading Bot - Enhanced Version
+# ICT Trading Bot v3.2.0 - AI Assistant & Enhanced Dashboard
 
 🤖 **Advanced ICT (Inner Circle Trader) Power of Three (PO3) Trading Bot** dengan integrasi WhatsApp, MetaTrader 5, dan AI Gemini Pro.
+
+## 🆕 **NEW in v3.2.0**
+- 🤖 **AI Assistant** - Chat dengan Gemini 2.5 Pro (`/ask`)
+- 📊 **Enhanced Dashboard** - Real-time monitoring (`/ictdash`)  
+- 📅 **Smart Schedule** - Detailed PO3 timeline (`/ictschedule`)
+- 📈 **Advanced Analytics** - Performance insights (`/ictanalytics`)
+- 🗄️ **Enhanced Cache** - Storage management (`/ictcache`)
+
+> **📖 Full Documentation**: [v3.2.0 New Features Guide](docs/v3.2.0_NEW_FEATURES.md)
 
 ## 🚀 **Quick Start**
 

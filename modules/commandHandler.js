@@ -32,12 +32,20 @@ const journalingHandler = require('./journalingHandler');
 const analysisHandler = require('./analysisHandler');
 const { getEconomicNews } = require('./analysis/helpers');
 
+// === NEW MODULES v3.2.0 ===
+const AIAssistant = require('./aiAssistant');
+const ICTDashboard = require('./enhancedDashboard');
+
 const PENDING_DIR = path.join(__dirname, '..', 'pending_orders');
 const POSITIONS_DIR = path.join(__dirname, '..', 'live_positions');
 const CACHE_DIR = path.join(__dirname, '..', 'analysis_cache');
 const CONFIG_DIR = path.join(__dirname, '..', 'config');
 const RECIPIENTS_FILE = path.join(CONFIG_DIR, 'recipients.json');
 const BOT_STATUS_PATH = path.join(CONFIG_DIR, 'bot_status.json');
+
+// === Initialize new modules ===
+const aiAssistant = new AIAssistant();
+const ictDashboard = new ICTDashboard();
 
 
 // --- Fungsi Helper ---
@@ -72,80 +80,43 @@ async function updateBotStatus(patch) {
 // --- FUNGSI-FUNGSI COMMAND HANDLER ---
 
 async function handleMenuCommand(whatsappSocket, chatId, supportedPairs = []) {
-    log.info('🎯 Menampilkan menu bantuan bot trading', { 
+    log.info('🎯 Menampilkan enhanced menu bot trading v3.2.0', { 
         chatId,
         timestamp: new Date().toISOString(),
         supportedPairsCount: supportedPairs.length
     });
     
-    const menuText = `🤖 *TRADING BOT ICT PO3 STRATEGY*
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🚀 *Powered by AI & Machine Learning*
-
-📊 *ANALISIS & TRADING COMMANDS*
-• \`/stage1\` - 🎯 Analisis bias harian (Stage 1)
-• \`/stage2\` - ⚡ Deteksi manipulasi London (Stage 2)  
-• \`/stage3\` - 🚀 Konfirmasi entry (Stage 3)
-• \`/analyze [PAIR]\` - 📈 Analisis lengkap spesifik pair
-• \`/fullcycle\` - 🔄 Jalankan semua stage PO3
-
-� *MONITORING & POSISI*
-• \`/status\` - 📊 Status bot & posisi aktif
-• \`/positions\` - 💼 Lihat semua posisi terbuka
-• \`/pending\` - ⏳ Lihat pending orders
-• \`/profit_today\` - 💰 Laporan profit hari ini
-• \`/cls [PAIR]\` - ❌ Tutup posisi manual
-
-⚙️ *PENGATURAN & KONTROL BOT*
-• \`/ictpause\` - ⏸️ Pause trading otomatis
-• \`/ictresume\` - ▶️ Resume trading otomatis
-• \`/ictadd [NOMOR]\` - ➕ Tambah penerima notif
-• \`/ictdel [NOMOR]\` - ➖ Hapus penerima notif
-• \`/ictlist\` - 📋 Lihat daftar penerima
-
-📰 *INFORMASI & UTILITAS*
-• \`/ictnews\` - 📰 Berita ekonomi forex terkini
-• \`/icthealth\` - 🏥 Status kesehatan sistem
-• \`/ictcontext [PAIR]\` - 📝 Status konteks pair harian
-• \`/ictcache\` - 🗑️ Bersihkan cache analisis
-
-🔧 *ADVANCED & MAINTENANCE*
-• \`/holdeod\` - 🌅 Analisis hold/close EOD
-• \`/icteod\` - 🚨 Paksa tutup semua posisi
-• \`/ictreset [PAIR]\` - 🔄 Reset konteks pair
-• \`/ictrestart\` - 🔄 Restart sistem bot
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-� *Supported Pairs:* ${supportedPairs.join(', ')}
-⏰ *Current Time:* ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })} WIB
-🌍 *Server Time:* ${new Date().toLocaleString('en-US', { timeZone: 'UTC' })} UTC
-
-💡 *Tips:* 
-• Ganti [PAIR] dengan kode mata uang (contoh: USDJPY)
-• Semua command case-insensitive
-• Bot bekerja 24/5 mengikuti jadwal forex
-
-🆘 *Butuh bantuan?* Ketik */icthelp* kapan saja!`;
-
     try {
-        await whatsappSocket.sendMessage(chatId, { text: menuText });
-        log.info('✅ Menu bantuan berhasil dikirim', { 
+        const enhancedMenu = await ictDashboard.generateEnhancedMenu();
+        await whatsappSocket.sendMessage(chatId, { text: enhancedMenu });
+        log.info('✅ Enhanced menu berhasil dikirim', { 
             chatId,
-            totalCommands: 25,
             supportedPairs: supportedPairs.length,
-            messageLength: menuText.length,
             timestamp: new Date().toISOString()
         });
     } catch (error) {
-        log.error('❌ Gagal mengirim menu bantuan', {
+        log.error('❌ Gagal mengirim enhanced menu', {
             error: error.message,
             chatId,
-            stack: error.stack,
-            messageLength: menuText?.length || 0,
-            supportedPairs: supportedPairs,
-            timestamp: new Date().toISOString()
+            stack: error.stack
         });
-        throw new Error(`Gagal mengirim menu: ${error.message}`);
+        
+        // Fallback to basic menu if enhanced fails
+        const fallbackMenu = `🤖 *ICT TRADING BOT MENU v3.2.0*
+
+❌ Enhanced menu temporarily unavailable
+⚠️ Using fallback mode
+
+� *BASIC COMMANDS*
+• \`/ictdash\` - 📊 Real-time dashboard
+• \`/ask [question]\` - 🤖 AI Assistant
+• \`/ictstatus\` - � Bot status
+• \`/stage1\` - 🌅 Force bias analysis
+• \`/ictrestart\` - 🔄 Restart system
+
+💡 Try \`/ictrestart\` to restore full functionality`;
+        
+        await whatsappSocket.sendMessage(chatId, { text: fallbackMenu });
     }
 }
 
@@ -855,6 +826,192 @@ async function handleForceEodCommand(whatsappSocket, chatId) {
     }
 }
 
+/**
+ * === NEW FEATURES v3.2.0 ===
+ */
+
+/**
+ * Handle AI Assistant /ask command
+ */
+async function handleAskCommand(text, whatsappSocket, chatId) {
+    const parts = text.split(' ');
+    if (parts.length < 2) {
+        await whatsappSocket.sendMessage(chatId, { text: '🤖 *AI ASSISTANT*\n\nFormat: `/ask [pertanyaan]`\n\n📝 *Contoh:*\n• `/ask apa bias EURUSD hari ini?`\n• `/ask jelaskan setup PO3 terbaik`\n• `/ask market outlook sekarang?`' });
+        return;
+    }
+    
+    const question = parts.slice(1).join(' ');
+    log.info('Memproses AI Assistant request', { question, chatId });
+    
+    try {
+        await whatsappSocket.sendMessage(chatId, { text: '🤖 *AI ASSISTANT*\n\n🔍 Menganalisis pertanyaan Anda dengan Gemini 2.5 Pro...' });
+        
+        const response = await aiAssistant.handleQuestion(question);
+        await whatsappSocket.sendMessage(chatId, { text: response });
+        
+        log.info('AI Assistant response sent successfully', { question: question.substring(0, 50), chatId });
+    } catch (error) {
+        log.error('Gagal memproses AI Assistant request:', { error: error.message, question, chatId, stack: error.stack });
+        await whatsappSocket.sendMessage(chatId, { text: `🤖 *AI ASSISTANT ERROR*\n\n❌ Maaf, terjadi kesalahan saat memproses pertanyaan Anda.\n\n*Error:* ${error.message}\n\n💡 Coba lagi atau gunakan \`/ictrestart\` jika masalah berlanjut.` });
+    }
+}
+
+/**
+ * Handle real-time dashboard /ictdash command
+ */
+async function handleDashboardCommand(whatsappSocket, chatId) {
+    log.info('Memproses dashboard command', { chatId });
+    
+    try {
+        await whatsappSocket.sendMessage(chatId, { text: '📊 *LOADING DASHBOARD*\n\n⏳ Mengumpulkan data real-time...' });
+        
+        const dashboard = await ictDashboard.generateRealTimeDashboard();
+        await whatsappSocket.sendMessage(chatId, { text: dashboard });
+        
+        log.info('Real-time dashboard sent successfully', { chatId });
+    } catch (error) {
+        log.error('Gagal memproses dashboard command:', { error: error.message, chatId, stack: error.stack });
+        await whatsappSocket.sendMessage(chatId, { text: `📊 *DASHBOARD ERROR*\n\n❌ Gagal memuat dashboard real-time.\n\n*Error:* ${error.message}\n\n💡 Coba gunakan \`/ictstatus\` untuk info basic atau \`/ictrestart\` untuk restart.` });
+    }
+}
+
+/**
+ * Handle enhanced schedule /ictschedule command
+ */
+async function handleScheduleCommand(whatsappSocket, chatId) {
+    log.info('Memproses schedule command', { chatId });
+    
+    try {
+        await whatsappSocket.sendMessage(chatId, { text: '📅 *LOADING SCHEDULE*\n\n⏳ Menyiapkan jadwal trading detail...' });
+        
+        const schedule = await ictDashboard.generateDetailedSchedule();
+        await whatsappSocket.sendMessage(chatId, { text: schedule });
+        
+        log.info('Detailed schedule sent successfully', { chatId });
+    } catch (error) {
+        log.error('Gagal memproses schedule command:', { error: error.message, chatId, stack: error.stack });
+        await whatsappSocket.sendMessage(chatId, { text: `📅 *SCHEDULE ERROR*\n\n❌ Gagal memuat jadwal detail.\n\n*Error:* ${error.message}\n\n💡 Gunakan \`/ictrestart\` untuk restart sistem.` });
+    }
+}
+
+/**
+ * Handle enhanced analytics /ictanalytics command
+ */
+async function handleAnalyticsCommand(whatsappSocket, chatId) {
+    log.info('Memproses analytics command', { chatId });
+    
+    try {
+        await whatsappSocket.sendMessage(chatId, { text: '📈 *LOADING ANALYTICS*\n\n⏳ Menganalisis performa trading...' });
+        
+        // Get comprehensive analytics data
+        const analytics = await generateAnalyticsReport();
+        await whatsappSocket.sendMessage(chatId, { text: analytics });
+        
+        log.info('Analytics report sent successfully', { chatId });
+    } catch (error) {
+        log.error('Gagal memproses analytics command:', { error: error.message, chatId, stack: error.stack });
+        await whatsappSocket.sendMessage(chatId, { text: `📈 *ANALYTICS ERROR*\n\n❌ Gagal memuat laporan analytics.\n\n*Error:* ${error.message}\n\n💡 Gunakan \`/profit_today\` untuk info basic atau \`/ictrestart\` untuk restart.` });
+    }
+}
+
+/**
+ * Handle cache management /ictcache command
+ */
+async function handleCacheManagementCommand(whatsappSocket, chatId) {
+    log.info('Memproses cache management command', { chatId });
+    
+    try {
+        await whatsappSocket.sendMessage(chatId, { text: '🗄️ *CACHE MANAGER*\n\n⏳ Menganalisis cache status...' });
+        
+        const AnalysisCacheManager = require('../scripts/cache_manager');
+        const cacheManager = new AnalysisCacheManager();
+        await cacheManager.init();
+        
+        const stats = await cacheManager.getStatistics();
+        const cacheReport = `🗄️ *ANALYSIS CACHE STATUS*
+
+📊 *STATISTIK*
+• Total Files: ${stats.totalFiles}
+• Files Hari Ini: ${stats.todayFiles}
+• Total Size: ${stats.totalSizeMB}MB
+• Last Update: ${stats.lastUpdate}
+
+📁 *FILE BREAKDOWN*
+• Stage 1 Files: ${stats.stage1Count || 0}
+• Stage 2 Files: ${stats.stage2Count || 0}
+• Stage 3 Files: ${stats.stage3Count || 0}
+
+💡 *ACTIONS*
+• \`/clearcache\` - Bersihkan semua cache
+• \`/ictanalytics\` - Lihat analytics detail
+• \`/ask berapa file cache hari ini?\` - Tanya AI`;
+
+        await whatsappSocket.sendMessage(chatId, { text: cacheReport });
+        
+        log.info('Cache management report sent successfully', { stats, chatId });
+    } catch (error) {
+        log.error('Gagal memproses cache management command:', { error: error.message, chatId, stack: error.stack });
+        await whatsappSocket.sendMessage(chatId, { text: `🗄️ *CACHE MANAGER ERROR*\n\n❌ Gagal mengakses cache manager.\n\n*Error:* ${error.message}\n\n💡 Gunakan \`/clearcache\` untuk reset cache.` });
+    }
+}
+
+/**
+ * Generate comprehensive analytics report
+ */
+async function generateAnalyticsReport() {
+    try {
+        const brokerHandler = require('./brokerHandler');
+        const performance = await brokerHandler.getWeeklyPerformance();
+        const todayProfit = await brokerHandler.getTodaysProfit();
+        
+        // Calculate analytics metrics
+        const analytics = {
+            daily: {
+                profit: todayProfit || 0,
+                trades: performance?.todayTrades || 0
+            },
+            weekly: {
+                profit: performance?.weeklyProfit || 0,
+                trades: performance?.totalTrades || 0,
+                winRate: performance?.winRate || 0
+            },
+            positions: await brokerHandler.getActivePositions() || []
+        };
+        
+        return `📈 *ICT TRADING ANALYTICS*
+
+💰 *PERFORMANCE HARI INI*
+• Profit: ${analytics.daily.profit >= 0 ? '🟢' : '🔴'} $${Math.abs(analytics.daily.profit).toFixed(2)}
+• Total Trades: ${analytics.daily.trades}
+
+📊 *PERFORMANCE MINGGU INI*  
+• Profit: ${analytics.weekly.profit >= 0 ? '🟢' : '🔴'} $${Math.abs(analytics.weekly.profit).toFixed(2)}
+• Total Trades: ${analytics.weekly.trades}
+• Win Rate: ${analytics.weekly.winRate}%
+
+💼 *POSISI AKTIF*
+• Total: ${analytics.positions.length} posisi
+${analytics.positions.length > 0 ? 
+  analytics.positions.map(pos => 
+    `• ${pos.symbol}: ${pos.pnl >= 0 ? '🟢' : '🔴'} $${Math.abs(pos.pnl).toFixed(2)}`
+  ).join('\n') : '• Tidak ada posisi aktif'}
+
+🎯 *INSIGHTS*
+${analytics.weekly.winRate >= 70 ? '✅ Performa excellent!' : 
+  analytics.weekly.winRate >= 50 ? '⚠️ Performa moderate' : 
+  '🔴 Perlu evaluasi strategi'}
+
+💡 *Actions*:
+• \`/ask analisis performa minggu ini\` - AI insights
+• \`/ictdash\` - Real-time monitoring
+• \`/positions\` - Detail posisi aktif`;
+        
+    } catch (error) {
+        log.error('Gagal generate analytics report:', error);
+        return `📈 *ANALYTICS REPORT*\n\n❌ Gagal menganalisis data performa.\n\n*Error:* ${error.message}\n\n💡 Gunakan \`/profit_today\` untuk info basic.`;
+    }
+}
+
 module.exports = {
     handleMenuCommand,
     handleConsolidatedStatusCommand,
@@ -885,5 +1042,11 @@ module.exports = {
     // Context dan maintenance
     handleContextCommand,
     handleResetContextCommand,
-    handleForceEodCommand
+    handleForceEodCommand,
+    // === NEW FEATURES v3.2.0 ===
+    handleAskCommand,
+    handleDashboardCommand,
+    handleScheduleCommand,
+    handleAnalyticsCommand,
+    handleCacheManagementCommand
 };
