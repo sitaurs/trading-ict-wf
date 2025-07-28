@@ -45,6 +45,79 @@ function sleep(ms) {
 const MAX_RETRIES = parseInt(process.env.MAX_RETRIES) || 3;
 
 /**
+ * Simpan full narrative ke analysis cache (daily files, overwrite setiap hari)
+ */
+async function saveAnalysisCache(pair, stage, narrativeText) {
+    try {
+        const cacheDir = path.join(__dirname, '..', 'analysis_cache');
+        
+        // Pastikan direktori ada
+        try {
+            await fs.access(cacheDir);
+        } catch {
+            await fs.mkdir(cacheDir, { recursive: true });
+            log.debug('📁 Created analysis_cache directory', { path: cacheDir });
+        }
+        
+        // File name tanpa tanggal - akan di-overwrite setiap hari
+        const fileName = `${pair}_stage${stage}.json`;
+        const filePath = path.join(cacheDir, fileName);
+        
+        const cacheData = {
+            pair,
+            stage,
+            date: new Date().toISOString().split('T')[0],
+            timestamp: new Date().toISOString(),
+            narrativeText,
+            charCount: narrativeText.length,
+            wordCount: narrativeText.split(' ').length
+        };
+        
+        await fs.writeFile(filePath, JSON.stringify(cacheData, null, 2));
+        log.debug(`💾 Analysis cache saved for ${pair} Stage ${stage}`, {
+            filePath,
+            charCount: narrativeText.length
+        });
+        
+        return filePath;
+    } catch (error) {
+        log.error('❌ Failed to save analysis cache', {
+            pair,
+            stage,
+            error: error.message
+        });
+        throw error;
+    }
+}
+
+/**
+ * Load full narrative dari analysis cache (daily files)
+ */
+async function loadAnalysisCache(pair, stage) {
+    try {
+        const cacheDir = path.join(__dirname, '..', 'analysis_cache');
+        const fileName = `${pair}_stage${stage}.json`;
+        const filePath = path.join(cacheDir, fileName);
+        
+        const cacheData = JSON.parse(await fs.readFile(filePath, 'utf8'));
+        
+        // Cek apakah file masih dari hari ini
+        const today = new Date().toISOString().split('T')[0];
+        if (cacheData.date !== today) {
+            log.warn(`⚠️ Cache file for ${pair} Stage ${stage} is from different date: ${cacheData.date}`);
+            return null;
+        }
+        
+        return cacheData.narrativeText;
+    } catch (error) {
+        log.warn(`⚠️ Could not load analysis cache for ${pair} Stage ${stage}`, {
+            error: error.message
+        });
+        return null;
+    }
+}
+
+/**
  * Memanggil Gemini Pro 2.5 untuk analisis naratif lengkap dengan retry logic
  */
 async function callGeminiProWithRetry(prompt, chartImages = []) {

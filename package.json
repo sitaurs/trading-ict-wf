@@ -6,9 +6,13 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node --max-old-space-size=512 index.js",
-    "monitor": "node monitor.js",
+    "monitor": "node scripts/monitor.js",
     "test": "node tests/contextManager.test.js && node tests/cronSchedule.test.js && node tests/aggregate.test.js",
-    "health": "node -e \"console.log('Bot Health Check:'); require('./monitor.js').run()\"",
+    "test:all": "node tests/test_full_narrative_storage.js && node tests/test_stage1_completion.js && node tests/test_profit_monitoring.js",
+    "health": "node scripts/api_compatibility_checker.js",
+    "cache:summary": "node scripts/cache_manager.js summary",
+    "cache:cleanup": "node scripts/cache_manager.js cleanup",
+    "cache:stats": "node scripts/cache_manager.js stats",
     "pterodactyl": "node --max-old-space-size=512 --optimize-for-size index.js",
     "lint": "echo 'Add linter configuration as needed'",
     "lint:fix": "echo 'Add linter fix command as needed'"
