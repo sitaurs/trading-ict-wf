@@ -60,9 +60,30 @@ async function prepareStage2Prompt(pair, context, ohlcvData, fullNarratives = {}
 async function prepareStage3Prompt(pair, context, ohlcvData, fullNarratives = {}) {
     let prompt = await getPrompt('prompt_stage3_entry.txt');
     
-    // Siapkan full narratives jika tersedia
-    const stage1Narrative = fullNarratives.stage1_full_narrative || 'Tidak tersedia - analisis dilakukan pada sesi sebelumnya';
-    const stage2Narrative = fullNarratives.stage2_full_narrative || 'Tidak tersedia - analisis dilakukan pada sesi sebelumnya';
+    // PERBAIKAN: Handle missing foundational data dengan fallback logic
+    const foundationalStatus = fullNarratives.foundational_status || 'COMPLETE';
+    
+    let stage1Narrative = 'Tidak tersedia - analisis dilakukan pada sesi sebelumnya';
+    let stage2Narrative = 'Tidak tersedia - analisis dilakukan pada sesi sebelumnya';
+    let contextualNote = '';
+    
+    if (foundationalStatus === 'MISSING_ALL') {
+        stage1Narrative = 'DATA TIDAK TERSEDIA - Lakukan analisis bias secara mandiri berdasarkan struktur market H4/H1';
+        stage2Narrative = 'DATA TIDAK TERSEDIA - Lakukan analisis manipulation secara mandiri berdasarkan reaksi price action';
+        contextualNote = '\n\n**IMPORTANT**: Stage 1 & 2 data tidak tersedia. Lakukan analisis komprehensif dari chart yang tersedia untuk menentukan bias dan manipulation patterns.';
+    } else if (foundationalStatus === 'MISSING_STAGE1') {
+        stage1Narrative = 'DATA TIDAK TERSEDIA - Lakukan analisis bias secara mandiri berdasarkan struktur market H4/H1';
+        stage2Narrative = fullNarratives.stage2_full_narrative || stage2Narrative;
+        contextualNote = '\n\n**IMPORTANT**: Stage 1 data tidak tersedia. Inferensikan bias dari Stage 2 dan chart analysis.';
+    } else if (foundationalStatus === 'MISSING_STAGE2') {
+        stage1Narrative = fullNarratives.stage1_full_narrative || stage1Narrative;
+        stage2Narrative = 'DATA TIDAK TERSEDIA - Lakukan analisis manipulation secara mandiri berdasarkan reaksi price action';
+        contextualNote = '\n\n**IMPORTANT**: Stage 2 data tidak tersedia. Gunakan Stage 1 bias dan chart analysis untuk konfirmasi.';
+    } else {
+        // COMPLETE - semua data tersedia
+        stage1Narrative = fullNarratives.stage1_full_narrative || stage1Narrative;
+        stage2Narrative = fullNarratives.stage2_full_narrative || stage2Narrative;
+    }
     
     // Tambahkan daily context data
     const dailyContextData = {
@@ -75,20 +96,22 @@ async function prepareStage3Prompt(pair, context, ohlcvData, fullNarratives = {}
         manipulation_detected: context.manipulation_detected,
         manipulation_side: context.manipulation_side,
         htf_reaction: context.htf_reaction,
-        status: context.status
+        status: context.status,
+        foundational_data_status: foundationalStatus
     };
     
     return prompt
         .replace(/\{PAIR\}/g, pair)
-        .replace(/\{BIAS\}/g, context.daily_bias || 'NETRAL')
-        .replace(/\{MANIPULATION\}/g, context.manipulation_detected ? 'TRUE' : 'FALSE')
-        .replace(/\{SIDE\}/g, context.manipulation_side || 'N/A')
-        .replace(/\{HTF_REACTION\}/g, context.htf_reaction ? 'TRUE' : 'FALSE')
+        .replace(/\{BIAS\}/g, context.daily_bias || 'ANALISIS_DARI_CHART')
+        .replace(/\{MANIPULATION\}/g, context.manipulation_detected ? 'TRUE' : 'ANALISIS_DARI_CHART')
+        .replace(/\{SIDE\}/g, context.manipulation_side || 'ANALISIS_DARI_CHART')
+        .replace(/\{HTF_REACTION\}/g, context.htf_reaction ? 'TRUE' : 'ANALISIS_DARI_CHART')
         .replace(/\{FULL_NARRATIVE_STAGE1\}/g, stage1Narrative)
         .replace(/\{FULL_NARRATIVE_STAGE2\}/g, stage2Narrative)
         .replace(/\{DAILY_CONTEXT\}/g, JSON.stringify(dailyContextData, null, 2))
         .replace(/\{MIN_RRR\}/g, process.env.MIN_RRR || '2')
-        .replace(/\{OHLCV\}/g, JSON.stringify(ohlcvData, null, 2));
+        .replace(/\{OHLCV\}/g, JSON.stringify(ohlcvData, null, 2))
+        + contextualNote;
 }
 
 async function prepareHoldClosePrompt(pair, ohlcvData, tradeDetails = null, currentPrice = null) {

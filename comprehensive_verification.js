@@ -36,9 +36,9 @@ async function comprehensiveVerification() {
     console.log('\n2️⃣ VERIFYING PROMPT FILES...');
     
     const requiredPrompts = [
-        'prompt_stage1_extractor_new.txt',
+        'prompt_stage1_extractor.txt',
         'prompt_stage2_extractor.txt', 
-        'prompt_extractor.txt',
+        'prompt_stage3_extractor.txt',
         'prompt_stage1_bias.txt',
         'prompt_stage2_manipulation.txt',
         'prompt_stage3_entry.txt',

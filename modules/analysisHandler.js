@@ -10,6 +10,7 @@ const { getLogger } = require('./logger');
 const { getContext, saveContext } = require('./contextManager');
 const { extractStage1Data } = require('./analysis/extractorStage1');
 const { extractStage2Data } = require('./analysis/extractorStage2');
+const { extractStage3Data } = require('./analysis/extractorStage3');
 const extractor = require('./analysis/extractor');
 const decisionHandlers = require('./analysis/decisionHandlers');
 const promptBuilders = require('./analysis/promptBuilders');
@@ -712,9 +713,26 @@ async function runStage3Analysis(pairs) {
             const stage1Data = await loadStageNarrative(pair, 1);
             const stage2Data = await loadStageNarrative(pair, 2);
             
+            // PERBAIKAN: Fallback logic untuk missing foundational data
+            let foundationalStatus = 'COMPLETE';
+            if (!stage1Data?.full_narrative && !stage2Data?.full_narrative) {
+                foundationalStatus = 'MISSING_ALL';
+                log.warn(`⚠️ ${pair} Missing both Stage 1 & 2 data - using standalone analysis`);
+                if (global.broadcastMessage) {
+                    global.broadcastMessage(`⚠️ *STAGE 3: ${pair}*\n❌ Data Stage 1 & 2 tidak ditemukan\n🔧 Menggunakan analisis mandiri...`);
+                }
+            } else if (!stage1Data?.full_narrative) {
+                foundationalStatus = 'MISSING_STAGE1';
+                log.warn(`⚠️ ${pair} Missing Stage 1 data - partial analysis`);
+            } else if (!stage2Data?.full_narrative) {
+                foundationalStatus = 'MISSING_STAGE2';
+                log.warn(`⚠️ ${pair} Missing Stage 2 data - partial analysis`);
+            }
+            
             const prompt = await promptBuilders.prepareStage3Prompt(pair, context, ohlcvData, {
                 stage1_full_narrative: stage1Data?.full_narrative || null,
-                stage2_full_narrative: stage2Data?.full_narrative || null
+                stage2_full_narrative: stage2Data?.full_narrative || null,
+                foundational_status: foundationalStatus
             });
             
             // Panggil AI untuk analisis
@@ -732,50 +750,84 @@ async function runStage3Analysis(pairs) {
                 global.broadcastMessage(`🔍 *STAGE 3: ${pair}*\n✅ Analisis AI selesai (${analysisLength} karakter)\n${signalEmoji} Status: ${hasSignal ? 'SINYAL DITEMUKAN!' : 'Mencari konfirmasi...'}`);
             }
             
-            // Periksa apakah ada sinyal
-            if (narrativeText.includes('SINYAL TRADING DITEMUKAN')) {
+            // Periksa apakah ada sinyal atau tidak (lebih fleksibel)
+            const hasSignal = narrativeText && (
+                narrativeText.includes('SINYAL TRADING DITEMUKAN') ||
+                narrativeText.includes('OPEN') ||
+                narrativeText.includes('ORDER_TYPE_BUY') ||
+                narrativeText.includes('ORDER_TYPE_SELL') ||
+                narrativeText.toLowerCase().includes('keputusan: open')
+            );
+            
+            if (hasSignal) {
                 log.info(`🎯 ${pair} Sinyal trading ditemukan!`);
                 
                 // Kirim notifikasi sinyal ditemukan
                 if (global.broadcastMessage) {
-                    global.broadcastMessage(`🎯 *STAGE 3: ${pair}*\n✅ SINYAL TRADING DITEMUKAN!\n⚙️ Mengekstrak detail trade dengan Gemini Flash...`);
+                    global.broadcastMessage(`🎯 *STAGE 3: ${pair}*\n✅ SINYAL TRADING DITEMUKAN!\n⚙️ Mengekstrak detail trade dengan AI extractor...`);
                 }
                 
-                // Ekstrak menggunakan extractor.js yang sudah ada
-                const extractedData = await extractor.extractAnalysisData(narrativeText);
+                // Ekstrak menggunakan extractorStage3.js yang baru dan robust
+                const extractedData = await extractStage3Data(narrativeText);
                 
-                // Kirim notifikasi ekstraksi selesai
+                // Kirim notifikasi ekstraksi selesai SELALU
                 if (global.broadcastMessage) {
-                    const decision = extractedData.keputusan || 'N/A';
-                    const price = extractedData.harga_entry || 'N/A';
-                    const sl = extractedData.stop_loss || 'N/A';
-                    const tp = extractedData.take_profit || 'N/A';
+                    const decision = extractedData.keputusan || 'NO_TRADE';
+                    const price = extractedData.harga || 'N/A';
+                    const sl = extractedData.sl || 'N/A';
+                    const tp = extractedData.tp || 'N/A';
+                    const reason = extractedData.alasan || 'No reason provided';
                     
-                    global.broadcastMessage(`📋 *STAGE 3: ${pair}*\n✅ Ekstraksi selesai\n📊 Keputusan: ${decision}\n💰 Entry: ${price}\n🛡️ SL: ${sl}\n🎯 TP: ${tp}\n⚡ Memproses order...`);
+                    global.broadcastMessage(`📋 *STAGE 3 HASIL: ${pair}*\n✅ Ekstraksi selesai\n📊 Keputusan: ${decision}\n💰 Entry: ${price}\n🛡️ SL: ${sl}\n🎯 TP: ${tp}\n💭 Alasan: ${reason}\n⚡ Memproses...`);
                 }
                 
                 if (extractedData.keputusan === 'OPEN') {
+                    // Format ulang untuk kompatibilitas dengan decision handler
+                    const formattedData = {
+                        keputusan: extractedData.keputusan,
+                        harga_entry: extractedData.harga,
+                        stop_loss: extractedData.sl,
+                        take_profit: extractedData.tp,
+                        pair: extractedData.pair || pair,
+                        order_type: extractedData.arah,
+                        alasan: extractedData.alasan
+                    };
+                    
                     // Teruskan ke decision handler
-                    await decisionHandlers.handleDecision(extractedData, pair, global.whatsappSocket || null, global.botSettings?.recipients || []);
+                    await decisionHandlers.handleDecision(formattedData, pair, global.whatsappSocket || null, global.botSettings?.recipients || []);
                     
                     context.status = 'COMPLETE_TRADE_OPENED';
-                    context.entry_price = extractedData.harga_entry;
-                    context.stop_loss = extractedData.stop_loss;
-                    context.take_profit = extractedData.take_profit;
+                    context.entry_price = extractedData.harga;
+                    context.stop_loss = extractedData.sl;
+                    context.take_profit = extractedData.tp;
                     context.trade_status = 'ACTIVE';
                     
                     // Kirim notifikasi trade berhasil dibuka
                     if (global.broadcastMessage) {
-                        global.broadcastMessage(`🚀 *STAGE 3 SELESAI: ${pair}*\n✅ Trade berhasil dibuka!\n📊 Status: ACTIVE\n💰 Entry: ${extractedData.harga_entry}\n🛡️ SL: ${extractedData.stop_loss}\n🎯 TP: ${extractedData.take_profit}`);
+                        global.broadcastMessage(`🚀 *STAGE 3 SELESAI: ${pair}*\n✅ Trade berhasil dibuka!\n📊 Status: ACTIVE\n💰 Entry: ${extractedData.harga}\n🛡️ SL: ${extractedData.sl}\n🎯 TP: ${extractedData.tp}`);
                     }
+                } else {
+                    // Keputusan NO_TRADE, HOLD, atau CLOSE_MANUAL
+                    log.info(`⏳ ${pair} Keputusan: ${extractedData.keputusan}`);
+                    
+                    // Kirim notifikasi keputusan non-trade SELALU
+                    if (global.broadcastMessage) {
+                        global.broadcastMessage(`⏳ *STAGE 3 SELESAI: ${pair}*\n📊 Keputusan: ${extractedData.keputusan}\n💭 Alasan: ${extractedData.alasan}\n🔄 Akan monitor terus...`);
+                    }
+                    
+                    context.status = 'COMPLETE_NO_ENTRY';
                 }
             } else {
-                // Tidak ada sinyal
-                log.info(`⏳ ${pair} Tidak ada sinyal entri yang valid`);
+                // Tidak ada sinyal tapi tetap coba ekstrak untuk mendapat alasan
+                log.info(`⏳ ${pair} Tidak ada sinyal entri yang jelas`);
                 
-                // Kirim notifikasi tidak ada sinyal
+                // Tetap ekstrak untuk mendapat informasi mengapa tidak ada sinyal
+                const extractedData = await extractStage3Data(narrativeText);
+                
+                // Kirim notifikasi hasil ekstraksi SELALU
                 if (global.broadcastMessage) {
-                    global.broadcastMessage(`⏳ *STAGE 3: ${pair}*\n❌ Belum ada sinyal entry yang valid\n📊 Market masih dalam observasi\n🔄 Akan dicoba lagi nanti...`);
+                    const reason = extractedData.alasan || 'Market belum memberikan setup yang jelas';
+                    global.broadcastMessage(`⏳ *STAGE 3 SELESAI: ${pair}*\n❌ Belum ada sinyal entry yang valid\n💭 Alasan: ${reason}\n📊 Market masih dalam observasi\n🔄 Akan dicoba lagi nanti...`);
                 }
                 
                 // Check time-out (misalnya jika sudah melewati jam distribusi)
