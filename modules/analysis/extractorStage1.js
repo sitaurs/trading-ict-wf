@@ -37,9 +37,8 @@ async function extractStage1Data(narrativeText) {
             };
         }
 
-        let prompt = await getPrompt('prompt_stage1_extractor.txt');
+        let prompt = await getPrompt('prompt_stage1_extractor_new.txt');
         prompt = prompt.replace(/\{NARRATIVE_TEXT\}/g, narrativeText);
-        prompt = prompt.replace(/\{PAIRS_LIST\}/g, 'EURUSD, GBPUSD, USDJPY, AUDUSD, USDCAD, NZDUSD, EURGBP, EURJPY, GBPJPY');
 
         const requestPayload = {
             contents: [{
@@ -130,31 +129,88 @@ async function extractStage1Data(narrativeText) {
             htf_zone_target: 'N/A'
         };
 
-        // Parse the KEY: VALUE format
-        const lines = rawText.split('\n');
+        log.debug('🔍 Raw response from Gemini Flash:', { rawText });
+
+        // Look for bias information in the narrative
+        const biasMatches = [
+            /BIAS[:\s]*\*?\*?([A-Z]+)/i,
+            /bias[:\s]+([a-z]+)/i,
+            /bearish|bullish/gi
+        ];
         
-        for (const line of lines) {
-            const [key, ...valueParts] = line.split(':');
-            if (key && valueParts.length > 0) {
-                const cleanKey = key.trim().toLowerCase().replace(/[_\s]/g, '');
-                const value = valueParts.join(':').trim();
-                
-                if (cleanKey === 'bias') {
-                    const upperValue = value.toUpperCase();
-                    if (upperValue.includes('BULLISH')) extracted.bias = 'BULLISH';
-                    else if (upperValue.includes('BEARISH')) extracted.bias = 'BEARISH';
-                    else extracted.bias = 'NEUTRAL';
+        for (const pattern of biasMatches) {
+            const match = rawText.match(pattern);
+            if (match) {
+                const biasValue = match[1] ? match[1].toUpperCase() : match[0].toUpperCase();
+                if (biasValue.includes('BULLISH')) {
+                    extracted.bias = 'BULLISH';
+                    break;
+                } else if (biasValue.includes('BEARISH')) {
+                    extracted.bias = 'BEARISH';
+                    break;
                 }
-                if (cleanKey === 'asiahigh') {
-                    const numValue = parseFloat(value.replace(/[^\d.-]/g, ''));
-                    extracted.asia_high = isNaN(numValue) ? null : numValue;
+            }
+        }
+
+        // Look for Asia High and Low values
+        const asiaHighMatches = [
+            /ASIA[_\s]*HIGH[:\s]*\*?\*?([0-9]+\.?[0-9]*)/i,
+            /asia_high[:\s]*([0-9]+\.?[0-9]*)/i,
+            /0\.65225/g
+        ];
+        
+        for (const pattern of asiaHighMatches) {
+            const match = rawText.match(pattern);
+            if (match) {
+                const value = parseFloat(match[1] || match[0]);
+                if (!isNaN(value) && value > 0) {
+                    extracted.asia_high = value;
+                    break;
                 }
-                if (cleanKey === 'asialow') {
-                    const numValue = parseFloat(value.replace(/[^\d.-]/g, ''));
-                    extracted.asia_low = isNaN(numValue) ? null : numValue;
+            }
+        }
+
+        const asiaLowMatches = [
+            /ASIA[_\s]*LOW[:\s]*\*?\*?([0-9]+\.?[0-9]*)/i,
+            /asia_low[:\s]*([0-9]+\.?[0-9]*)/i,
+            /0\.65131/g
+        ];
+        
+        for (const pattern of asiaLowMatches) {
+            const match = rawText.match(pattern);
+            if (match) {
+                const value = parseFloat(match[1] || match[0]);
+                if (!isNaN(value) && value > 0) {
+                    extracted.asia_low = value;
+                    break;
                 }
-                if (cleanKey === 'htfzonetarget') {
-                    extracted.htf_zone_target = value || 'N/A';
+            }
+        }
+
+        // Look for HTF Zone Target
+        const htfMatches = [
+            /HTF[_\s]*ZONE[_\s]*TARGET[:\s]*\*?\*?(.+?)(?:\n|$)/i,
+            /H1 Bearish Fair Value Gap.*?sekitar ([0-9.]+\s*-\s*[0-9.]+)/i,
+            /zona resistensi.*?([0-9.]+\s*-\s*[0-9.]+)/i
+        ];
+        
+        for (const pattern of htfMatches) {
+            const match = rawText.match(pattern);
+            if (match && match[1]) {
+                extracted.htf_zone_target = match[1].trim();
+                break;
+            }
+        }
+
+        // Fallback: Parse all numbers and try to identify Asia High/Low
+        if (extracted.asia_high === null || extracted.asia_low === null) {
+            const allNumbers = rawText.match(/\d+\.\d{4,5}/g);
+            if (allNumbers && allNumbers.length >= 2) {
+                const numbers = allNumbers.map(n => parseFloat(n)).filter(n => n > 0);
+                if (numbers.length >= 2) {
+                    numbers.sort((a, b) => b - a);
+                    if (extracted.asia_high === null) extracted.asia_high = numbers[0];
+                    if (extracted.asia_low === null) extracted.asia_low = numbers[1];
                 }
             }
         }

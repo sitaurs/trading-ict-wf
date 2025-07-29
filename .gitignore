@@ -3,7 +3,7 @@
 npm-debug.log
 yarn-error.log
 package-lock.json
-
+/json_bot
 # File Environment Rahasia
 .env
 

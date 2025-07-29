@@ -53,24 +53,47 @@ ${this.getSessionEmoji(currentSession)} Sesi: ${currentSession}
 • \`/ictstage1\` - 🌅 Force analisis bias harian
 • \`/ictstage2\` - ⚡ Force deteksi manipulasi  
 • \`/ictstage3\` - 🚀 Force konfirmasi entry
+• \`/fullcycle\` - 🔄 Jalankan semua stage PO3
+• \`/ictanalyze [PAIR]\` - � Analisis lengkap spesifik pair
+• \`/holdeod\` - 🌙 Force evaluasi hold/close
 
-📊 *DASHBOARD & MONITORING*
+�📊 *DASHBOARD & MONITORING*
 • \`/ictdash\` - 📊 Dashboard real-time lengkap
 • \`/ictstatus\` - 📈 Status bot & posisi aktif
 • \`/ictanalytics\` - 📈 Analisis performa detail
 • \`/ictpositions\` - 💰 Manajemen posisi aktif
+• \`/ictpending\` - ⏳ Lihat pending orders
 • \`/ictschedule\` - 📅 Jadwal trading detail
+• \`/ictprofit\` - 💰 Laporan profit hari ini
 
 🎛️ *KONTROL BOT*
 • \`/ictpause\` - ⏸️ Pause trading otomatis
 • \`/ictresume\` - ▶️ Resume trading otomatis  
 • \`/ictrestart\` - 🔄 Restart sistem bot
+• \`/ictclose [PAIR]\` - ❌ Tutup posisi manual
+• \`/ictentry\` - 📈 Buka posisi manual
 
-📰 *INFORMASI & UTILITAS*
+⚙️ *KONFIGURASI & SETTING*
+• \`/ictsetting [type] [on/off]\` - ⚙️ Pengaturan bot
+• \`/ictadd [ID_WA]\` - ➕ Tambah penerima notifikasi
+• \`/ictdel [ID_WA]\` - ➖ Hapus penerima notifikasi
+• \`/ictlist\` - � Lihat daftar penerima
+
+�📰 *INFORMASI & UTILITAS*
 • \`/ictnews\` - 📰 Berita ekonomi forex
 • \`/icthealth\` - 🏥 Status kesehatan sistem
 • \`/ictcontext [PAIR]\` - 📝 Status konteks pair
 • \`/ictcache\` - 🗄️ Manajemen cache analisis
+• \`/ictcachemanage\` - 🔧 Cache management advanced
+• \`/clearcache\` - 🧹 Bersihkan semua cache
+• \`/ictreset\` - 🔄 Reset konteks trading
+• \`/icteod\` - 🌙 Force end of day procedures
+
+🆘 *LEGACY COMMANDS (Tetap Didukung)*
+• \`/stage1\` = \`/ictstage1\`
+• \`/stage2\` = \`/ictstage2\`
+• \`/stage3\` = \`/ictstage3\`
+• \`/icthelp\` = \`/ictmenu\`
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 💱 *Supported Pairs:* ${pairs.join(', ')}
@@ -79,7 +102,15 @@ ${this.getSessionEmoji(currentSession)} Sesi: ${currentSession}
 💡 *Pro Tips:*
 • Tanya AI tentang market conditions: \`/ask market sentiment?\`
 • Monitor real-time: \`/ictdash\` untuk update terkini
-• Analisis mendalam: \`/ictanalytics\` untuk performance review`;
+• Analisis mendalam: \`/ictanalytics\` untuk performance review
+• Force analysis kapan saja: \`/ictstage1\`, \`/ictstage2\`, \`/ictstage3\`
+• Kelola cache: \`/ictcache\` untuk optimasi performa
+
+📚 *Contoh Penggunaan:*
+• \`/ictanalyze EURUSD\` - Analisis khusus EURUSD
+• \`/ask setup terbaik GBPUSD?\` - Tanya AI tentang setup
+• \`/ictcontext USDJPY\` - Lihat status konteks USDJPY
+• \`/ictsetting berita on\` - Aktifkan notifikasi berita`;
 
         } catch (error) {
             this.log.error('Error generating menu:', error);
@@ -225,29 +256,55 @@ ${scheduleItems.map(item =>
     async getActivePositions() {
         try {
             const brokerHandler = require('./brokerHandler');
-            return await brokerHandler.getActivePositions();
+            const positions = await brokerHandler.getActivePositions();
+            
+            // Jika ada posisi real, gunakan itu
+            if (positions && positions.length > 0) {
+                return positions;
+            }
+            
+            // Jika tidak ada posisi real, return array kosong
+            return [];
+            
         } catch (error) {
-            // Mock data untuk development
-            return [
-                { symbol: 'EURUSD', type: 'BUY', volume: 0.01, price: 1.0850, pnl: 15.50 },
-                { symbol: 'GBPUSD', type: 'SELL', volume: 0.01, price: 1.2720, pnl: -8.20 }
-            ];
+            this.log.warn('Broker handler tidak tersedia untuk posisi aktif', { error: error.message });
+            
+            // Return empty array untuk development
+            return [];
         }
     }
 
     async getTodayPerformance() {
         try {
             const brokerHandler = require('./brokerHandler');
-            return await brokerHandler.getTodayPerformance();
-        } catch (error) {
-            // Mock data
+            const realPerformance = await brokerHandler.getTodayPerformance();
+            
+            // Jika broker handler mengembalikan data real, gunakan itu
+            if (realPerformance && realPerformance.totalTrades > 0) {
+                return realPerformance;
+            }
+            
+            // Jika tidak ada data real, kembalikan nol
             return {
-                totalProfit: 12.30,
-                winRate: 75,
-                wins: 3,
-                losses: 1,
-                totalTrades: 4,
-                bestTrade: 25.80
+                totalProfit: 0.00,
+                winRate: 0,
+                wins: 0,
+                losses: 0,
+                totalTrades: 0,
+                bestTrade: 0.00
+            };
+            
+        } catch (error) {
+            this.log.warn('Broker handler tidak tersedia, menggunakan data kosong', { error: error.message });
+            
+            // Return empty/zero data untuk development
+            return {
+                totalProfit: 0.00,
+                winRate: 0,
+                wins: 0,
+                losses: 0,
+                totalTrades: 0,
+                bestTrade: 0.00
             };
         }
     }

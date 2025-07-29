@@ -406,18 +406,19 @@ async function runStage1Analysis(pairs) {
         try {
             context = await getContext(pair);
             
-            // Skip jika sudah lock atau bukan status yang tepat
-            if (context.lock || context.status !== 'PENDING_BIAS') {
-                log.info(`Melewati ${pair}: lock=${context.lock}, status=${context.status}`);
+            // PERBAIKAN: Tidak skip analisis jika dipanggil manual
+            // Hanya skip jika context.lock = true (sedang diproses pair lain)
+            if (context.lock) {
+                log.info(`Melewati ${pair}: sedang diproses oleh thread lain`);
                 results.skipped++;
                 continue;
             }
 
-            // Set lock
+            // Set lock untuk mencegah concurrent processing
             context.lock = true;
             await saveContext(context);
 
-            log.info(`📊 Memproses ${pair} untuk analisis bias harian...`);
+            log.info(`📊 Memproses ${pair} untuk analisis bias harian (FORCE)...`);
             
             // Kirim notifikasi awal
             if (global.broadcastMessage) {
@@ -546,16 +547,17 @@ async function runStage2Analysis(pairs) {
         try {
             context = await getContext(pair);
             
-            // Skip jika bukan status yang tepat
-            if (context.lock || context.status !== 'PENDING_MANIPULATION') {
+            // PERBAIKAN: Hanya skip jika sedang diproses oleh thread lain
+            if (context.lock) {
+                log.info(`Melewati ${pair}: sedang diproses oleh thread lain`);
                 continue;
             }
 
-            // Set lock
+            // Set lock untuk mencegah concurrent processing
             context.lock = true;
             await saveContext(context);
 
-            log.info(`📊 Memproses ${pair} untuk deteksi manipulasi London...`);
+            log.info(`📊 Memproses ${pair} untuk deteksi manipulasi London (FORCE)...`);
             
             // Kirim notifikasi awal Stage 2
             if (global.broadcastMessage) {
@@ -676,16 +678,17 @@ async function runStage3Analysis(pairs) {
         try {
             context = await getContext(pair);
             
-            // Skip jika bukan status yang tepat
-            if (context.lock || context.status !== 'PENDING_ENTRY') {
+            // PERBAIKAN: Hanya skip jika sedang diproses oleh thread lain
+            if (context.lock) {
+                log.info(`Melewati ${pair}: sedang diproses oleh thread lain`);
                 continue;
             }
 
-            // Set lock
+            // Set lock untuk mencegah concurrent processing
             context.lock = true;
             await saveContext(context);
 
-            log.info(`📊 Memproses ${pair} untuk konfirmasi entri...`);
+            log.info(`📊 Memproses ${pair} untuk konfirmasi entri (FORCE)...`);
             
             // Kirim notifikasi awal Stage 3
             if (global.broadcastMessage) {
