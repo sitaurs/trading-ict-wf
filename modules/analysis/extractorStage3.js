@@ -2,6 +2,7 @@ const axios = require('axios');
 const fs = require('fs/promises');
 const path = require('path');
 const { getLogger } = require('../logger');
+const { getNextGeminiKey } = require('./helpers');
 const log = getLogger('ExtractorStage3');
 
 async function getPrompt(filename) {

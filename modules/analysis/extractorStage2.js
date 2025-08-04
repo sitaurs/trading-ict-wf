@@ -2,6 +2,7 @@ const axios = require('axios');
 const fs = require('fs/promises');
 const path = require('path');
 const { getLogger } = require('../logger');
+const { getNextGeminiKey } = require('./helpers');
 const log = getLogger('ExtractorStage2');
 
 async function getPrompt(filename) {
@@ -19,7 +20,10 @@ async function getPrompt(filename) {
 
 async function extractStage2Data(narrativeText) {
     const MODEL_NAME = 'gemini-2.0-flash-exp';
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${process.env.GEMINI_API_KEY}`;
+    const geminiApiKey = getNextGeminiKey();
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${geminiApiKey}`;
+    
+    log.debug(`🤖 [Stage2 Extractor] Menggunakan Gemini API Key: ${geminiApiKey.substring(0, 10)}...${geminiApiKey.substring(geminiApiKey.length - 4)}`);
     
     try {
         let prompt = await getPrompt('prompt_stage2_extractor.txt');

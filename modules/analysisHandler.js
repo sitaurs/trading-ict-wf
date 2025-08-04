@@ -14,6 +14,7 @@ const { extractStage3Data } = require('./analysis/extractorStage3');
 const extractor = require('./analysis/extractor');
 const decisionHandlers = require('./analysis/decisionHandlers');
 const promptBuilders = require('./analysis/promptBuilders');
+const { getNextGeminiKey, getAllGeminiKeys } = require('./analysis/helpers');
 
 const log = getLogger('AnalysisHandler');
 
@@ -263,7 +264,10 @@ async function callGeminiProWithRetry(prompt, chartImages = []) {
  */
 async function callGeminiPro(prompt, chartImages = []) {
     const MODEL_NAME = 'gemini-2.5-pro';
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${process.env.GEMINI_API_KEY}`;
+    const geminiApiKey = getNextGeminiKey();
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${geminiApiKey}`;
+    
+    log.debug(`🤖 Menggunakan Gemini API Key: ${geminiApiKey.substring(0, 10)}...${geminiApiKey.substring(geminiApiKey.length - 4)}`);
     
     const contents = [{
         parts: [

@@ -109,6 +109,25 @@ Stage 2: Manipulation → Full Context + Stage 1 → Detect Judas Swing
 Stage 3: Entry → Full Context + Stage 1&2 → Confirm MSS/FVG
 ```
 
+### **🔄 Multiple API Keys Support**
+- **Automatic rotation** untuk menghindari rate limiting
+- **Round-robin distribution** dari API requests
+- **Fallback mechanism** jika satu key bermasalah
+- **Easy management** dengan utility scripts
+
+```bash
+# Add new API key
+node scripts/add_gemini_api_key.js "YOUR_NEW_API_KEY"
+
+# Check API status  
+node scripts/check_gemini_api_status.js
+
+# Test key rotation
+node scripts/check_gemini_api_status.js --test
+```
+
+> **📖 Complete Guide**: [Multiple Gemini API Keys Setup](docs/MULTIPLE_GEMINI_API_GUIDE.md)
+
 ## 📊 **Key Modules**
 
 ### **🧠 Analysis Handler**

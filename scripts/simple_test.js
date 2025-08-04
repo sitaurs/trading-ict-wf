@@ -1,10 +1,14 @@
 const axios = require('axios');
+require('dotenv').config();
 
 console.log('🧪 Testing Python MT5 API Connection...');
 
-axios.get('https://api.mt5.flx.web.id/health', {
+const baseURL = process.env.BROKER_API_BASE_URL || 'https://api.mt5.flx.web.id';
+const apiKey = process.env.BROKER_API_KEY || 'zamani-zamani-nandac-nandac';
+
+axios.get(`${baseURL}/health`, {
     headers: {
-        'X-API-Key': 'zamani-zamani-nandac-nandac'
+        'X-API-Key': apiKey
     }
 }).then(response => {
     console.log('✅ API is WORKING!');

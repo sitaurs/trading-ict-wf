@@ -16,6 +16,7 @@ const API_KEY_STATUS_PATH = path.join(__dirname, '..', '..', 'config', 'api_key_
 const NEWS_CACHE_PATH = path.join(CACHE_DIR, 'daily_news.json');
 
 let chartImgKeyIndex = loadLastKeyIndex();
+let geminiKeyIndex = loadLastGeminiKeyIndex();
 
 function loadLastKeyIndex() {
     try {
@@ -33,6 +34,22 @@ function loadLastKeyIndex() {
     return 0;
 }
 
+function loadLastGeminiKeyIndex() {
+    try {
+        if (fsSync.existsSync(API_KEY_STATUS_PATH)) {
+            const data = fsSync.readFileSync(API_KEY_STATUS_PATH, 'utf8');
+            const status = JSON.parse(data);
+            if (typeof status.geminiKeyIndex === 'number') {
+                log.info(`Melanjutkan dari Gemini API Key index: ${status.geminiKeyIndex}`);
+                return status.geminiKeyIndex;
+            }
+        }
+    } catch (error) {
+        log.error('Gagal memuat status Gemini API key, memulai dari 0.', error);
+    }
+    return 0;
+}
+
 function getAllChartImgKeys(){
     const keys=[];
     let idx=1;
@@ -44,17 +61,65 @@ function getAllChartImgKeys(){
     return keys;
 }
 
+function getAllGeminiKeys(){
+    const keys=[];
+    let idx=1;
+    while(process.env[`GEMINI_API_KEY_${idx}`]){
+        keys.push(process.env[`GEMINI_API_KEY_${idx}`]);
+        idx++;
+    }
+    
+    // Fallback ke GEMINI_API_KEY tunggal jika tidak ada GEMINI_API_KEY_1
+    if(keys.length===0 && process.env.GEMINI_API_KEY) {
+        log.info('🔄 Menggunakan GEMINI_API_KEY tunggal (fallback mode)');
+        keys.push(process.env.GEMINI_API_KEY);
+    }
+    
+    if(keys.length===0) throw new Error('Tidak ada GEMINI_API_KEY_X atau GEMINI_API_KEY di file .env!');
+    log.info(`📊 Total Gemini API Keys tersedia: ${keys.length}`);
+    return keys;
+}
+
 function getNextChartImgKey(){
     const keys = getAllChartImgKeys();
     log.debug(`Menggunakan Chart API Key index: ${chartImgKeyIndex}`);
     const key = keys[chartImgKeyIndex];
     chartImgKeyIndex = (chartImgKeyIndex + 1) % keys.length;
     try{
-        fsSync.writeFileSync(API_KEY_STATUS_PATH, JSON.stringify({chartImgKeyIndex}, null, 2), 'utf8');
+        const currentStatus = loadCurrentApiStatus();
+        currentStatus.chartImgKeyIndex = chartImgKeyIndex;
+        fsSync.writeFileSync(API_KEY_STATUS_PATH, JSON.stringify(currentStatus, null, 2), 'utf8');
     }catch(err){
         log.error('Gagal menyimpan status API key index.', err);
     }
     return key;
+}
+
+function getNextGeminiKey(){
+    const keys = getAllGeminiKeys();
+    log.debug(`🤖 Menggunakan Gemini API Key index: ${geminiKeyIndex} (dari ${keys.length} keys)`);
+    const key = keys[geminiKeyIndex];
+    geminiKeyIndex = (geminiKeyIndex + 1) % keys.length;
+    try{
+        const currentStatus = loadCurrentApiStatus();
+        currentStatus.geminiKeyIndex = geminiKeyIndex;
+        fsSync.writeFileSync(API_KEY_STATUS_PATH, JSON.stringify(currentStatus, null, 2), 'utf8');
+    }catch(err){
+        log.error('Gagal menyimpan status Gemini API key index.', err);
+    }
+    return key;
+}
+
+function loadCurrentApiStatus(){
+    try {
+        if (fsSync.existsSync(API_KEY_STATUS_PATH)) {
+            const data = fsSync.readFileSync(API_KEY_STATUS_PATH, 'utf8');
+            return JSON.parse(data);
+        }
+    } catch (error) {
+        log.error('Gagal memuat current API status:', error);
+    }
+    return { chartImgKeyIndex: 0, geminiKeyIndex: 0 };
 }
 
 async function getPrompt(name){
@@ -64,7 +129,8 @@ async function getPrompt(name){
 }
 
 async function fetchOhlcv(symbol, timeframe='m30', count=50){
-    const brokerUrl = `https://api.mt5.flx.web.id/ohlcv`;
+    const baseUrl = process.env.BROKER_API_BASE_URL || 'https://api.mt5.flx.web.id';
+    const brokerUrl = `${baseUrl}/ohlcv`;
     
     const requestParams = {
         symbol: symbol,
@@ -381,7 +447,8 @@ function getCurrentWIBDatetime(){
 
 async function fetchCurrentPrice(pair){
     try{
-        const url=`https://api.mt5.flx.web.id/data/tick/${pair}`;
+        const baseUrl = process.env.BROKER_API_BASE_URL || 'https://api.mt5.flx.web.id';
+        const url = `${baseUrl}/data/tick/${pair}`;
         const res=await axios.get(url);
         let tick=res.data;
         if(Array.isArray(tick)) tick=tick[0];
@@ -392,10 +459,11 @@ async function fetchCurrentPrice(pair){
         }
         throw new Error('No price data');
     }catch(e){
+        const baseUrl = process.env.BROKER_API_BASE_URL || 'https://api.mt5.flx.web.id';
         log.error(`Gagal fetch current price untuk ${pair}:`, { 
             error: e.message, 
             pair,
-            url: `https://api.mt5.flx.web.id/data/tick/${pair}`,
+            url: `${baseUrl}/data/tick/${pair}`,
             statusCode: e.response?.status,
             responseData: e.response?.data,
             stack: e.stack 
@@ -419,6 +487,8 @@ module.exports={
     fetchCurrentPrice,
     getNextChartImgKey,
     getAllChartImgKeys,
+    getNextGeminiKey,
+    getAllGeminiKeys,
     PENDING_DIR,
     POSITIONS_DIR,
     JOURNAL_DIR,
